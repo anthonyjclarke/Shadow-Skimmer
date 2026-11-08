@@ -8,10 +8,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Item                | State                                     |
 |:--------------------|:------------------------------------------|
-| Phase               | 3 – depth pass, G1 graphics engine        |
+| Phase               | 3 – depth pass, G2 screen layouts         |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
 | Baseline findings   | 52                                        |
-| Routines to the bar | 4 of 120 (`$B080`, `$B096`, `$B20A`, `$B38E`) |
+| Routines to the bar | 9 of 120 (`$B080–$B3AF`, `$B4D9–$B765`)  |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
 | Catalogs            | graphics, sound, data: not started        |
@@ -24,7 +24,8 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Target              | Lane | State                                |
 |:--------------------|:-----|:-------------------------------------|
-| Depth G1 `$B080–$B3AF` | code | fixes applied; re-review         |
+| Depth G2b `$B4D9–$B788` | code | spliced; review                 |
+| Depth G2a `$B3B0–$B4D8`, `$B789–$B811` | code | Worker deriving |
 
 ---
 
@@ -76,19 +77,19 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$FA00–$FFFF` | `@equ` names for workspace and IM 2 table     |
 | `$A020`       | Map and render the font; `$A150` is the "/"   |
 | `$B16F`       | Label the control panel patterns in `$A2B8`   |
-| `$B766`       | Code or data? No reader found                 |
 | `$BAA7`       | Code with no caller: unused?                  |
 | `$BC68`       | Draw-mode code templates: what copies them?   |
 | `$C2DA`       | Lone `$C9` after a RET: unused byte?          |
 | `$C4DB`       | Table address built from immediates           |
 | `$C186`       | `LD H,$BD` raw high byte of the launch cells  |
-| `$B5BD`       | `LD DE,($BD14)` reloads D from the draw attribute |
 | `$CB8E`       | Delay loop with no caller: unused?            |
 | `$CD9C`       | Retype the Skimmer image pointers as `W`      |
 | `$BA3B`       | Fold WALL DONE's end `$00` into `t $BA06`     |
 | `$BA45`       | Dead store to the text attribute              |
 | `$6200`       | Document the graphic directory record (also `$A818`, needs a split) |
 | `$B20A`       | Split plot_graphic, plot_unmasked, cast_shadow, draw_shadow into entries |
+| `$D800`       | Split the layout tables and lists; record `#TABLE` |
+| `$9520`       | Title and render the defence device designs   |
 | `$B26D`       | Mask and pattern table addresses built from immediates (`@ssub`) |
 
 ### Game behaviour
@@ -96,11 +97,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | Address       | Open question                                 |
 |:--------------|:----------------------------------------------|
 | whole image   | Sectors 2–3 and game end coverage (FuseX)     |
-| `$B51C`       | WALL DONE screen: inner screen 5, `$BD3D`     |
 | `$BA06`       | Title and label of WALL DONE                  |
-| `$BD18`       | Run flag and low bits: animation speed?       |
-| `$BD19`       | Real maximum layout row                       |
-| `$B681`       | More than 4 launch graphics overwrite the pointer? |
 | `$BD40`       | Is the device the only hostile object inside? |
 | `$C946`       | Limit test counts two objects per call: bug?  |
 | `$D2CB`       | Countdown forcing directions: which events?   |
@@ -124,10 +121,8 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$CC32`       | What the NOP / DEC C patch changes            |
 | `$CD3A`       | Is AND `$0B` a cover test?                    |
 | `$FF70`       | What the flip check searches                  |
-| `$B04F`       | What does `$B507` draw with the INC DE patch? |
 | `$B889`       | Shield count at column 5; leaflet says right  |
 | `$B850`       | Rows 0–3 cleared; panel is rows 0–5           |
-| `$B640`       | List every special layout graphic             |
 | `$CCB0`       | Which map does `CP H` test?                   |
 | `$CBC6`       | `DEC C` vs `DEC A`: first shield-loss frame never drawn? |
 | `$CD36`       | Fold the out-of-line tail into `$CD3A`?       |
@@ -138,13 +133,11 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$D2CE`       | Are the clicks the pulse laser shot's sound?  |
 | `$CD86`       | Meaning of attribute mirror mark `$04`        |
 | `$CCD3`       | Meaning of the mark the flipped Skimmer ignores |
-| `$EA00`       | Inner-section map index                       |
 | `$F30A`       | Is it the title tune's data?                  |
 | `$B3B0`       | Does the bar run from the previous graphic?   |
 | `$B432`       | Is `$99A0` the hatchway graphic's buffer?     |
 | `$B449`       | Do cover patterns depend on the screen number? |
 | `$B4A7`       | Does it draw the first frame?                 |
-| `$B4D9`       | Which table is the inner-section map?         |
 | `$B7B7`       | Which mirror marks block a shadow?            |
 | `$B427`       | The 11 fields of the animation template       |
 | `$BC1F`       | Schema of the three control-key sets          |
@@ -154,12 +147,13 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$C819`       | What do the blocking marks mean?              |
 | `$C880`       | Does it fire across its line of travel?       |
 | `$C957`       | What do the per-move flags mean?              |
-| `$C926`       | Can a screen hold a third animated graphic?   |
-| `$D800`       | Layout format; count graphic `$2B` per screen |
-| `$B789`       | Is the colour rectangle reachable?            |
-| `$B5F0`       | Stores alternate BC after cast_shadow: bug?   |
 | `$B4A3`       | Colour pass reuses the hatchway's cell?       |
 | `$B812`       | Can the control panel shadow row 6?           |
+| `$C18B`       | Does steering override the start direction at once? |
+| `$B5F6`       | Column-0 vertical runs shade twice: visible?  |
+| `$E141`       | Screen 55's last record runs into the next layout |
+| `$B4FB`       | Does anything call `$B04F` while `$B058` is a NOP? |
+| `$C955`       | Counter value `$17` for the defence device    |
 | `$B363`       | Shadow edge tests use the layout cell, not the drawn one |
 | `$B37B`       | Full top shadow cell on row 6: why?           |
 | `$B0CC`       | Marks 1, 2, `$22` for hostile objects and shots |
@@ -210,3 +204,16 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B096`  | Bug, latent: columns ≥ 32 all map to column 32      |
 | `$B27D`  | Yes: unmasked mask bytes come from mirror rows 0–5  |
 | `$B11B`  | Mask 7's 20 bytes are equal, so both shapes work    |
+| `$B5BD`  | Reloads `draw_attr` into D; E is unused            |
+| `$B766`  | No reader: an uncalled routine and four patterns   |
+| `$B51C`  | Inner screen 5 ends the game; WALL DONE for ~9 s   |
+| `$BD19`  | The lowest layout row is 23                        |
+| `$BD18`  | Flags 3 or 7; bit 2 starts a run; timer limit 5    |
+| `$B681`  | Yes; no layout has more than 3 launch graphics     |
+| `$B04F`  | A NOP patch draws the 16×16 device on the panel    |
+| `$B640`  | Each special graphic has its own test at `$B640`   |
+| `$EA00`  | Indexed by the same screen number as `$D800`       |
+| `$C926`  | No: at most one animated graphic per screen        |
+| `$D800`  | 3-byte records, `$FF` ends; runs reach the next cell |
+| `$B789`  | Unreachable: `$FF` ends the list first             |
+| `$B5F0`  | Bug, latent: no outer-hull run ends on a join graphic |

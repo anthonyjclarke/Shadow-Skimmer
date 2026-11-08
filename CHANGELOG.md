@@ -5,6 +5,8 @@
 ### Added
 
 - Graphics engine documented in depth (`$B080–$B3AF`): cell addresses, the graphic directory fields, cell masks, colour patterns, the pixel, colour, mark and shadow passes, with every basic block commented.
+- Screen layout interpreter documented in depth (`$B4D9–$B788`): the layout record format, runs, special graphics, launch cells, the WALL DONE screen and the defence device set-up.
+- Documented two more defects in the game: launch cells store their direction where the reader takes another bit, and a run records the last graphic's size, not its own cell, as the previous graphic's cell.
 - Documented a latent defect in the game: `$B096` maps every column past the right edge to column 32.
 
 ## [0.2.0] 08-11-2026

@@ -333,22 +333,200 @@ c $B4A7 Draw an animated graphic
 D $B4A7 Adds an animated graphic to the #R$C909(animation list) and draws its first frame?
 @ $B4D9 label=draw_screen
 c $B4D9 Draw the current screen
-D $B4D9 Shows the sector's defence device on the control panel, then draws the screen's layout from the outer-hull map or the inner-section map?
+D $B4D9 Draws a screen's layout, and shows the current sector's defence device on the control panel. Inside the hull, the WALL DONE screen draws no layout and ends the game.
+R $B4D9 I:A number of the screen
+  $B4D9 Keep the screen number.
+  $B4DA Find the device's place on the control panel, half a cell below the top of its cell.
+  $B4E4 Find the sector's design from the start of the designs at #R$9520, 48 bytes per sector.
+  $B4F3 Never runs: no sector's design lies a page or more in.
+@ $B4F4 label=panel_device_addr
+  $B4F4 Point at the design.
+  $B4FB Draw a single band, and patch the #R$B058(hull pattern's step) to do nothing.
 @ $B501 ssub=LD ($B058),A
+  $B504 Each pixel row of the design takes three bytes. Copy the first two of each onto the panel, and skip the third.
+  $B50A Let the hull pattern repeat down the screen again.
+  $B50E Is the Skimmer on the outer hull? Start from the outer hull's layouts.
+  $B516 Jump if so
+  $B518 Take the inner sections' layouts instead.
+  $B51B Is it the WALL DONE screen?
+  $B51E Jump if not
+  $B520 End the game, and show the WALL DONE message.
+  $B52A Count the pauses.
+@ $B52C label=wall_done_pause
+  $B52C,5 Hold the message for a little over 9 seconds at the 3.5 MHz clock, longer by the time the interrupt routine takes.
+@ $B532 label=outer_layout
+  $B532 Recover the screen number.
+@ $B533 label=find_layout
+  $B533 Fetch the address of the screen's layout from the map, one word per screen number.
+  $B541 Start the launch cells afresh, and point at the first record.
+@ $B548 label=read_layout_record
+N $B548 Each record of a layout holds one graphic at one cell, in three bytes. A record that starts a run takes the cell of the record after it as the run's end.
+  $B548 Fetch the graphic number. Is it the end of the layout?
+  $B54C Return if so
+  $B54D Keep the graphic number, and start from white ink on black.
+  $B554 The low five bits of the second byte give the column.
+  $B55A Do its top three bits give an ink?
+  $B55D Jump if not: the graphic stays dull, so it marks no cell and casts no shadow
+  $B55F Make the attribute bright, with that ink on black paper.
+  $B568 Let the graphic cast its own shadow.
+@ $B56D label=read_layout_row
+  $B56D The top three bits of the third byte are the record's flags.
+  $B577 Its low five bits give the row, counted down from the top row of the play area.
+  $B580 Keep the address of the next record.
+  $B582 Does the record start a run?
+  $B587 Jump if so
+@ $B589 label=draw_single
+  $B589 Draw the graphic once.
+@ $B591 label=layout_record_done
+  $B591 Record the graphic and its cell for the next record, and move on to it.
+@ $B59E label=start_layout_run
+N $B59E A run repeats its graphic toward the end cell, one graphic width or height apart. It stops short of the end, where the next record draws its own graphic.
+  $B59E Fetch the end column from the next record. While a column other than 0 sits in #R$BD34(the shadow switch), the graphics of the run cast no shadows of their own.
+  $B5A9 Does the run end in its own column?
+  $B5AA Jump if so: the run goes down
+  $B5AC Find the run's length in cells.
+  $B5AD If the end lies to the left, draw the graphic once
+  $B5AF Keep the length twice, as the distance left and as the width of the shadow, and keep the start cell.
+@ $B5B6 label=draw_run_across
+  $B5B6 Draw the graphic, and recover its attribute, which the draw keeps at #R$BD15(the draw attribute).
+  $B5C2 Take the graphic's width off the distance left. Is the end reached?
+  $B5CC Jump if so
+  $B5CE Jump if the run overshoots the end
+  $B5D0 Step right by the graphic's width, and draw the next one.
+@ $B5D5 label=run_across_done
+  $B5D5 Recover the start cell. Is it the one graphic whose runs across cast no shadow?
+  $B5DB Jump if so
+  $B5DD Find the attribute address of the cell below the run's bottom-left cell. The shadow's block is the graphic's height tall and the run's length wide.
+@ $B5EC label=shadow_layout_run
+N $B5EC BUG: the jump back records the registers the shadow leaves as the previous graphic's cell, not the run's cell. They hold the last graphic's size. So a bar joined to the end of the run starts from the wrong cell.
+  $B5EC Cast the run's shadow from the attribute mirror, then move on to the next record.
+@ $B5F6 label=start_run_down
+N $B5F6 A run down keeps its own column in #R$BD34(the shadow switch). In column 0 that lets each of its graphics cast a shadow of its own as well as the run's.
+  $B5F6 Fetch the end row from the next record, and find the run's length in rows.
+  $B5FD If the end lies above, draw the graphic once
+  $B5FF Keep the length twice, as the rows left and as the height of the shadow, and keep the start cell.
+@ $B606 label=draw_run_down
+  $B606 Draw the graphic, and recover its attribute, which the draw keeps at #R$BD15(the draw attribute).
+  $B612 Take the graphic's height off the rows left. Is the end reached?
+  $B61C Jump if so
+  $B61E Jump if the run overshoots the end
+  $B620 Step down by the graphic's height, and draw the next one.
+@ $B625 label=run_down_done
+  $B625 Recover the start cell. Is it the one graphic whose runs down cast no shadow?
+  $B62B Jump if so
+  $B62E Find the attribute address of the cell below the run's bottom-left cell. The shadow's block is the run's length tall and the graphic's width wide.
 @ $B640 label=draw_layout_graphic
 c $B640 Draw one graphic of a screen's layout
-D $B640 Draws one graphic of the layout at a cell. Some graphics also place the hatchway, an animation, a shadow or the defence device?
+D $B640 Draws one graphic of a screen's layout at its cell. Some graphics do a task of their own as well as the draw, or in its place.
+R $B640 I:A graphic number
+R $B640 I:B character row of the graphic's top-left cell
+R $B640 I:C column of the graphic's top-left cell
+R $B640 I:D attribute of the graphic
+  $B640 Is the Skimmer inside the hull?
+  $B645 Jump if so
+  $B648 Is it a hatchway?
+  $B64A Jump if so
+  $B64D Is it a graphic joined to the one before by a vertical bar?
+  $B64F Jump if so
+  $B652 Is it a graphic joined to the one before by a horizontal bar?
+  $B654 Jump if so
+  $B657 Is it the animated graphic?
+  $B659 Jump if so
+  $B65C Is it below the launch graphics?
+  $B65E Jump if so
+  $B660 Is it above them?
+  $B662 Jump if so
+  $B664 A launch graphic records a launch cell for hostile objects, one cell down and right of its top-left cell.
+  $B66B Number the launch graphics from 0. Is it the one given the start direction left?
+  $B66F Jump if so
+  $B671 Is it the one given the start direction down?
+  $B673 Jump if not
+  $B675 Give it the start direction down.
+@ $B67A label=launch_dir_add
+  $B67A Give the first the start direction right, and the second up.
+@ $B67C label=store_launch_cell
+N $B67C BUG: the direction goes into the column byte one bit higher than #R$C0B4(the move of the hostile objects) reads it. So an object from a launch cell starts up or left.
+  $B67C Put the start direction in the top two bits of the column byte.
+  $B681 Store the launch cell and count it. The launch cells have room for four, and a fifth would land on the address of the next free cell.
+@ $B68E label=test_shaded_graphic
+  $B68E Is it the graphic that shades the cell one down and right of its top-left cell?
+  $B690 Jump if not
+  $B692 Draw it, then shade that cell as a lone shadow cell.
+@ $B69D label=test_double_shadow
+  $B69D Is it the graphic that casts a second shadow?
+  $B69F Jump if not
+  $B6A1 Draw it. In the other register set, fetch its size, and step one cell down and right from the cell below its bottom-left cell.
+  $B6AF Cross into the next page of the attribute mirror.
+@ $B6B0 label=cast_far_shadow
+  $B6B0 Cast the second shadow there, one cell further from the graphic than its own shadow.
+  $B6B4 Never runs: the cast returns straight to the caller of this routine.
+@ $B6B5 label=test_shadow_cell
+  $B6B5 Is it a lone shadow cell?
+  $B6B7 Jump if not
+  $B6B9,14 Shade the cell in full. It draws no graphic.
+@ $B6C8 label=test_gate_graphic
+  $B6C8 Is it the graphic of a coloured rectangle?
+  $B6CA Jump if so, which never happens: that graphic number ends a layout first
+  $B6CD Is it the graphic that stands while the sector's defence device stands?
+  $B6CF If not, draw the graphic as it is
+  $B6D2 Is the device destroyed?
+  $B6D7 Return if so, and leave the graphic out
+  $B6D8 Draw the graphic.
 @ $B6DD label=draw_inner_graphic
+N $B6DD The Skimmer is inside the hull.
+  $B6DD Is it a hatchway?
+  $B6DF Jump if so
+  $B6E1 Is it the defence device?
+  $B6E3 If not, draw the graphic as it is
+  $B6E6 Is the device destroyed?
+  $B6EC Return if so
+  $B6ED Keep the cell, and point at the device's slot.
+@ $B6F4 label=clear_device_slot
+  $B6F4 Clear the slot.
+  $B6F8,10 Set up the device at the cell. Copy its record into the slot, and draw it (#R$C204).
+@ $B703 label=record_inner_hatch
+  $B703 Record the hatchway's cell, and draw it.
 @ $B70B label=set_hostile_cell
 c $B70B Set the current hostile object's cell
+D $B70B Places the current hostile object at a cell, with the cell's screen address and attribute mirror address.
+R $B70B I:B character row of the object's top-left cell, 0–23
+R $B70B I:C column of the object's top-left cell, 0–31
+  $B70B Record the cell, and find its screen address.
+  $B715,8 Turn its attribute address into its attribute mirror address, and record that.
 @ $B71E label=init_defence_device
 c $B71E Set up the defence device
-D $B71E Places the current sector's defence device at a cell, with its graphic from the sector's entry at #R$9520.
+D $B71E Makes the current hostile object the current sector's defence device, at a cell. Its design comes from the sector's entry at #R$9520.
+R $B71E I:B character row of the device's top-left cell
+R $B71E I:C column of the device's top-left cell
+  $B71E Place it at the cell. Its marks and its background store sit in the device's own slot.
+  $B72D Mark it as the defence device, with the same value in its counter.
+  $B735 Find the sector's design from the start of the designs, 48 bytes per sector.
+  $B745 Never runs: no sector's design lies a page or more in.
+@ $B746 label=device_design_addr
+  $B746 The device draws its design as it is, with no shifted images.
+  $B74D Start it at the left edge of its column, and make the step at #R$CC32 in the Skimmer's draw, which hostile objects share, do nothing.
 @ $B751 ssub=LD ($CC32),A
+  $B754,5 Choose the mark it toggles in the attribute mirror (#R$C80D).
 @ $B756 ssub=LD ($C80D+1),A
 @ $B75A label=find_device_flag
 c $B75A Find the current sector's defence device flag
-b $B766
+D $B75A Gives the address of the current sector's defence device flag.
+R $B75A O:HL address of the flag
+  $B75A Index the three flags by the sector.
+  $B763 Return with the address.
+  $B764,1 Never runs: the flags lie within one page.
+u $B766 Unused bytes
+@ $B769 label=unused_pattern_1
+b $B769 Unused cell patterns
+D $B769 Four 8×8 pixel patterns that nothing in the game draws.
+N $B769 #UDGTABLE { #UDG$B769(unused_pattern_1) | #UDG$B771(unused_pattern_2) | #UDG$B779(unused_pattern_3) | #UDG$B781(unused_pattern_4) } TABLE#
+B $B769,8
+@ $B771 label=unused_pattern_2
+B $B771,8
+@ $B779 label=unused_pattern_3
+B $B779,8
+@ $B781 label=unused_pattern_4
+B $B781,8
 @ $B789 label=colour_rectangle
 c $B789 Colour a rectangle of the screen
 D $B789 Gives bright white paper and black ink to the cells between the cell at #R$BD1D and this one?
@@ -492,7 +670,7 @@ B $BD16,1 Width in cells of the current graphic
 @ $BD17 label=layout_column
 B $BD17,1 Column of the current layout graphic, 0–31
 @ $BD18 label=layout_flags
-B $BD18,1 Flags of the current layout entry, 0–7, with 4–7 for a run of one graphic to an end cell?
+B $BD18,1 Flags of the current layout record, 0–7, with 4–7 for a run to the next record's cell
 @ $BD19 label=layout_row
 B $BD19,1 Character row of the current layout graphic, counted from the top of the screen
 @ $BD1A label=graphic_width

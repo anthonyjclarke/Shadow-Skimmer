@@ -127,12 +127,6 @@ message = "11 bytes with no sub-directives. Fix it in this order: render it; sta
 [[finding]]
 check = "data-structure"
 kind = "UNTYPED"
-at = "$B766"
-message = "35 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
-
-[[finding]]
-check = "data-structure"
-kind = "UNTYPED"
 at = "$BC1F"
 message = "24 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
 
@@ -273,12 +267,6 @@ check = "identity"
 kind = "UNTITLED_ENTRY"
 at = "$6200"
 message = "`b $6200` has no title and publishes as a page headed \"Data at 6200\". There is no record to fold it into — the entry above it is c $61FD — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$B766"
-message = "`b $B766` has no title and publishes as a page headed \"Data at B766\". There is no record to fold it into — the entry above it is c $B75A — so it is an entry in its own right: write the title"
 
 [[finding]]
 check = "identity"
