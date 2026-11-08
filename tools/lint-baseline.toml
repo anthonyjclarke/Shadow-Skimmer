@@ -66,12 +66,6 @@ message = "341 bytes with no sub-directive - the record size is stated in prose 
 
 [[finding]]
 check = "comments"
-kind = "CODE_LIST"
-at = "shadskim.skool:$41,-$42,-$43"
-message = "XORs the 769 bytes from #R$F009 with $41, $42, $43... (the key wraps at $FF)."
-
-[[finding]]
-check = "comments"
 kind = "STE_LENGTH"
 at = "shadskim.skool:these-bytes-are-code-xor-encrypted-in-…"
 message = "These bytes are code XOR-encrypted in place: #R$F45F decrypts them (key $41"
@@ -147,24 +141,6 @@ check = "data-structure"
 kind = "UNTYPED"
 at = "$CB8E"
 message = "26 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
-
-[[finding]]
-check = "data-structure"
-kind = "UNTYPED"
-at = "$CD9C"
-message = "76 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
-
-[[finding]]
-check = "data-structure"
-kind = "UNTYPED"
-at = "$CE86"
-message = "11 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
-
-[[finding]]
-check = "data-structure"
-kind = "UNTYPED"
-at = "$D2A6"
-message = "48 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
 
 [[finding]]
 check = "data-structure"
@@ -283,36 +259,6 @@ message = "`s $BA3B` has no title and publishes as a page headed \"Unused RAM at
 [[finding]]
 check = "identity"
 kind = "UNTITLED"
-at = "$CBA8"
-message = "`c $CBA8` has no title and publishes as a page headed \"Routine at CBA8\". Either it is one field split out of the record above it (b $CB8E), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED"
-at = "$CDE8"
-message = "`c $CDE8` has no title and publishes as a page headed \"Routine at CDE8\". Either it is one field split out of the record above it (b $CD9C), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED"
-at = "$CE91"
-message = "`c $CE91` has no title and publishes as a page headed \"Routine at CE91\". Either it is one field split out of the record above it (b $CE86), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED"
-at = "$D2D6"
-message = "`c $D2D6` has no title and publishes as a page headed \"Routine at D2D6\". Either it is one field split out of the record above it (b $D2A6), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED"
-at = "$F000"
-message = "`c $F000` has no title and publishes as a page headed \"Routine at F000\". Either it is one field split out of the record above it (b $D473), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED"
 at = "$F30A"
 message = "`b $F30A` has no title and publishes as a page headed \"Data at F30A\". Either it is one field split out of the record above it (b $F009 Encrypted routine), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
 
@@ -361,194 +307,14 @@ message = "`b $CB8E` has no title and publishes as a page headed \"Data at CB8E\
 [[finding]]
 check = "identity"
 kind = "UNTITLED_ENTRY"
-at = "$CC42"
-message = "`c $CC42` has no title and publishes as a page headed \"Routine at CC42\". There is no record to fold it into — the entry above it is c $CBA8 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CC73"
-message = "`c $CC73` has no title and publishes as a page headed \"Routine at CC73\". There is no record to fold it into — the entry above it is c $CC42 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CC9B"
-message = "`c $CC9B` has no title and publishes as a page headed \"Routine at CC9B\". There is no record to fold it into — the entry above it is c $CC73 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CCB0"
-message = "`c $CCB0` has no title and publishes as a page headed \"Routine at CCB0\". There is no record to fold it into — the entry above it is c $CC9B — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CCD3"
-message = "`c $CCD3` has no title and publishes as a page headed \"Routine at CCD3\". There is no record to fold it into — the entry above it is c $CCB0 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CD18"
-message = "`c $CD18` has no title and publishes as a page headed \"Routine at CD18\". There is no record to fold it into — the entry above it is c $CCD3 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CD36"
-message = "`c $CD36` has no title and publishes as a page headed \"Routine at CD36\". There is no record to fold it into — the entry above it is c $CD18 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CD3A"
-message = "`c $CD3A` has no title and publishes as a page headed \"Routine at CD3A\". There is no record to fold it into — the entry above it is c $CD36 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CD6E"
-message = "`c $CD6E` has no title and publishes as a page headed \"Routine at CD6E\". There is no record to fold it into — the entry above it is c $CD3A — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CD86"
-message = "`c $CD86` has no title and publishes as a page headed \"Routine at CD86\". There is no record to fold it into — the entry above it is c $CD6E — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CD9C"
-message = "`b $CD9C` has no title and publishes as a page headed \"Data at CD9C\". There is no record to fold it into — the entry above it is c $CD86 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CE07"
-message = "`c $CE07` has no title and publishes as a page headed \"Routine at CE07\". There is no record to fold it into — the entry above it is c $CDE8 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CE30"
-message = "`c $CE30` has no title and publishes as a page headed \"Routine at CE30\". There is no record to fold it into — the entry above it is c $CE07 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CE4B"
-message = "`c $CE4B` has no title and publishes as a page headed \"Routine at CE4B\". There is no record to fold it into — the entry above it is c $CE30 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CE61"
-message = "`c $CE61` has no title and publishes as a page headed \"Routine at CE61\". There is no record to fold it into — the entry above it is c $CE4B — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$CE86"
-message = "`b $CE86` has no title and publishes as a page headed \"Data at CE86\". There is no record to fold it into — the entry above it is c $CE61 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$D219"
-message = "`c $D219` has no title and publishes as a page headed \"Routine at D219\". There is no record to fold it into — the entry above it is c $CE91 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$D24A"
-message = "`c $D24A` has no title and publishes as a page headed \"Routine at D24A\". There is no record to fold it into — the entry above it is c $D219 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$D292"
-message = "`c $D292` has no title and publishes as a page headed \"Routine at D292\". There is no record to fold it into — the entry above it is c $D24A — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$D29D"
-message = "`c $D29D` has no title and publishes as a page headed \"Routine at D29D\". There is no record to fold it into — the entry above it is c $D292 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$D2A6"
-message = "`b $D2A6` has no title and publishes as a page headed \"Data at D2A6\". There is no record to fold it into — the entry above it is c $D29D — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$D2E6"
-message = "`c $D2E6` has no title and publishes as a page headed \"Routine at D2E6\". There is no record to fold it into — the entry above it is c $D2D6 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$D2FD"
-message = "`c $D2FD` has no title and publishes as a page headed \"Routine at D2FD\". There is no record to fold it into — the entry above it is c $D2E6 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$D31E"
-message = "`c $D31E` has no title and publishes as a page headed \"Routine at D31E\". There is no record to fold it into — the entry above it is c $D2FD — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$D343"
-message = "`c $D343` has no title and publishes as a page headed \"Routine at D343\". There is no record to fold it into — the entry above it is c $D31E — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$D3F7"
-message = "`c $D3F7` has no title and publishes as a page headed \"Routine at D3F7\". There is no record to fold it into — the entry above it is c $D343 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$D401"
-message = "`c $D401` has no title and publishes as a page headed \"Routine at D401\". There is no record to fold it into — the entry above it is c $D3F7 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$D41A"
-message = "`c $D41A` has no title and publishes as a page headed \"Routine at D41A\". There is no record to fold it into — the entry above it is c $D401 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
 at = "$D473"
 message = "`b $D473` has no title and publishes as a page headed \"Data at D473\". There is no record to fold it into — the entry above it is c $D41A — so it is an entry in its own right: write the title"
 
 [[finding]]
 check = "identity"
 kind = "UNTITLED_ENTRY"
-at = "$F006"
-message = "`c $F006` has no title and publishes as a page headed \"Routine at F006\". There is no record to fold it into — the entry above it is c $F000 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
 at = "$F473"
 message = "`b $F473` has no title and publishes as a page headed \"Data at F473\". There is no record to fold it into — the entry above it is c $F45F — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "publication"
-kind = "MUTABLE"
-at = "$D2A6"
-message = "`b $D2A6 ` publishes 48 bytes as data the program was loaded with, and the code stores to 35 of them: $D2AF (*) from $CE29, $D2B0 (*) from $C9C6, $D2B1 (*) from $C9C6. Bytes the program writes as it runs are `g`, the page SkoolKit heads \"Game status buffer entry at\" — the type is what tells a reader whether a value survives a replay, and an agent-trainer which addresses are state. Retype the entry `g`, or - if the rest of it really is a static table with a runtime slot glued to its tail - split the written bytes into a `g` entry of their own"
 
 [[finding]]
 check = "publication"

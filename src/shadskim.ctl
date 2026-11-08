@@ -379,6 +379,8 @@ B $BD43,1 1 to draw the hull pattern as one band of 16 pixel rows, 0 to repeat i
 @ $BD44 label=handle_fire
 c $BD44 Handle the fire key
 D $BD44 With fire and one direction held and no pulse laser shot in flight, it fires that way if the Skimmer lines up on that axis? When it fires nothing, over a hatchway? it starts the hatchway animation, and every call ends with a move of the shots.
+@ $BD96 ssub=LD A,($D2B0+1)
+@ $BDB5 ssub=LD A,($D2B0+1)
 @ $BE11 label=fire_laser_shot
 c $BE11 Fire a pulse laser shot
 D $BE11 Launches the pulse laser shot from the cell beside the Skimmer in the chosen direction, unless that cell stops it.
@@ -422,7 +424,7 @@ D $C0AC The address of each hostile object's image buffer, which holds its shift
 W $C0AC,8,2
 @ $C0B4 label=move_hostile_objects
 c $C0B4 Move the hostile objects
-D $C0B4 Moves two of the four hostile objects each frame and the other two on the frame after.
+D $C0B4 Moves two of the four hostile objects on each call and the other two on the call after.
 D $C0B4 It brings a new hostile object in while fewer are out than the limit at #R$BD33?
 @ $C0B5 ssub=LD ($CC32),A
 @ $C0D6 ssub=LD ($C80D+1),A
@@ -716,6 +718,7 @@ D $CA4E Flags that the Skimmer leaves the screen across its top edge.
 @ $CA54 label=move_skimmer_up
 c $CA54 Move the Skimmer up
 D $CA54 Moves the Skimmer up by its vertical step. A blocked move turns it back, and the top of the play area flags an exit.
+@ $CA59 ssub=LD A,($D2B0+1)
 @ $CA7D label=turn_skimmer_y
 @ $CA86 label=move_up_row_clear
 @ $CA8E label=move_up_px
@@ -728,8 +731,10 @@ D $CA54 Moves the Skimmer up by its vertical step. A blocked move turns it back,
 c $CAEA Flag an exit to the screen below
 D $CAEA Flags that the Skimmer leaves the screen across its bottom edge.
 @ $CAF0 label=move_skimmer_down
+@ $CAF0 ssub=LD A,($D2B0+1)
 c $CAF0 Move the Skimmer down
 D $CAF0 Moves the Skimmer down by its vertical step. A blocked move turns it back, and the bottom of the play area flags an exit.
+@ $CB0C ssub=LD A,($D2B0+1)
 @ $CB11 label=move_down_px
 @ $CB27 label=move_down_source
 @ $CB45 label=move_down_big_step
@@ -738,124 +743,250 @@ D $CAF0 Moves the Skimmer down by its vertical step. A blocked move turns it bac
 @ $CB6A label=move_down_draw_at
 @ $CB85 label=move_down_store
 b $CB8E
-c $CBA8
+@ $CBA8 label=draw_skimmer
+c $CBA8 Draw the Skimmer
+D $CBA8 Draws the Skimmer through its mask over its saved background, and leaves undrawn the cells its #R$CD3A(cover map) marks.
 @ $CBAA ssub=LD ($CC32),A
-@ $CC0A label=*
-@ $CC32 label=*
-c $CC42
-c $CC73
-c $CC9B
-c $CCB0
-c $CCD3
-c $CD18
-c $CD36
-c $CD3A
-c $CD6E
-c $CD86
-b $CD9C
-@ $CDAC label=*
-@ $CDBC label=*
-@ $CDC8 label=*
-B $CDC8
-c $CDE8
-c $CE07
-@ $CE26 label=*
-c $CE30
-c $CE4B
-c $CE61
-b $CE86
-c $CE91
+@ $CBBB label=skimmer_draw_seq
+@ $CBCA label=skimmer_draw_shift
+@ $CBD1 label=skimmer_draw_frame
+@ $CBF3 label=skimmer_draw_row
+@ $CBF6 label=skimmer_draw_byte
+@ $CC03 label=skimmer_draw_next
+@ $CC0A label=skimmer_draw_sound
+@ $CC17 label=skimmer_draw_down
+@ $CC2A label=skimmer_draw_rows_left
+@ $CC2E label=skimmer_draw_rewind
+@ $CC32 label=skimmer_draw_map_back
+@ $CC38 label=skimmer_draw_covered
+@ $CC42 label=save_skimmer_bg
+c $CC42 Save the background behind the Skimmer
+D $CC42 Copies the screen under the Skimmer into its background store.
+@ $CC4A label=skimmer_bg_col
+@ $CC57 label=save_bg_column
+@ $CC5A label=bg_save_row
+@ $CC73 label=restore_bg_column
+c $CC73 Put back one column of the Skimmer's background
+D $CC73 Copies one column of the Skimmer's background store back to the screen, and leaves out the cells its cover map marks.
+@ $CC77 label=bg_restore_row
+@ $CC7F label=bg_restore_next
+@ $CC9B label=save_screen_block
+c $CC9B Save a block of the screen
+D $CC9B Copies a block of the screen, as many pixel rows deep as the count at #R$D2C4, into a store.
+@ $CCA1 label=block_save_row
+@ $CCA4 label=block_save_byte
+@ $CCB0 label=restore_screen_block
+c $CCB0 Put back a block of the screen
+D $CCB0 Copies a stored block, as many pixel rows deep as the count at #R$D2C4, back onto the screen. It leaves out the columns a cover map marks?
+@ $CCB6 label=block_restore_row
+@ $CCB9 label=block_restore_byte
+@ $CCC2 label=block_restore_next
+@ $CCD3 label=check_skimmer_column
+c $CCD3 Check the cells beside the Skimmer
+D $CCD3 Checks a column of cells beside the Skimmer for anything that blocks it. The flipped Skimmer ignores one more attribute mirror mark, so cells with only that mark do not block it.
+R $CCD3 O:F carry set if the way is clear
+@ $CCDE label=check_skimmer_col_len
+@ $CCE0 ssub=LD A,($D2B0+1)
+@ $CCE8 label=check_skimmer_col_go
+@ $CCEB label=check_skimmer_col_cell
+@ $CCF4 label=skimmer_blocked
+@ $CD06 label=skimmer_blocked_mark
+@ $CD16 label=skimmer_blocked_done
+@ $CD18 label=check_skimmer_row
+c $CD18 Check the cells above or below the Skimmer
+D $CD18 Checks a row of cells above or below the Skimmer for anything that blocks it.
+R $CD18 O:F carry set if the way is clear
+@ $CD23 label=check_skimmer_row_len
+@ $CD2D label=check_skimmer_row_cell
+@ $CD36 label=mark_cell_covered
+c $CD36 Mark a cell in the Skimmer's cover map
+@ $CD3A label=map_skimmer_cover
+c $CD3A Build the Skimmer's cover map
+D $CD3A Marks each cell under the Skimmer that the attribute mirror marks, and the fourth column when the Skimmer sits on a cell edge?
+@ $CD49 label=cover_map_row
+@ $CD4F label=cover_map_cell
+@ $CD5D label=cover_map_store
+@ $CD6E label=get_skimmer_span
+c $CD6E Find the cells under the Skimmer
+D $CD6E Gives the Skimmer's top-left cell in the attribute mirror and how many rows and columns of cells lie under it. Each count is four, or three where the Skimmer sits exactly on a cell edge.
+@ $CD7C label=get_skimmer_span_rows
+@ $CD7C ssub=LD A,($D2B0+1)
+@ $CD86 label=toggle_skimmer_flag
+c $CD86 Toggle the Skimmer's flag in the attribute mirror
+D $CD86 Flips a flag bit in each attribute mirror cell under the Skimmer?
+@ $CD89 label=toggle_cells_flag
+@ $CD8C label=toggle_cells_flag_row
+@ $CD8F label=toggle_cells_flag_cell
+@ $CD9C label=skimmer_images
+b $CD9C Skimmer images, normal and flipped
+D $CD9C Each entry is two words: the address of an image, then the address of its mask. The first four are the Skimmer's images at each pixel offset.
+B $CD9C,16,4
+@ $CDAC label=skimmer_flipped_images
+N $CDAC The flipped Skimmer at each pixel offset
+B $CDAC,16,4
+@ $CDBC label=skimmer_flip_frames
+b $CDBC Skimmer flip frames
+D $CDBC The three frames of the flip, each laid out as an entry of the #R$CD9C(Skimmer images).
+B $CDBC,12,4
+@ $CDC8 label=shield_loss_frames
+b $CDC8 Skimmer frames for a shield loss
+D $CDC8 Eight frames, each laid out as an entry of the #R$CD9C(Skimmer images). The stage of a shield loss at #R$D2D4 picks the frame.
+B $CDC8,32,4
+@ $CDE8 label=init_interrupts
+c $CDE8 Set up the interrupt routine
+D $CDE8 Fills the interrupt vector table so that every interrupt jumps to the #R$CE26(flag routine), and switches to vectored interrupts.
+@ $CDEF label=init_interrupts_fill
+@ $CE07 label=readouts_interrupt
+c $CE07 Interrupt routine that updates the readouts
+D $CE07 Runs the #R$D343(readout update) on each interrupt, then sets the flag at #R$D2AF.
+@ $CE26 label=flag_interrupt
+@ $CE30 label=skimmer_cells_changed
+c $CE30 Check whether the cells under the Skimmer changed
+D $CE30 Compares the Skimmer's attribute mirror address and span with the ones saved at #R$D2BA and #R$D2BC.
+R $CE30 O:F zero set if nothing changed
+@ $CE38 ssub=LD A,($D2B8+1)
+@ $CE4B label=colour_play_area_split
+c $CE4B Colour the play area with a black left strip
+D $CE4B Sets the play area to black on black in its left 11 columns and to white on black in the right 21.
+@ $CE4D label=split_colour_row
+@ $CE51 label=split_colour_left
+@ $CE59 label=split_colour_right
+@ $CE61 label=animate_flip
+c $CE61 Step the Skimmer's flip animation
+D $CE61 Every fourth call, advances the flip frame. After the third frame of the flip, it toggles the flipped state and switches to the Skimmer images for the new state.
+@ $CE82 label=animate_flip_frames
+@ $CE85 label=animate_flip_done
+@ $CE86 label=row_first_screen
+b $CE86 First screen number of each hull map row
+D $CE86 One byte per row of the hull map: the number of the row's first screen. A screen's number is this byte plus its column.
+B $CE86,11,1
+@ $CE91 label=play_game
+c $CE91 Play a game
+D $CE91 Runs a game until the last shield goes or the Skimmer reaches the WALL DONE screen, one pass of its loop for each interrupt.
+R $CE91 O:A $5E if the game ends on the WALL DONE screen
+@ $CEDB label=enter_screen
+@ $CEDF label=enter_screen_hatchway
 @ $CEE0 ssub=LD HL,$CE07
+@ $CF0C ssub=LD ($D2C7+1),A
 @ $CF3C ssub=LD ($B87A+1),A
 @ $CF53 ssub=LD ($B87A+1),A
 @ $CF70 ssub=LD HL,$CE26
+@ $CF92 label=play_loop
 @ $CFA6 ssub=LD ($CC0A+1),A
+@ $CFB2 ssub=LD A,($D2B0+1)
+@ $D10D label=play_loop_update
 @ $D10F ssub=LD ($CC0A+1),A
-c $D219
-c $D24A
-c $D292
-c $D29D
-b $D2A6
-@ $D2AF label=*
-B $D2AF
-@ $D2B0 label=*
-B $D2B0
-@ $D2B1 label=*
-B $D2B1
-@ $D2B2 label=*
-B $D2B2
-@ $D2B3 label=*
-B $D2B3
-@ $D2B4 label=*
-B $D2B4
-@ $D2B5 label=*
-B $D2B5
-B $D2B6
-@ $D2B6 label=*
-@ $D2B7 label=*
-B $D2B7
-@ $D2B8 label=*
-B $D2B8
-@ $D2B9 label=*
-B $D2B9
-@ $D2BA label=*
-B $D2BA
-@ $D2BC label=*
-B $D2BC
-B $D2BE
-@ $D2BE label=*
-@ $D2BF label=*
-B $D2BF
-@ $D2C0 label=*
-B $D2C0
-@ $D2C1 label=*
-B $D2C1
-@ $D2C2 label=*
-B $D2C2
-@ $D2C3 label=*
-B $D2C3
-@ $D2C4 label=*
-B $D2C4
-@ $D2C5 label=*
-B $D2C5
-B $D2C6
-@ $D2C6 label=*
-@ $D2C7 label=*
-B $D2C7
-@ $D2C8 label=*
-B $D2C8
-@ $D2C9 label=*
-B $D2C9
-@ $D2CA label=*
-B $D2CA
-@ $D2CB label=*
-B $D2CB
-@ $D2CC label=*
-B $D2CC
-@ $D2CD label=*
-B $D2CD
-B $D2CE
-@ $D2CE label=*
-@ $D2CF label=*
-B $D2CF
-@ $D2D1 label=*
-B $D2D1
-@ $D2D2 label=*
-B $D2D2
-@ $D2D3 label=*
-B $D2D3
-@ $D2D4 label=*
-B $D2D4
-@ $D2D5 label=*
-B $D2D5
-c $D2D6
-c $D2E6
-c $D2FD
-c $D31E
-c $D343
-c $D3F7
-c $D401
-c $D41A
+@ $D191 ssub=LD A,($D2B0+1)
+@ $D1E2 ssub=LD A,($D2B0+1)
+@ $D219 label=set_speed_rates
+c $D219 Set the step rates of a Skimmer speed
+D $D219 Sets the Skimmer's step rates on one axis from its speed on that axis and the table at #R$D2A6. While no push runs, a flipped Skimmer takes the rates of the next slower speed.
+@ $D24A label=lose_shield
+c $D24A Lose a shield
+D $D24A Once the Damage Report Indicator runs out, advances a shield loss by one stage every fourth call, or every eighth with one shield left. Its eighth stage takes away a shield, fills the indicator again and ends the game when it takes the last shield.
+@ $D292 label=fill_damage_report
+c $D292 Fill the Damage Report Indicator
+D $D292 Sets the Damage Report Indicator to 999.
+@ $D29D label=pause
+c $D29D Pause
+@ $D2A6 label=speed_rates
+b $D2A6 Skimmer speed rates
+D $D2A6 One record of two bytes for each Skimmer speed, from speed 0 to speed 3. The first byte is the size of one step? The second is 1 for a step on every second pass of the play loop, or 0 for a step on every pass.
+B $D2A6,8,2
+u $D2AE Unused bytes
+@ $D2AF label=interrupt_flag
+g $D2AF Play loop variables
+B $D2AF,1
+@ $D2B0 label=skimmer_scr_addr
+W $D2B0,2
+@ $D2B2 label=skimmer_x_shift
+B $D2B2,1
+@ $D2B3 label=skimmer_stepped
+B $D2B3,1
+@ $D2B4 label=control_bits
+B $D2B4,1
+@ $D2B5 label=speaker_byte
+B $D2B5,1 Byte the clicks send to the border and speaker port?
+@ $D2B6 label=skimmer_column
+B $D2B6,1
+@ $D2B7 label=skimmer_row
+B $D2B7,1
+@ $D2B8 label=skimmer_mirror_addr
+W $D2B8,2
+@ $D2BA label=old_mirror_addr
+B $D2BA,2
+@ $D2BC label=old_skimmer_span
+B $D2BC,2
+@ $D2BE label=screen_exit
+B $D2BE,1
+@ $D2BF label=speed_x
+B $D2BF,1
+@ $D2C0 label=speed_x_step
+B $D2C0,1 Size of one step on the X axis?
+@ $D2C1 label=speed_x_mask
+B $D2C1,1
+@ $D2C2 label=speed_x_phase
+B $D2C2,1
+@ $D2C3 label=speed_y
+B $D2C3,1
+@ $D2C4 label=speed_y_step
+B $D2C4,1 Size of one step on the Y axis, in pixel rows?
+@ $D2C5 label=speed_y_mask
+B $D2C5,1
+@ $D2C6 label=speed_y_phase
+B $D2C6,1
+@ $D2C7 label=hatchway_cell
+W $D2C7,2 Column, then row, of the hatchway's cell on the current screen
+@ $D2C9 label=hatchway_step
+B $D2C9,1
+@ $D2CA label=anim_divider
+B $D2CA,1 Count of hatchway and flip animation calls, read modulo 4
+@ $D2CB label=push_time
+B $D2CB,1
+@ $D2CC label=hostile_hold_time
+B $D2CC,1 Hold count of the hostile objects, $FE or $FF while they hold and 0 once they move?
+@ $D2CD label=shot_click_row
+B $D2CD,1 First pixel row of a cell at which the Skimmer draw clicks the speaker, 0 for every row and $FE or $FF for none
+@ $D2CE label=shot_click_time
+B $D2CE,1 Passes of the play loop left before the clicks of a pulse laser shot stop, 0 when none run?
+@ $D2CF label=skimmer_image_set
+B $D2CF,2
+@ $D2D1 label=flip_step
+B $D2D1,1
+@ $D2D2 label=flipped
+B $D2D2,1
+@ $D2D3 label=skimmer_moving
+B $D2D3,1
+@ $D2D4 label=shield_loss_step
+B $D2D4,1 Stage of a shield loss, 0–7, with 0 when no shield loss runs
+@ $D2D5 label=shield_loss_ticks
+B $D2D5,1
+@ $D2D6 label=print_readout
+c $D2D6 Print a control panel number
+D $D2D6 Prints a run of digits in inverse video at a character cell of the control panel.
+@ $D2E6 label=print_inverse_digit
+c $D2E6 Print one control panel digit
+D $D2E6 Prints one digit in inverse video and moves to the next cell on the right.
+@ $D2FD label=add_score_digits
+c $D2FD Add to the score digits
+D $D2FD Adds a number held as decimal digits to the score, digit by digit.
+@ $D31E label=subtract_damage_digits
+c $D31E Subtract from the Damage Report Indicator
+D $D31E Takes a number held as decimal digits away from the Damage Report Indicator, digit by digit.
+@ $D343 label=update_readouts
+c $D343 Update the Damage Report Indicator and the score
+D $D343 Runs down the Damage Report Indicator, faster while a push on the Skimmer runs, and starts a shield loss when it runs out?
+D $D343 It then prints the indicator and counts points still due into the score?
+@ $D372 label=show_readouts
+@ $D3F7 label=add_points
+c $D3F7 Add points to the score
+D $D3F7 Adds points to the total still to count into the score?
+@ $D401 label=reset_score
+c $D401 Reset the score
+D $D401 Fills the Damage Report Indicator, sets the score to zero and prints it.
+@ $D41A label=step_animations
+c $D41A Step the animated graphics
+D $D41A Advances the timers of the animated graphics in the #R$C909(animation list), and draws the next frame of the first one whose timer reaches its limit.
 b $D473
 @ $D475 label=*
 B $D475
@@ -883,13 +1014,18 @@ B $D48D
 B $D800
 @ $EA00 label=*
 B $EA00
-c $F000
-c $F006
+@ $F000 label=play_title_tune
+c $F000 Play the title tune
+D $F000 Plays the title tune with interrupts off, over and over until the player presses a key.
+@ $F006 label=run_title_tune
+c $F006 Decrypt and run the title tune player
+D $F006 Decrypts the tune player at #R$F009 and runs straight into it. The player encrypts itself again before it returns.
 b $F009 Encrypted routine
 D $F009 These bytes are code XOR-encrypted in place: #R$F45F decrypts them (key $41 for the first byte, one more for each byte after it) and the routine at #R$F006 runs straight into the result.
 b $F30A
-c $F45F Decrypt or re-encrypt the routine at #R$F009
-D $F45F XORs the 769 bytes from #R$F009 with $41, $42, $43... (the key wraps at $FF). XOR is its own inverse, so a second call restores the ciphertext.
+@ $F45F label=crypt_title_tune
+c $F45F Decrypt or re-encrypt the title tune player
+D $F45F Decrypts the title tune player at #R$F009, or encrypts it again. XOR is its own inverse, so one pass does either.
 b $F473
 @ $F480 label=*
 B $F480

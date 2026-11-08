@@ -8,9 +8,9 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Item                | State                                     |
 |:--------------------|:------------------------------------------|
-| Phase               | 2 – naming pass (S1–S7 and V integrated)  |
+| Phase               | 2 – naming pass, all slices integrated    |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
-| Baseline findings   | 91                                        |
+| Baseline findings   | 52                                        |
 | Routines to the bar | 0 of 120                                  |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
@@ -24,8 +24,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Target              | Lane | State                                |
 |:--------------------|:-----|:-------------------------------------|
-| Naming S1–S7, V     | code | final SPLIT fixes; re-review next    |
-| Naming S8, S9       | code | fragments ready; next batch          |
+| Naming S8, S9       | code | fixes applied; final re-review       |
 
 ---
 
@@ -40,8 +39,8 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | S5    | `$C227–$C657`                 | integrated |
 | S6    | `$C658–$C962`                 | integrated |
 | S7    | `$C963–$CBA7`                 | integrated |
-| S8    | `$CBA8–$CE90`                 | fragment   |
-| S9    | `$CE91–$D472`, `$F000–$F472`  | fragment   |
+| S8    | `$CBA8–$CE90`                 | integrated |
+| S9    | `$CE91–$D472`, `$F000–$F472`  | integrated |
 | V     | variables `$BD0F–$BD43`       | integrated |
 
 ---
@@ -58,6 +57,8 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$FA00` workspace        | attribute mirror     | cell map                 |
 | saved screen bytes       | background store     | backdrop                 |
 | what stops a move        | blocked              | structure (for any block) |
+| the 50 Hz tick           | interrupt            | frame (frame = animation) |
+| `$D2B8` pointer          | attribute mirror address | colour cell          |
 
 ---
 
@@ -68,7 +69,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | Address       | Open question                                 |
 |:--------------|:----------------------------------------------|
 | `$61A8`       | What is the code-like stub below the entry?   |
-| `$F009`       | Decrypted listing of the title tune player    |
+| `$F009`       | Decrypted listing of the title tune player (see `docs/RESEARCH.md`) |
 | `$F30A–$F45E` | Code or data? No play trace executes it       |
 | `$F480`       | Document the key copy that `$BA3C` jumps to   |
 | `$FA00`       | Attribute mirror: `@equ` name and mark bits   |
@@ -84,9 +85,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$C186`       | `LD H,$BD` raw high byte of the launch cells  |
 | `$B5BD`       | `LD DE,($BD14)` reloads D from the draw attribute |
 | `$CB8E`       | Delay loop with no caller: unused?            |
-| `$CE86`       | Table of multiples of 10: screen numbers?     |
-| `$CD9C`       | Retype the Skimmer frame pointers as `W`      |
-| `$D2A6`       | Split speed rates from variables at `$D2AF`   |
+| `$CD9C`       | Retype the Skimmer image pointers as `W`      |
 | `$BA3B`       | Fold WALL DONE's end `$00` into `t $BA06`     |
 | `$BA45`       | Dead store to the text attribute              |
 
@@ -95,7 +94,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | Address       | Open question                                 |
 |:--------------|:----------------------------------------------|
 | whole image   | Sectors 2–3 and game end coverage (FuseX)     |
-| `$F009`       | Confirm it is the title tune player           |
 | `$B51C`       | WALL DONE screen: inner screen 5, `$BD3D`     |
 | `$BA06`       | Title and label of WALL DONE                  |
 | `$BD18`       | Run flag and low bits: animation speed?       |
@@ -104,17 +102,16 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$BD40`       | Is the device the only hostile object inside? |
 | `$C946`       | Limit test counts two objects per call: bug?  |
 | `$D2CB`       | Countdown forcing directions: which events?   |
-| `$D2CC`       | Countdown holding hostile objects: why?       |
-| `$D2BF`       | Speed units; what is `$D2C0`?                 |
-| `$D2C4`       | Vertical step in pixel lines (2 or 4)?        |
-| `$D2C0`…`$D2D4` | Purposes of the unnamed game variables      |
-| `$D47F`       | Damage Report Indicator digits and drain rates |
+| `$D2CC`       | Count up from `$FE` that holds hostile objects: why? |
+| `$D2C4`       | Is the first speed-rate byte a step size?     |
+| `$D2AF`       | Define the play loop variables with no description |
+| `$D47F`       | Damage Report Indicator drain rates           |
 | `$D48A`       | Score unit: trace `$D3C7–$D3F6` and `$D2FD`   |
 | `$BD44`       | Firing alignment: `$D2B2` = 2, pixel line 4   |
 | `$BF8B`       | Does the `$21` result end the opening?        |
 | `$BF6A`       | Rows and widths of the hatchway graphic       |
 | `$BEE0`       | Which cell pushes the Skimmer, and how?       |
-| `$D2CD`       | Patched into `$CC0A` on launch: sound?        |
+| `$D2CD`       | Other `$CC0B` patches: `$C47D`, `$C48A`, `$D10F` |
 | `$D343`       | Task run by the full interrupt routine        |
 | `$C46B`       | Explosion inside the hull sets device flag?   |
 | `$C494`       | Cells skipped when they hold ink: why?        |
@@ -124,14 +121,24 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$C76A`       | What do the inked-cell marks mean?            |
 | `$CC32`       | What the NOP / DEC C patch changes            |
 | `$CD3A`       | Is AND `$0B` a cover test?                    |
-| `$CDC8`       | 8-frame Skimmer sequence; `DEC C` at `$CBC6`  |
-| `$CE4B`       | Black strip + white area = play area?         |
 | `$FF70`       | What the flip check searches                  |
 | `$B096`       | Off-edge column ≥ 32 is one past 31: bug?     |
 | `$B04F`       | What does `$B507` draw with the INC DE patch? |
 | `$B889`       | Shield count at column 5; leaflet says right  |
 | `$B850`       | Rows 0–3 cleared; panel is rows 0–5           |
 | `$B640`       | List every special layout graphic             |
+| `$CCB0`       | Which map does `CP H` test?                   |
+| `$CBC6`       | `DEC C` vs `DEC A`: first shield-loss frame never drawn? |
+| `$CD36`       | Fold the out-of-line tail into `$CD3A`?       |
+| `$D2CF`       | Type `$D2CF` and `$D2BA` as words?            |
+| `$CD3A`       | Is the fourth column marked at a cell edge?   |
+| `$D2C0`       | Is it the X step size? Speed units of `$D2BF`? |
+| `$D2B5`       | Is the speaker bit flipped only at clicks?    |
+| `$D2CE`       | Are the clicks the pulse laser shot's sound?  |
+| `$CD86`       | Meaning of attribute mirror mark `$04`        |
+| `$CCD3`       | Meaning of the mark the flipped Skimmer ignores |
+| `$EA00`       | Inner-section map index                       |
+| `$F30A`       | Is it the title tune's data?                  |
 | `$B3B0`       | Does the bar run from the previous graphic?   |
 | `$B432`       | Is `$99A0` the hatchway graphic's buffer?     |
 | `$B449`       | Do cover patterns depend on the screen number? |
@@ -190,3 +197,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$BD28`  | Launch direction is bits 5–6 of the column byte     |
 | `$C935`  | Only bytes 0–12 of a shot record are used           |
 | `$CFC6`  | Yes, on the last shield; GAME OVER still prints     |
+| `$F009`  | Title tune player (decrypted; only caller `$BAEB`)  |
+| `$CE86`  | Screen number = `$CE86`[row] + column               |
+| `$D2A6`  | Speed rates split from the play loop variables      |
+| `$CE4B`  | Play area rows 6–23, black left strip               |

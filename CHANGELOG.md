@@ -7,10 +7,13 @@
 - Screen text documented (`$B89F–$BA3A`): title, redefine-keys, key names, control names, menu keys, game over and wall done, with labels, the message line format and the text colours.
 - Documented a defect in the game: the redefine-keys screen names the F key "E".
 - `docs/PLAN.md`: the Manager's plan and dig-task queue.
+- `docs/RESEARCH.md`: the Researcher's leads and the proposed order of the deep documentation.
 - `src/glossary.ref`: the naming policy and a registry of the game's own words, linked from the site's index.
 - Routines and data from `$61FD` and `$B000–$CBA7` named: labels, titles and tentative one-line purposes.
 - Game variables (`$BD11–$BD43`) labelled and defined, and the workspace at `$C909` split into the animation list, the shot records and the current hostile object.
 - Graphic cell masks and colour patterns split into their own tables, with the pointer tables typed as words.
+- Routines from `$CBA8` to `$D472` named (the Skimmer's drawing and collision checks, the interrupt set-up, the game loop, shields, the Damage Report Indicator and the score), and the title tune player's wrapper and decrypter at `$F000`–`$F472`.
+- Skimmer image and frame tables and the play loop variables split into their own entries, with the Skimmer speed rates on their own.
 
 ## [0.1.0] 08-11-2026
 
