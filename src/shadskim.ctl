@@ -67,17 +67,41 @@ D $B02A Fills the play area below the control panel with the hull pattern of the
 @ $B080 label=cell_addrs
 c $B080 Find the screen addresses of a cell
 D $B080 Gives the pixel address and the attribute address of the character cell at a row and a column.
+R $B080 I:B character row, 0–23
+R $B080 I:C column, 0–31
+R $B080 O:DE attribute address of the cell
+R $B080 O:HL screen address of the cell's top pixel row
+  $B080 The row's screen third picks the high byte of the pixel address.
+  $B086 The same third picks the high byte of the attribute address.
+  $B08C,9 The row within its third, × 32, plus the column, gives the low byte of both addresses.
 @ $B096 label=edge_cell_addrs
 c $B096 Find the screen addresses of a cell that may lie off the screen's sides
-D $B096 Gives the pixel and attribute addresses of a cell whose column may lie off the left or the right edge of the screen?
+D $B096 Gives the pixel and attribute addresses of a cell, as #R$B080 does. Its column may lie off the left or the right edge of the screen.
+N $B096 Each step past an edge moves both addresses one cell along screen memory, within the row's screen third. A column off the left edge lands near the end of the row above, or of the third's bottom row from its top row. A column off the right edge lands at the start of the row below, or of the third's top row from its bottom row.
+R $B096 I:B character row, 0–23
+R $B096 I:C column, from −128 to 127, negative for a column off the left edge
+R $B096 O:DE attribute address of the cell
+R $B096 O:HL screen address of the cell's top pixel row
+  $B096 Is the column off the left edge?
+  $B099 Jump if not
+  $B09C Find the addresses of the row's first cell, and count the columns past the edge.
+@ $B0A4 label=edge_step_left
+  $B0A4,5 Step both addresses one cell back for each column past the edge.
+@ $B0AA label=edge_test_right
+  $B0AA Is the column on the screen?
+  $B0AC If so, find its addresses the usual way
+  $B0AE Find the addresses of the row's last cell, and count the columns past it.
+@ $B0B6 label=edge_step_right
+N $B0B6 BUG: the loop goes on while the column count is below 31, which it never is past the right edge. So it stops after one step, and every column past the edge gives the cell after column 31. The game passes only columns 0–31 here, so the defect has no effect.
+  $B0B6,7 Step both addresses one cell on.
 @ $B0BE label=cell_mask_addrs
 b $B0BE Cell mask addresses
-D $B0BE The address of each graphic's cell mask, by mask number from 1. The top five bits of a graphic's height give its mask number, and 0 draws every cell.
+D $B0BE The address of each cell mask, by mask number from 1.
 W $B0BE,14,2
 @ $B0CC label=cell_mask_1
 b $B0CC Cell masks
-D $B0CC Each graphic's mask holds one byte per character cell, row by row. A 0 byte leaves its cell's pixels as they are, and any other value draws the cell and marks it in the attribute mirror.
-B $B0CC,6
+D $B0CC Each cell mask holds one byte per character cell of a graphic, row by row from the top. A 0 byte is a cell the graphic does not draw, which keeps its pixels and marks. Any other byte is the mark a bright graphic sets in the cell's attribute mirror entry. A graphic reads only as many bytes as it has cells, so one mask serves graphics of several sizes.
+B $B0CC,6,3
 @ $B0D2 label=cell_mask_2
 B $B0D2,9,3
 @ $B0DB label=cell_mask_3
@@ -92,14 +116,14 @@ B $B10B,16,4
 B $B11B,20,4
 @ $B12F label=colour_pat_addrs
 b $B12F Colour pattern addresses
-D $B12F The address of each colour pattern, by pattern number from 1. The top five bits of a graphic's width give its pattern number, and 0 colours the whole graphic in one colour. The control panel's two halves take patterns 33 and 34.
+D $B12F The address of each colour pattern, by pattern number from 1.
 W $B12F,30,2
 S $B14D,34 Patterns 16–32, which hold no address
 W $B16F,4,2 Addresses of the colour patterns of the control panel's two halves
 @ $B173 label=colour_pat_1
 b $B173 Colour patterns
-D $B173 Each colour pattern holds one attribute per character cell, row by row. A 0 byte leaves its cell's colour as it is, and $FF gives the cell the graphic's own colour. Some patterns share bytes, so one can start inside another.
-B $B173,4
+D $B173 Each colour pattern holds one byte per character cell of a graphic, row by row from the top. A 0 byte leaves the cell's colour as it is, and $FF gives the cell the graphic's own colour. Any other byte is the cell's attribute. Some patterns share bytes, so one can start inside another.
+B $B173,4,2
 @ $B177 label=colour_pat_3
 B $B177,1
 @ $B178 label=colour_pat_4
@@ -130,14 +154,165 @@ B $B1F8,9,3
 B $B201,9,3
 @ $B20A label=draw_graphic
 c $B20A Draw a graphic
-D $B20A Draws a graphic by its number at a row and a column, and colours it. Inside the hull it takes the graphic from the inner-section set.
+D $B20A Draws a graphic from the graphic directory at a cell and colours it. A bright graphic also marks its cells in the attribute mirror and, on the outer hull, casts a shadow.
+R $B20A I:A graphic number
+R $B20A I:B character row of the graphic's top-left cell
+R $B20A I:C column of the graphic's top-left cell
+R $B20A I:D attribute of the graphic, or $80 to draw its pixels alone
+R $B20A O:HL' attribute mirror address of the cell below the graphic's bottom-left cell, or of its top-left cell if it marks nothing, or unchanged when the attribute is $80
+  $B20A Keep the attribute and the cell.
+  $B20C Start from the outer hull's directory.
+  $B20F Is the Skimmer on the outer hull?
+  $B214 Jump if so
+  $B216 Take the inner sections' directory instead.
+@ $B219 label=find_graphic_entry
+  $B219 Point at the graphic's entry, 4 bytes per graphic.
+  $B228 Fetch the address of the graphic's pixels, then the width byte and the height byte.
+  $B22F Recover the cell and the attribute.
 @ $B231 label=plot_graphic
+N $B231 This entry point draws a graphic from outside the directories. The caller holds the pixel address, the two size bytes, the cell and the attribute as the directory path leaves them.
+  $B231 Keep the attribute for the colour pass.
+  $B234 Is the graphic bright?
+  $B236 Jump if not
+  $B238 A bright graphic marks its cells in the attribute mirror.
+@ $B23C label=plot_no_mark
+  $B23C Any other graphic marks nothing.
+@ $B23E label=plot_store_mark
+  $B23E Store the choice for the mark and shadow passes.
+  $B241 Find the cell's pixel and attribute addresses, and record both.
+  $B251 Split the width byte: the low three bits are the width in cells, and the top five bits give the colour pattern, kept doubled.
+  $B25F Split the height byte: the low three bits are the height in cells, and the top five bits the mask number. Does the graphic have a mask?
+  $B268 Jump if not
+  $B26A Index the mask table by the mask number.
+  $B274 Never runs: no mask number carries past the page.
+@ $B275 label=read_mask_addr
+  $B275 Push the mask's address for the three passes.
 @ $B27D label=plot_unmasked
+N $B27D This entry point draws a graphic with no mask. A caller that enters here sets the attribute, the mirror mark and the colour pattern first, and the top-left cell's attribute address (#R$BD11). Its size can then run past 7 cells each way.
+  $B27D Use the attribute mirror's top rows, from column 4, as the mask. #R$B003 fills them with 1, and later marks only set more bits, so every cell draws.
+@ $B283 label=plot_store_size
+  $B283 Record the size, keep it for the later passes, and keep the width for each row of cells.
+@ $B28C label=plot_row
+N $B28C The pixel pass. A graphic holds 8 bytes per cell, one per pixel row from the top, cell by cell along each row of cells. A cell the mask skips still takes its 8 bytes.
+  $B28C Keep the screen address of the row's first cell.
+@ $B28D label=plot_cell
+  $B28D Does the mask cover this cell?
+  $B295 Jump if so
+  $B298 Skip the cell's pixel data.
+  $B29E Cross into the next page of the pixel data.
+@ $B2A1 label=copy_cell_pixels
+  $B2A1 Walk the cell's pixel rows from the top.
+@ $B2A3 label=copy_pixel_row
+  $B2A3 Copy each pixel row of the cell onto the screen, over what was there.
+@ $B2A9 label=next_plot_cell
+  $B2A9 Move one cell right, until the row of cells is done.
+  $B2B0 Back at the row's first cell, step down one character row.
+  $B2BB Cross into the next screen third.
+@ $B2BF label=next_plot_row
+  $B2BF Draw the next row of cells.
+  $B2C1 Does the graphic keep the colours of its cells?
+  $B2C6 Jump if not
+  $B2C8,2 Drop the size and the mask address. The graphic leaves its cells' colours and marks as they are, and casts no shadow.
+@ $B2CB label=apply_colours
+N $B2CB The colour pass. The graphic's own colour is its attribute without flash.
+  $B2CB Switch register sets for the colour, mark and shadow passes, and keep the graphic's own colour.
+  $B2CF Fetch the size and the mask address, and start at the top-left cell's attribute.
+  $B2D6 Does the graphic have a colour pattern?
+  $B2DB Jump if not
+  $B2DD Index the colour pattern table by the pattern number.
+  $B2E4 Never runs: no pattern number carries past the page.
+@ $B2E5 label=read_pattern_addr
+  $B2E5 Fetch the pattern's address and colour the cells from it.
+@ $B2EF label=fill_row
+N $B2EF With no colour pattern, every cell the mask covers takes the graphic's own colour.
+  $B2EF Start a row of cells.
+@ $B2F2 label=fill_cell
+  $B2F2 Does the mask cover this cell?
+  $B2F5 Jump if not
+  $B2F7 Give the cell the graphic's own colour.
+@ $B2FA label=next_fill_cell
+  $B2FA Go on along the row.
+  $B2FE Step down to the next row of attributes.
+  $B305 Cross into the next third of the attributes.
+@ $B306 label=next_fill_row
+  $B306 Colour the next row.
+@ $B309 label=mark_graphic
+N $B309 The mark pass. A marked graphic sets the bits of each covered cell's mask byte in that cell's marks in the attribute mirror.
+  $B309 Fetch the size and the mask address, and find the top-left cell in the attribute mirror.
+  $B313 Does the graphic mark its cells?
+  $B318 Jump if not
+@ $B31A label=mark_row
+  $B31A Start a row of cells.
+@ $B31D label=mark_cell
+  $B31D Does the mask cover this cell?
+  $B320 Jump if not
+  $B322 Set the mask byte's bits in the cell's marks.
+@ $B324 label=next_mark_cell
+  $B324 Go on to the next cell.
+  $B328 Step down one row of the attribute mirror.
+  $B32F Cross into the next page of the attribute mirror.
+@ $B330 label=next_mark_row
+  $B330 Mark the next row.
+@ $B333 label=check_shadow
+  $B333 Recover the size.
+  $B334 Does the graphic leave its shadow to the caller?
+  $B339 Jump if so
 @ $B33B label=cast_shadow
+N $B33B This entry point casts the shadow of a block of cells. It takes the block's size and the attribute mirror address of the cell below its bottom-left cell. It returns with the two register sets exchanged, the address in HL'.
+N $B33B A shadow covers the cells the block sweeps over as it slides one cell down and one cell right. It forms a band under the block and up its right side, with a half cell cut at 45° at each end. It shades only cells that the attribute mirror leaves clear (#R$B7B7).
+  $B33B Is the block unmarked?
+  $B341 Jump if so: it casts no shadow
+  $B343 Is the Skimmer inside the hull?
+  $B348 Jump if so: nothing casts a shadow there
 @ $B34A label=draw_shadow
+N $B34A This entry point casts the shadow of any block, marked or not. It leaves through a pop that takes its own return address, so a CALL to it returns to its caller's caller.
+  $B34A Is the bottom edge's first cell in column 0?
+  $B34E Jump if so: it starts with a full cell
+  $B350 Start the bottom edge with its cut corner.
+  $B356 Count the cell.
+  $B357 Jump if that was the whole bottom edge
+@ $B359 label=next_shadow_cell
+  $B359 Move one cell right.
+@ $B35A label=shade_bottom_cell
+  $B35A Shade the rest of the bottom edge in full, one cell per column of the block.
+@ $B363 label=shade_right_side
+  $B363 Step past the block's right side. Does that column, counted from the current layout graphic, lie off the screen?
+  $B36B Jump if so: no right edge
+  $B36D The right edge rises one cell per row of the block.
+@ $B36E label=shade_right_cell
+  $B36E Shade the right edge in full, from the bottom row up.
+  $B37B Is the layout graphic on the top row of the play area? If so, its top cell is in full.
+  $B383 Jump if so
+  $B385 Otherwise cut the top corner.
+@ $B388 label=shade_top_cell
+  $B388 Shade the cell beside the block's top row.
+@ $B38B label=shadow_done
+  $B38B Recover the attribute mirror address.
+@ $B38C label=exit_graphic
+  $B38C,1 Switch back to the first register set, which leaves the attribute mirror address in HL'.
 @ $B38E label=colour_graphic
 c $B38E Colour a graphic from a colour pattern
-D $B38E Writes the attributes of a graphic's cells. A pattern byte of 0 leaves its cell as it is, and $FF gives the cell the graphic's own colour.
+D $B38E Writes the attributes of a block of cells from one of the #R$B173(colour patterns).
+R $B38E I:A' the graphic's own colour
+R $B38E I:B height in cells
+R $B38E I:C width in cells
+R $B38E I:DE address of the colour pattern
+R $B38E I:HL attribute address of the block's top-left cell
+  $B38E Start a row of cells.
+@ $B391 label=colour_cell
+  $B391 Does the pattern leave this cell as it is?
+  $B394 Jump if so
+  $B396 Does it give the cell the graphic's own colour?
+  $B398 Jump if so
+  $B39A Write the pattern's attribute.
+@ $B39D label=colour_own
+  $B39D Write the graphic's own colour.
+@ $B3A0 label=next_colour_cell
+  $B3A0 Go on along the row.
+  $B3A4 Step down to the next row of attributes.
+  $B3AB Cross into the next third of the attributes.
+@ $B3AC label=next_colour_row
+  $B3AC,3 Colour the next row.
 @ $B3B0 label=join_vertical
 c $B3B0 Draw a graphic joined to the one before by a vertical bar
 D $B3B0 Draws a graphic and a vertical bar with its shadow from the layout's previous graphic down to this one?

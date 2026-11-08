@@ -8,10 +8,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Item                | State                                     |
 |:--------------------|:------------------------------------------|
-| Phase               | 2 – naming pass, all slices integrated    |
+| Phase               | 3 – depth pass, G1 graphics engine        |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
 | Baseline findings   | 52                                        |
-| Routines to the bar | 0 of 120                                  |
+| Routines to the bar | 4 of 120 (`$B080`, `$B096`, `$B20A`, `$B38E`) |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
 | Catalogs            | graphics, sound, data: not started        |
@@ -24,7 +24,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Target              | Lane | State                                |
 |:--------------------|:-----|:-------------------------------------|
-| Naming S8, S9       | code | fixes applied; final re-review       |
+| Depth G1 `$B080–$B3AF` | code | fixes applied; re-review         |
 
 ---
 
@@ -76,7 +76,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$FA00–$FFFF` | `@equ` names for workspace and IM 2 table     |
 | `$A020`       | Map and render the font; `$A150` is the "/"   |
 | `$B16F`       | Label the control panel patterns in `$A2B8`   |
-| `$B11B`       | Mask 7 serves 4- and 5-wide graphics          |
 | `$B766`       | Code or data? No reader found                 |
 | `$BAA7`       | Code with no caller: unused?                  |
 | `$BC68`       | Draw-mode code templates: what copies them?   |
@@ -88,6 +87,9 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$CD9C`       | Retype the Skimmer image pointers as `W`      |
 | `$BA3B`       | Fold WALL DONE's end `$00` into `t $BA06`     |
 | `$BA45`       | Dead store to the text attribute              |
+| `$6200`       | Document the graphic directory record (also `$A818`, needs a split) |
+| `$B20A`       | Split plot_graphic, plot_unmasked, cast_shadow, draw_shadow into entries |
+| `$B26D`       | Mask and pattern table addresses built from immediates (`@ssub`) |
 
 ### Game behaviour
 
@@ -122,7 +124,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$CC32`       | What the NOP / DEC C patch changes            |
 | `$CD3A`       | Is AND `$0B` a cover test?                    |
 | `$FF70`       | What the flip check searches                  |
-| `$B096`       | Off-edge column ≥ 32 is one past 31: bug?     |
 | `$B04F`       | What does `$B507` draw with the INC DE patch? |
 | `$B889`       | Shield count at column 5; leaflet says right  |
 | `$B850`       | Rows 0–3 cleared; panel is rows 0–5           |
@@ -145,7 +146,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B4A7`       | Does it draw the first frame?                 |
 | `$B4D9`       | Which table is the inner-section map?         |
 | `$B7B7`       | Which mirror marks block a shadow?            |
-| `$B27D`       | Does mask 0 draw every cell?                  |
 | `$B427`       | The 11 fields of the animation template       |
 | `$BC1F`       | Schema of the three control-key sets          |
 | `$BD40`       | Does `$FF` mean the device is destroyed?      |
@@ -157,6 +157,12 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$C926`       | Can a screen hold a third animated graphic?   |
 | `$D800`       | Layout format; count graphic `$2B` per screen |
 | `$B789`       | Is the colour rectangle reachable?            |
+| `$B5F0`       | Stores alternate BC after cast_shadow: bug?   |
+| `$B4A3`       | Colour pass reuses the hatchway's cell?       |
+| `$B812`       | Can the control panel shadow row 6?           |
+| `$B363`       | Shadow edge tests use the layout cell, not the drawn one |
+| `$B37B`       | Full top shadow cell on row 6: why?           |
+| `$B0CC`       | Marks 1, 2, `$22` for hostile objects and shots |
 
 ### Names
 
@@ -201,3 +207,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$CE86`  | Screen number = `$CE86`[row] + column               |
 | `$D2A6`  | Speed rates split from the play loop variables      |
 | `$CE4B`  | Play area rows 6–23, black left strip               |
+| `$B096`  | Bug, latent: columns ≥ 32 all map to column 32      |
+| `$B27D`  | Yes: unmasked mask bytes come from mirror rows 0–5  |
+| `$B11B`  | Mask 7's 20 bytes are equal, so both shapes work    |

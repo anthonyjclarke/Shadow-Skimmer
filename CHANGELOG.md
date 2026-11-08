@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0] 09-11-2026
+
+### Added
+
+- Graphics engine documented in depth (`$B080–$B3AF`): cell addresses, the graphic directory fields, cell masks, colour patterns, the pixel, colour, mark and shadow passes, with every basic block commented.
+- Documented a latent defect in the game: `$B096` maps every column past the right edge to column 32.
+
 ## [0.2.0] 08-11-2026
 
 ### Added
