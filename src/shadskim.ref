@@ -4,6 +4,7 @@
 ; [Index:...], [Paths], [Links] and [Titles] lines, as it is written.
 
 [Config]
+RefFiles=glossary.ref
 GameDir=shadskim
 
 ; Parsed first, before every other project ref and the skill's theme.ref.
@@ -20,5 +21,17 @@ AddressAnchor={address#IF({base}==16)(:04x)}
 Release=The Edge / Softek, 1987
 Copyright=Game &copy; 1987 The Edge / Softek. Disassembly for preservation and study.
 
+; Index headings group pages on the home page. Each name must match a
+; [Page:...] or a generated page id.
+[Index:Reference:Reference]
+Glossary
+
 [Paths]
 CodeFiles={address:04X}.html
+Glossary=reference/glossary.html
+
+[Links]
+Glossary=Glossary
+
+[Titles]
+Glossary=Glossary

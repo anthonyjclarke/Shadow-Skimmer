@@ -1,0 +1,46 @@
+; The project's glossary. It holds the policy on names, the terminology
+; registry (the Write/Not table that `make lint-terms` holds every other file
+; to), and the terms the game or the project coined whose names do not say what
+; they are (DEF-6). A term gets an entry only once a code label carries it, and
+; terms go in alphabetical order after the two entries below.
+
+[Page:Glossary]
+SectionPrefix=Term
+
+[Term:policy-on-names:Policy on names]
+A thing takes the name the game gives it. The screen text comes first, then the
+instruction leaflet.
+
+A thing the player knows by its picture takes the name of that picture. The code
+decides what the thing does.
+
+A name says what a thing is. Its description says what it does, as the code
+shows it.
+
+The project names each part of the code before it documents that part in full.
+Such a first name can change once the project writes the full description.
+
+The project writes each word as the game spells it, such as defence.
+
+This page defines a word only when the game or the project made it up. The word
+alone must also fail to say what it is. Each such word is the word of a label in
+the listing.
+
+[Term:one-word-per-thing:One word per thing]
+Each word on the left is the one word the project uses for its thing. The words
+on the right never name that thing, in a label, a title or a sentence.
+
+#TABLE(default)
+{ =h Write | =h Not }
+{ control panel | status bar, status panel, scoreboard, dashboard, HUD }
+{ Damage Report Indicator | damage meter, damage bar, health bar, energy bar }
+{ defence device | defense device, defense, boss }
+{ flip, flipped | barrel roll, inverted flight, upside-down mode }
+{ hatchway | hatch-way, trapdoor, trap door, airlock }
+{ mothership | mother ship, mother-ship, liner, liners, starship }
+{ pulse laser | laser cannon, laser gun, blaster }
+{ sector | hull-sector }
+{ shield | energy shield }
+{ Skimmer | craft, spaceship, spacecraft }
+{ structure | obstacle, obstacles }
+TABLE#

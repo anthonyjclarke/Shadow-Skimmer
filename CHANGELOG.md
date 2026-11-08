@@ -7,6 +7,7 @@
 - Screen text documented (`$B89F–$BA3A`): title, redefine-keys, key names, control names, menu keys, game over and wall done, with labels, the message line format and the text colours.
 - Documented a defect in the game: the redefine-keys screen names the F key "E".
 - `docs/PLAN.md`: the Manager's plan and dig-task queue.
+- `src/glossary.ref`: the naming policy and a registry of the game's own words, linked from the site's index.
 
 ## [0.1.0] 08-11-2026
 
