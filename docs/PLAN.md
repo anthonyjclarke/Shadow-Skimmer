@@ -74,14 +74,12 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$F009`       | Decrypted listing of the title tune player (see `docs/RESEARCH.md`) |
 | `$F30A–$F45E` | Code or data? No play trace executes it       |
 | `$F480`       | Document the key copy that `$BA3C` jumps to   |
-| `$FA00`       | Attribute mirror: `@equ` name and mark bits   |
-| `$FA00–$FFFF` | `@equ` names for workspace and IM 2 table     |
 | `$A020`       | Map and render the font; `$A150` is the "/"   |
 | `$B16F`       | Label the control panel patterns in `$A2B8`   |
 | `$BAA7`       | Code with no caller: unused?                  |
 | `$BC68`       | Draw-mode code templates: what copies them?   |
 | `$C2DA`       | Lone `$C9` after a RET: unused byte?          |
-| `$C4DB`       | Table address built from immediates           |
+| `$C4DB`       | Table addresses built from immediates: `$BBE5`, `$BF58`, `$C186`, `$C1D0`, `$C1F5`, `$C4E0`, `$C503`, `$CF62` |
 | `$C186`       | `LD H,$BD` raw high byte of the launch cells  |
 | `$CB8E`       | Delay loop with no caller: unused?            |
 | `$CD9C`       | Retype the Skimmer image pointers as `W`      |
@@ -90,11 +88,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$6200`       | Document the graphic directory record (also `$A818`, needs a split) |
 | `$B20A`       | Split plot_graphic, plot_unmasked, cast_shadow, draw_shadow into entries |
 | `$D800`       | Split the layout tables and lists; record `#TABLE` |
-| `$9520`       | Title and render the defence device designs   |
-| `$95D0`       | Label the animated graphic frames             |
-| `$99A0`       | Label the hatch bitmap; split `$99E8` patterns (`@ssub`) |
-| `$FF10`       | `@equ` for the hatch workspace / background store |
-| `$B26D`       | Mask and pattern table addresses built from immediates (`@ssub`) |
+| `$9520`       | Title the defence device designs (`$7CD4` split) |
+| `$9A88`       | Label and render the 13 hostile object designs |
+| `$95B0`       | 32 zero bytes after the device designs        |
+| `$99A0`       | Title the hatch bitmap (`$7CD4` split)        |
 
 ### Game behaviour
 
@@ -124,7 +121,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$C76A`       | What do the inked-cell marks mean?            |
 | `$CC32`       | What the NOP / DEC C patch changes            |
 | `$CD3A`       | Is AND `$0B` a cover test?                    |
-| `$FF70`       | What the flip check searches                  |
 | `$B889`       | Shield count at column 5; leaflet says right  |
 | `$B850`       | Rows 0–3 cleared; panel is rows 0–5           |
 | `$CCB0`       | Which map does `CP H` test?                   |
@@ -135,8 +131,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$D2C0`       | Is it the X step size? Speed units of `$D2BF`? |
 | `$D2B5`       | Is the speaker bit flipped only at clicks?    |
 | `$D2CE`       | Are the clicks the pulse laser shot's sound?  |
-| `$CD86`       | Meaning of attribute mirror mark `$04`        |
-| `$CCD3`       | Meaning of the mark the flipped Skimmer ignores |
+| `$CD86`       | When is the Skimmer's mark `$04` toggled?     |
 | `$F30A`       | Is it the title tune's data?                  |
 | `$BC1F`       | Schema of the three control-key sets          |
 | `$BD40`       | Does `$FF` mean the device is destroyed?      |
@@ -148,15 +143,20 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B812`       | Can the control panel shadow row 6?           |
 | `$C18B`       | Does steering override the start direction at once? |
 | `$B5F6`       | Column-0 vertical runs shade twice: visible?  |
-| `$B7B7`       | What writes mark bit 7 in the attribute mirror? |
+| `$B7B7`       | Bit 7: only the steering distances' sign bits? |
 | `$B3B0`       | A zero-length bar loops 256 times: document?  |
 | `$B3F0`       | Why do the two bars' shadow offsets differ?   |
+| `$C802`       | Does `$C0D4`'s reset to `$08` pair the explosion toggles? |
+| mark bit 5    | Which graphics use cell mask 7?               |
+| `$B6F8`       | `add_hostile` draws nothing: who draws the device? |
+| `$CDE8`       | Inline `$26`/`$CE` writes are `flag_interrupt`'s address |
+| `$CDEC`       | `LD BC,$00FD` holds the vector byte as a literal |
+| `$FF70`       | Cover map `$FF` is the map's page byte (relocation) |
 | `$E141`       | Screen 55's last record runs into the next layout |
 | `$B4FB`       | Does anything call `$B04F` while `$B058` is a NOP? |
 | `$C955`       | Counter value `$17` for the defence device    |
 | `$B363`       | Shadow edge tests use the layout cell, not the drawn one |
 | `$B37B`       | Full top shadow cell on row 6: why?           |
-| `$B0CC`       | Marks 1, 2, `$22` for hostile objects and shots |
 
 ### Names
 
@@ -224,3 +224,11 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B4A3`  | Yes, but it repaints the same colour               |
 | `$B7B7`  | Marks with bit 0, 1 or 7 block a shadow            |
 | hatchway | Two things: the hatchway, and the hatch at its centre |
+| `$FA00`  | `attr_mirror` `@equ`; marks tabled on the Workspace page |
+| `$FA00–$FFFF` | `@equ` names: `int_jump`, `int_vectors`, `skimmer_bg_store`, `skimmer_cover_map` |
+| `$FF10`  | `skimmer_bg_store`, also the hatch's draw buffer   |
+| `$95D0`  | Labelled `animated_frames`                          |
+| `$B26D`  | Expression `@ssub` on the table labels              |
+| `$FF70`  | The flip check scans the cover map's top-left 3×3   |
+| `$CCD3`  | The flipped Skimmer ignores bit 5 (cell mask 7)     |
+| `$B0CC`  | Mark 1 stops hostile objects and shots; 2 and `$22` do not |

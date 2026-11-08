@@ -8,6 +8,11 @@
 ; the code shows otherwise. See docs/DISASSEMBLY.md.
 @ $61A8 start
 @ $61A8 org
+@ $61A8 equ=attr_mirror=$FA00
+@ $61A8 equ=int_jump=$FDFD
+@ $61A8 equ=int_vectors=$FE00
+@ $61A8 equ=skimmer_bg_store=$FF10
+@ $61A8 equ=skimmer_cover_map=$FF70
 b $61A8
 @ $61FD label=game_entry
 c $61FD Game entry point
@@ -29,16 +34,22 @@ B $9020
 B $94E0
 @ $9500 label=*
 B $9500
-@ $9520 label=*
+@ $9520 label=device_designs
+N $9520 The design of each sector's defence device.
+N $9520 #UDGTABLE { #UDGARRAY2,,6,3($9520;$9521;$9538;$9539)(device_design_1) | #UDGARRAY2,,6,3($9550;$9551;$9568;$9569)(device_design_2) | #UDGARRAY2,,6,3($9580;$9581;$9598;$9599)(device_design_3) } { Sector 1 | Sector 2 | Sector 3 } TABLE#
 B $9520
-@ $95D0 label=*
+@ $95D0 label=animated_frames
 B $95D0
-@ $99A0 label=*
+@ $99A0 label=hatch_bitmap
 B $99A0
-@ $99A9 label=*
+@ $99A9 label=hatch_upper_patch
 B $99A9
-@ $99C7 label=*
+@ $99C7 label=hatch_lower_patch
 B $99C7
+@ $99E8 label=hatch_patterns
+B $99E8
+@ $9A68 label=*
+B $9A68
 @ $9E08 label=*
 B $9E08
 @ $9F58 label=*
@@ -184,12 +195,15 @@ N $B231 This entry point draws a graphic from outside the directories. The calle
   $B25F Split the height byte: the low three bits are the height in cells, and the top five bits the mask number. Does the graphic have a mask?
   $B268 Jump if not
   $B26A Index the mask table by the mask number.
+@ $B26D ssub=ADD A,(cell_mask_addrs-$02)%$100
+@ $B270 ssub=LD H,(cell_mask_addrs-$02)/$100
   $B274 Never runs: no mask number carries past the page.
 @ $B275 label=read_mask_addr
   $B275 Push the mask's address for the three passes.
 @ $B27D label=plot_unmasked
 N $B27D This entry point draws a graphic with no mask. A caller that enters here sets the attribute, the mirror mark and the colour pattern first, and the top-left cell's attribute address (#R$BD11). Its size can then run past 7 cells each way.
   $B27D Use the attribute mirror's top rows, from column 4, as the mask. #R$B003 fills them with 1, and later marks only set more bits, so every cell draws.
+@ $B27E ssub=LD BC,attr_mirror+4
 @ $B283 label=plot_store_size
   $B283 Record the size, keep it for the later passes, and keep the width for each row of cells.
 @ $B28C label=plot_row
@@ -220,6 +234,8 @@ N $B2CB The colour pass. The graphic's own colour is its attribute without flash
   $B2D6 Does the graphic have a colour pattern?
   $B2DB Jump if not
   $B2DD Index the colour pattern table by the pattern number.
+@ $B2DE ssub=LD H,(colour_pat_addrs-$02)/$100
+@ $B2E0 ssub=ADD A,(colour_pat_addrs-$02)%$100
   $B2E4 Never runs: no pattern number carries past the page.
 @ $B2E5 label=read_pattern_addr
   $B2E5 Fetch the pattern's address and colour the cells from it.
@@ -239,6 +255,7 @@ N $B2EF With no colour pattern, every cell the mask covers takes the graphic's o
 @ $B309 label=mark_graphic
 N $B309 The mark pass. A marked graphic sets the bits of each covered cell's mask byte in that cell's marks in the attribute mirror.
   $B309 Fetch the size and the mask address, and find the top-left cell in the attribute mirror.
+@ $B310 ssub=ADD A,(attr_mirror-$5800)/256
   $B313 Does the graphic mark its cells?
   $B318 Jump if not
 @ $B31A label=mark_row
@@ -327,6 +344,7 @@ R $B3B0 I:D attribute of the bottom end
   $B3CF Keep the bar's length for its shadow.
   $B3D1 Would the shadow's column lie off the right edge? Return if so: the bar casts no shadow.
   $B3D7 Find the shadow's top cell in the attribute mirror.
+@ $B3DB ssub=ADD A,(attr_mirror-$5800)/256
 @ $B3E2 label=shade_vbar_cell
   $B3E2,13 Shade the shadow's cells down the column, one for each cell of the bar.
 @ $B3F0 label=join_horizontal
@@ -342,6 +360,7 @@ R $B3F0 I:D attribute of the right end
   $B402 Draw the bar along that row in the horizontal bar cell and the right end's colour. Mark its cells as a bar in the attribute mirror.
   $B40F Keep the bar's length for its shadow.
   $B411 Find the shadow's first cell in the attribute mirror.
+@ $B415 ssub=ADD A,(attr_mirror-$5800)/256
 @ $B41C label=shade_hbar_cell
   $B41C,10 Shade the shadow's cells along the row, one for each cell of the bar.
 @ $B427 label=animation_template
@@ -355,12 +374,14 @@ B $B42D,1 Step from one frame to the next
 W $B42E,2 Current frame
 B $B430,2 Width and height
 @ $B432 label=stamp_hatch_pattern
+@ $B432 ssub=ADD A,hatch_patterns%$100
 c $B432 Stamp a pattern into the hatch
 D $B432 Copies a hatch pattern into a patch of #R$99A0(the hatch's bitmap).
 N $B432 The hatch is the centre of a hatchway, 3×3 cells. Its bitmap holds each pixel row across all three cells as three bytes, rows from the top. A hatch pattern covers 16×8 pixels, two bytes per pixel row.
 R $B432 I:A offset of the pattern in the hatch patterns, 16 bytes per pattern
 R $B432 I:DE address in the hatch's bitmap of the patch's top-left byte
   $B432 Point at the pattern in the hatch patterns.
+@ $B435 ssub=LD H,hatch_patterns/$100
   $B439 Cross into the next page.
 @ $B43A label=stamp_pattern_rows
   $B43A Walk the pattern's pixel rows from the top.
@@ -476,6 +497,7 @@ N $B59E A run repeats its graphic toward the end cell, one graphic width or heig
 @ $B5EC label=shadow_layout_run
 N $B5EC BUG: the jump back records the registers the shadow leaves as the previous graphic's cell, not the run's cell. They hold the last graphic's size. So a bar joined to the end of the run starts from the wrong cell.
   $B5EC Cast the run's shadow from the attribute mirror, then move on to the next record.
+@ $B5ED ssub=ADD A,(attr_mirror-$5800)/256
 @ $B5F6 label=start_run_down
 N $B5F6 A run down keeps its own column in #R$BD34(the shadow switch). In column 0 that lets each of its graphics cast a shadow of its own as well as the run's.
   $B5F6 Fetch the end row from the next record, and find the run's length in rows.
@@ -540,6 +562,7 @@ N $B67C BUG: the direction goes into the column byte one bit higher than #R$C0B4
   $B6B5 Is it a lone shadow cell?
   $B6B7 Jump if not
   $B6B9,14 Shade the cell in full. It draws no graphic.
+@ $B6C1 ssub=ADD A,(attr_mirror-$5800)/256
 @ $B6C8 label=test_gate_graphic
   $B6C8 Is it the graphic of a coloured rectangle?
   $B6CA Jump if so, which never happens: that graphic number ends a layout first
@@ -569,6 +592,7 @@ R $B70B I:B character row of the object's top-left cell, 0–23
 R $B70B I:C column of the object's top-left cell, 0–31
   $B70B Record the cell, and find its screen address.
   $B715,8 Turn its attribute address into its attribute mirror address, and record that.
+@ $B716 ssub=ADD A,(attr_mirror-$5800)/256
 @ $B71E label=init_defence_device
 c $B71E Set up the defence device
 D $B71E Makes the current hostile object the current sector's defence device, at a cell. Its design comes from the sector's entry at #R$9520.
@@ -624,6 +648,7 @@ R $B7B7 I:DE address of the shadow mask
 R $B7B7 I:HL attribute mirror address of the cell, kept on return
   $B7B7 Does the cell carry a mark that keeps shadows off, such as a bright graphic's or a bar's? Return if so.
   $B7BB Is the cell below the screen's bottom row? Return if so.
+@ $B7BC ssub=CP (attr_mirror+$300)/256
   $B7BF Find the cell's top pixel row.
 @ $B7C5 label=shade_pixel_row
   $B7C5 Clear the pixels that each row of the mask leaves out, from the cell's top pixel row down.
@@ -634,6 +659,7 @@ D $B7CE Gives the screen address of the top pixel row of the cell at an attribut
 R $B7CE I:HL attribute mirror address of the cell
 R $B7CE O:HL screen address of the cell's top pixel row
   $B7CE,11 The attribute page that matches the mirror's page gives the cell's screen third, which picks the high byte. The low byte stays as it is.
+@ $B7CF ssub=SUB (attr_mirror-$5800)/256
 @ $B7DA label=shadow_mask_full
 b $B7DA Shadow masks
 D $B7DA The pixel masks of the cells of a shadow, one byte per pixel row from the top. A set bit keeps its pixel, and a clear bit clears it.
@@ -752,9 +778,11 @@ b $BC68
 @ $BC70 label=draw_pattern_row
 c $BC70 Draw a row of one pattern
 D $BC70 Draws one 8×8 pattern again and again along a row of character cells, coloured with #R$BD15.
+@ $BC9E ssub=ADD A,(attr_mirror-$5800)/256
 @ $BCB3 label=draw_pattern_column
 c $BCB3 Draw a column of one pattern
 D $BCB3 Draws one 8×8 pattern again and again down a column of character cells, coloured with #R$BD15.
+@ $BCF4 ssub=ADD A,(attr_mirror-$5800)/256
 u $BD0F Unused bytes
 @ $BD11 label=graphic_attr_addr
 g $BD11 Game variables
@@ -848,6 +876,7 @@ D $BE94 Moves a position on the play area one cell left, right, up or down.
 @ $BEB9 label=erase_shot
 c $BEB9 Erase a shot
 D $BEB9 Puts back the pixels and colour of the cell a shot covered.
+@ $BEC2 ssub=SUB (attr_mirror-$5800)/256
 @ $BEE0 label=push_skimmer_from_shot
 c $BEE0 Push the Skimmer after a shot strikes
 D $BEE0 Starts a push on the Skimmer whose direction follows the shot's?
@@ -862,12 +891,18 @@ c $BF16 Report a stopped shot
 @ $BF19 label=draw_shot
 c $BF19 Draw a shot
 D $BF19 Draws a shot in its new cell and saves what was there, or reports that the cell stops the shot.
+@ $BF36 ssub=SUB (attr_mirror-$5800)/256
 @ $BF6A label=find_hatch_graphic
 c $BF6A Find the graphic for a step of the hatchway animation
 D $BF6A Works out where the rows of the hatch's bitmap for one animation step start, and how many rows it shows?
+@ $BF75 ssub=ADD A,hatch_bitmap%$100
+@ $BF78 ssub=LD D,hatch_bitmap/$100
+@ $BF80 ssub=ADD A,hatch_bitmap%$100
+@ $BF83 ssub=LD H,hatch_bitmap/$100
 @ $BF8B label=animate_hatchway
 c $BF8B Step the hatchway animation
 D $BF8B Every fourth call, draws the next step of the hatch as it opens or closes. It returns the step after that one, or zero once the animation is over?
+@ $BFCF ssub=LD HL,skimmer_bg_store+$5E
 @ $C09B label=random_below
 c $C09B Random number below a limit
 D $C09B Returns a number from zero to one less than the limit, the remainder of the refresh register divided by the limit.
@@ -882,6 +917,8 @@ D $C0B4 It brings a new hostile object in while fewer are out than the limit at 
 @ $C0B5 ssub=LD ($CC32),A
 @ $C0D6 ssub=LD ($C80D+1),A
 @ $C12B ssub=LD ($C80D+1),A
+@ $C1A6 ssub=ADD A,(attr_mirror-$5800)/256
+@ $C204 label=add_hostile
 @ $C227 label=preshift_hostile
 c $C227 Build a hostile object's shifted images
 D $C227 Builds the four images and four masks of the current hostile object from its design, each copy shifted 2 pixels further right.
@@ -948,6 +985,7 @@ D $C44B Starts the current hostile object's explosion or shows its next frame.
 @ $C494 label=colour_hostile_cells
 c $C494 Colour a hostile object's cells
 D $C494 Colours the current hostile object's cells that hold no ink, and clicks the speaker once per cell row?
+@ $C4A0 ssub=SUB (attr_mirror-$5800)/256
 @ $C4A3 label=colour_hostile_row
 @ $C4A7 label=colour_hostile_cell
 @ $C4AE label=colour_hostile_next
@@ -1153,9 +1191,13 @@ D $C985 Moves the Skimmer one cell left when nothing blocks that cell, and other
 @ $C99E label=move_left_px
 c $C99E Move the Skimmer left inside its cell
 D $C99E Moves the Skimmer left without a change of cell, and puts back the background of the column it leaves at the cell's left edge.
+@ $C9A6 ssub=LD DE,skimmer_bg_store+3
+@ $C9AA ssub=LD HL,skimmer_cover_map+3
 @ $C9B7 label=move_left_scroll
 c $C9B7 Shift the Skimmer's background store one cell left
 D $C9B7 Moves the Skimmer's screen position one cell left and saves the background of the column it enters.
+@ $C9BA ssub=LD HL,skimmer_bg_store+$5E
+@ $C9BD ssub=LD DE,skimmer_bg_store+$5F
 @ $C9D2 label=store_left_px
 @ $C9DA label=exit_screen_right
 c $C9DA Flag an exit to the screen on the right
@@ -1163,7 +1205,10 @@ D $C9DA Flags that the Skimmer leaves the screen across its right edge.
 @ $C9E0 label=move_skimmer_right
 c $C9E0 Move the Skimmer right
 D $C9E0 Moves the Skimmer right by its horizontal step. A blocked move turns it back, and the right edge of the screen flags an exit.
+@ $C9FA ssub=LD DE,skimmer_bg_store+3
 @ $CA07 label=move_right_px
+@ $CA2B ssub=LD HL,skimmer_bg_store+1
+@ $CA3D ssub=LD DE,skimmer_bg_store+3
 @ $CA46 label=store_right_px
 @ $CA4E label=exit_screen_top
 c $CA4E Flag an exit to the screen above
@@ -1171,15 +1216,22 @@ D $CA4E Flags that the Skimmer leaves the screen across its top edge.
 @ $CA54 label=move_skimmer_up
 c $CA54 Move the Skimmer up
 D $CA54 Moves the Skimmer up by its vertical step. A blocked move turns it back, and the top of the play area flags an exit.
+@ $CA55 ssub=LD HL,skimmer_cover_map+$0C
 @ $CA59 ssub=LD A,($D2B0+1)
 @ $CA7D label=turn_skimmer_y
 @ $CA86 label=move_up_row_clear
+@ $CA87 ssub=LD HL,skimmer_cover_map+8
 @ $CA8E label=move_up_px
 @ $CAA4 label=move_up_line
 @ $CAB1 label=move_up_source
+@ $CAB1 ssub=LD HL,skimmer_bg_store+$58
+@ $CABB ssub=LD HL,skimmer_bg_store+$50
 @ $CABE label=move_up_draw
+@ $CAC8 ssub=LD HL,skimmer_bg_store+$4F
 @ $CAD0 label=move_up_small_step
+@ $CAD0 ssub=LD HL,skimmer_bg_store+$57
 @ $CAD6 label=move_up_scroll
+@ $CAD6 ssub=LD DE,skimmer_bg_store+$5F
 @ $CAEA label=exit_screen_bottom
 c $CAEA Flag an exit to the screen below
 D $CAEA Flags that the Skimmer leaves the screen across its bottom edge.
@@ -1190,9 +1242,13 @@ D $CAF0 Moves the Skimmer down by its vertical step. A blocked move turns it bac
 @ $CB0C ssub=LD A,($D2B0+1)
 @ $CB11 label=move_down_px
 @ $CB27 label=move_down_source
+@ $CB40 ssub=LD HL,skimmer_bg_store+8
 @ $CB45 label=move_down_big_step
+@ $CB48 ssub=LD HL,skimmer_bg_store+$10
 @ $CB4B label=move_down_scroll
 @ $CB5D label=move_down_draw
+@ $CB60 ssub=LD DE,skimmer_bg_store+$58
+@ $CB67 ssub=LD DE,skimmer_bg_store+$50
 @ $CB6A label=move_down_draw_at
 @ $CB85 label=move_down_store
 b $CB8E
@@ -1289,6 +1345,7 @@ B $CDC8,32,4
 c $CDE8 Set up the interrupt routine
 D $CDE8 Fills the interrupt vector table so that every interrupt jumps to the #R$CE26(flag routine), and switches to vectored interrupts.
 @ $CDEF label=init_interrupts_fill
+@ $CDFF ssub=LD A,int_vectors/256
 @ $CE07 label=readouts_interrupt
 c $CE07 Interrupt routine that updates the readouts
 D $CE07 Runs the #R$D343(readout update) on each interrupt, then sets the flag at #R$D2AF.
@@ -1320,10 +1377,14 @@ R $CE91 O:A $5E if the game ends on the WALL DONE screen
 @ $CEDB label=enter_screen
 @ $CEDF label=enter_screen_hatchway
 @ $CEE0 ssub=LD HL,$CE07
+@ $CEE3 ssub=LD (int_jump+1),HL
+@ $CEEF ssub=ADD A,(attr_mirror-$5800)/256
 @ $CF0C ssub=LD ($D2C7+1),A
 @ $CF3C ssub=LD ($B87A+1),A
 @ $CF53 ssub=LD ($B87A+1),A
+@ $CF56 ssub=LD HL,attr_mirror+$C0
 @ $CF70 ssub=LD HL,$CE26
+@ $CF73 ssub=LD (int_jump+1),HL
 @ $CF92 label=play_loop
 @ $CFA6 ssub=LD ($CC0A+1),A
 @ $CFB2 ssub=LD A,($D2B0+1)
@@ -1484,7 +1545,7 @@ b $F473
 B $F480
 @ $F7F8 label=*
 B $F7F8
-@ $F800 label=*
+@ $F800 label=hostile_slots
 B $F800
 @ $F809 label=*
 B $F809

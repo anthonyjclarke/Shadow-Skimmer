@@ -5,6 +5,8 @@
 ### Added
 
 - Graphics engine documented in depth (`$B080–$B3AF`): cell addresses, the graphic directory fields, cell masks, colour patterns, the pixel, colour, mark and shadow passes, with every basic block commented.
+- Workspace page (`src/workspace.ref`): the attribute mirror and its mark bits, the IM 2 table, the Skimmer's background store and cover map, with `@equ` names for every workspace operand.
+- Labels for the defence device designs, the animated graphic frames, the hatch bitmap and patterns, the hostile object slots and `add_hostile`; the cell mask, colour pattern, hatch bitmap and hatch pattern addresses built from immediates now assemble from their labels.
 - Bars, hatchways, animated graphics and cell shading documented in depth (`$B3B0–$B4D8`, `$B789–$B811`), with the animated graphic template's fields and the bar cell renders.
 - Screen layout interpreter documented in depth (`$B4D9–$B788`): the layout record format, runs, special graphics, launch cells, the WALL DONE screen and the defence device set-up.
 - Documented two more defects in the game: launch cells store their direction where the reader takes another bit, and a run records the last graphic's size, not its own cell, as the previous graphic's cell.

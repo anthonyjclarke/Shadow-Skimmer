@@ -1,0 +1,54 @@
+; The workspace the game keeps in RAM above its code block, from $FA00 to the
+; top of memory. The program image does not hold these bytes, so they have no
+; entries in the listing. Each region has an EQU constant there, and this page
+; is where each region is defined.
+
+[Page:Workspace]
+SectionPrefix=Region
+
+[Region:attribute-mirror:Attribute mirror]
+The marks of each character cell of the screen, one byte per cell, from $FA00
+to $FCFF. A cell's marks sit $A200 above its attribute byte. So the mirror runs
+row by row from row 0 to row 23, as the attributes do.
+
+The marks are bits, and a cell can carry several of them. A bright graphic gives
+each of its cells the bits that its #R$B0CC(cell mask) holds for that cell. A
+bright graphic with no cell mask sets the marks of the control panel's top rows
+in its cells instead (#R$B27D).
+
+#TABLE(default)
+{ =h Bit | =h Mark | =h Stops the Skimmer | =h Stops the flipped Skimmer | =h Stops a hostile object | =h Lets a shot through | =h Hides the Skimmer | =h Keeps shadows off }
+{ 0 | Bright graphic | Yes | Yes | Yes | No | Yes | Yes }
+{ 1 | Bright graphic or bar | No | No | No | Yes | Yes | Yes }
+{ 2 | Skimmer | No | No | Yes | No | No | No }
+{ 3 | Hostile object | Yes | Yes | Yes | No | Yes | No }
+{ 2 and 3 | Shot, or a struck hostile object? | Yes | Yes | Yes | No | Yes | No }
+{ 4 | Hostile object as it explodes? | Yes | Yes | Yes | No | No | No }
+{ 5 | Bright graphic | Yes | No | No | Yes | No | No }
+{ 7 | ? | No | No | No | Yes | No | Yes }
+TABLE#
+
+Each cell of the control panel, rows 0 to 5, holds bit 0, apart from the first
+four. Those four bytes hold a hostile object's distances to the Skimmer, which
+#R$C349(the code that steers it) writes.
+
+[Region:interrupt-jump:Interrupt jump]
+A jump instruction at $FDFD, which every interrupt reaches through the
+interrupt vectors. It jumps to the interrupt routine in use: the
+#R$CE26(flag routine), or the #R$CE07(readout routine) while the game draws a
+screen.
+
+[Region:interrupt-vectors:Interrupt vectors]
+The interrupt vectors from $FE00 to $FF00, 257 bytes that all hold $FD. Each
+vector the Z80 can read from them is $FDFD, the interrupt jump.
+
+[Region:skimmer-background-store:Skimmer's background store]
+The screen bytes behind the Skimmer, from $FF10 to $FF6F: 24 pixel rows from
+the top, 4 bytes per row. While the game draws a hatchway, the store holds
+the hatch's bitmap as a graphic of 3×3 cells instead.
+
+[Region:skimmer-cover-map:Skimmer's cover map]
+One byte for each cell under the Skimmer, from $FF70 to $FF7F: 4 rows of 4
+cells, rows from the top. A byte holds $FF for a cell where the game does not
+draw the Skimmer, and 0 for any other. Such a cell hides the Skimmer, or lies in the fourth
+column while the Skimmer sits on a cell edge? That $FF is the high byte of the map's address.
