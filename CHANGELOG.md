@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0] 08-11-2026
+
+### Added
+
+- Screen text documented (`$B89F–$BA3A`): title, redefine-keys, key names, control names, menu keys, game over and wall done, with labels, the message line format and the text colours.
+- Documented a defect in the game: the redefine-keys screen names the F key "E".
+- `docs/PLAN.md`: the Manager's plan and dig-task queue.
+
 ## [0.1.0] 08-11-2026
 
 ### Added

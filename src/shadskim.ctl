@@ -94,19 +94,51 @@ c $B850
 c $B874
 @ $B87A label=*
 c $B889
-b $B89F
-@ $B95E label=*
-B $B95E
-B $B987
-@ $B987 label=*
-@ $B9BD label=*
-B $B9BD
-@ $B9F3 label=*
-B $B9F3
-@ $B9F9 label=*
-B $B9F9
-@ $BA06 label=*
-B $BA06
+@ $B89F label=msg_title
+t $B89F Title screen text
+D $B89F The title, the menu and the copyright line of the title screen, printed by #R$BAC6. The four control-method lines end in spaces, so each one fills the 21-cell bar that #R$BAAE inverts over the selected method.
+N $B89F Every message that #R$BB4A prints is a run of lines in this format. All of them print on black paper.
+N $B89F #TABLE(default,,,:w) { =h Byte | =h Content | =h Values } { 1 | Column | 0–31 } { 2 | Row | 0–23 } { 3 | Attribute | One for every character on the line } { 4 onward | Characters | Space, digits, capitals and [ } { Last | End of the message | $00 } { Last | End of the line | $80–$FF, with the next line after it } TABLE#
+T $B89F,18,n3:14:n1 Game title in bright white
+T $B8B1,25,n3:21:n1 Keyboard option in bright yellow
+T $B8CA,25,n3:21:n1 Kempston joystick option in bright yellow
+T $B8E3,25,n3:21:n1 Sinclair joystick option in bright yellow
+T $B8FC,25,n3:21:n1 Cursor joystick option in bright yellow
+T $B915,21,n3:17:n1 Redefine-keys option in bright yellow
+T $B92A,18,n3:14:n1 Start-game option in bright yellow
+T $B93C,34,n3:30:n1 Copyright line in bright cyan. The font draws [ as a slash.
+@ $B95E label=msg_redefine
+t $B95E Redefine-keys screen text
+D $B95E The title and the prompt of the redefine-keys screen, printed by #R$BA3C in the message format of #R$B89F. Each control name from #R$B9BD prints into the gap after PRESS THE.
+T $B95E,17,n3:13:n1 Title in bright cyan
+T $B96F,24,n3:20:n1 Prompt in bright cyan
+@ $B987 label=key_names
+t $B987 Key names
+D $B987 The name of each key as the redefine-keys screen shows it, indexed by key code from 0 to 39, in the key order of #R$BC04. The first character of a name has bit 7 set, and the name runs up to the next byte with bit 7 set.
+N $B987 BUG: the name for the F key is E, so the redefine-keys screen shows E for a control defined on F.
+T $B987,54,1*24,1:2,1*7,1:4,1:4,1*5,1:3,n1 One name per line, then a byte that only ends the last name
+@ $B9BD label=msg_controls
+t $B9BD Control names
+D $B9BD The six controls that the redefine-keys screen asks a key for, in the order it asks. Each is a one-line message in the format of #R$B89F, with its own end byte. All six print in the gap of the prompt at #R$B95E.
+T $B9BD,54,n3:5:n1 One control per line, in bright white
+@ $B9F3 label=menu_keys
+b $B9F3 Title-screen menu keys
+D $B9F3 The key code of each title-screen menu option, one byte per option in menu order. The key names at #R$B987 give the key for each code.
+B $B9F3,6,1
+  $B9F3 Key 1 for the keyboard
+  $B9F4 Key 2 for the Kempston joystick
+  $B9F5 Key 3 for the Sinclair joystick
+  $B9F6 Key 4 for the cursor joystick
+  $B9F7 Key 5 to redefine the keys
+  $B9F8 Key 0 to start the game
+@ $B9F9 label=msg_game_over
+t $B9F9 Game over message
+D $B9F9 One line printed by #R$BAC6 in the message format of #R$B89F.
+T $B9F9,13,n3:9:n1 Bright white
+@ $BA06 label=msg_wall_done
+t $BA06 Wall-done message
+D $BA06 Three lines printed by #R$B4D9 in the message format of #R$B89F.
+T $BA06,53,n3:9:n1,n3:13:n1,n3:20 Bright white
 s $BA3B
 c $BA3C
 b $BAA7

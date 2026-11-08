@@ -163,12 +163,6 @@ message = "56 bytes with no sub-directives. Fix it in this order: render it; sta
 [[finding]]
 check = "data-structure"
 kind = "UNTYPED"
-at = "$B89F"
-message = "412 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
-
-[[finding]]
-check = "data-structure"
-kind = "UNTYPED"
 at = "$BC1F"
 message = "24 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
 
@@ -356,7 +350,7 @@ message = "`c $B812` has no title and publishes as a page headed \"Routine at B8
 check = "identity"
 kind = "UNTITLED"
 at = "$BA3B"
-message = "`s $BA3B` has no title and publishes as a page headed \"Unused RAM at BA3B\". Either it is one field split out of the record above it (b $B89F), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
+message = "`s $BA3B` has no title and publishes as a page headed \"Unused RAM at BA3B\". Either it is one field split out of the record above it (t $BA06 Wall-done message), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
 
 [[finding]]
 check = "identity"
@@ -603,12 +597,6 @@ check = "identity"
 kind = "UNTITLED_ENTRY"
 at = "$B889"
 message = "`c $B889` has no title and publishes as a page headed \"Routine at B889\". There is no record to fold it into — the entry above it is c $B874 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$B89F"
-message = "`b $B89F` has no title and publishes as a page headed \"Data at B89F\". There is no record to fold it into — the entry above it is c $B889 — so it is an entry in its own right: write the title"
 
 [[finding]]
 check = "identity"
