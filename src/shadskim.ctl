@@ -315,22 +315,98 @@ R $B38E I:HL attribute address of the block's top-left cell
   $B3AC,3 Colour the next row.
 @ $B3B0 label=join_vertical
 c $B3B0 Draw a graphic joined to the one before by a vertical bar
-D $B3B0 Draws a graphic and a vertical bar with its shadow from the layout's previous graphic down to this one?
+D $B3B0 Draws the bottom end of a vertical bar and the bar up to its top end, the layout's previous graphic. The bar casts a shadow on the hull beside it.
+N $B3B0 The bar fills the rows between the two ends, in the second column of the top end. Its shadow runs down the column two to the right of the bar. It starts one row below the bar's top and ends on the bottom end's top row.
+R $B3B0 I:A graphic number of the bottom end
+R $B3B0 I:B character row of the bottom end's top-left cell
+R $B3B0 I:C column of the bottom end's top-left cell
+R $B3B0 I:D attribute of the bottom end
+  $B3B0 Draw the bottom end, and keep its cell and attribute.
+  $B3B7 Count the rows from two below the top end's top-left cell down to the bottom end, and start the bar one column in.
+  $B3C2 Draw the bar down that column in the vertical bar cell and the bottom end's colour. Mark its cells as a bar in the attribute mirror.
+  $B3CF Keep the bar's length for its shadow.
+  $B3D1 Would the shadow's column lie off the right edge? Return if so: the bar casts no shadow.
+  $B3D7 Find the shadow's top cell in the attribute mirror.
+@ $B3E2 label=shade_vbar_cell
+  $B3E2,13 Shade the shadow's cells down the column, one for each cell of the bar.
 @ $B3F0 label=join_horizontal
 c $B3F0 Draw a graphic joined to the one before by a horizontal bar
-D $B3F0 Draws a graphic and a horizontal bar with its shadow from the layout's previous graphic across to this one?
+D $B3F0 Draws the right end of a horizontal bar and the bar across from its left end, the layout's previous graphic. The bar casts a shadow on the hull below it.
+N $B3F0 The bar fills the columns between the two ends, in the second row of the left end. Its shadow runs along the row two below the bar. It starts one column right of the bar's first cell and ends on the right end's first column.
+R $B3F0 I:A graphic number of the right end
+R $B3F0 I:B character row of the right end's top-left cell
+R $B3F0 I:C column of the right end's top-left cell
+R $B3F0 I:D attribute of the right end
+  $B3F0 Draw the right end, and keep its cell and attribute.
+  $B3F7 Count the columns from two right of the left end's top-left cell across to the right end, and start the bar one row down.
+  $B402 Draw the bar along that row in the horizontal bar cell and the right end's colour. Mark its cells as a bar in the attribute mirror.
+  $B40F Keep the bar's length for its shadow.
+  $B411 Find the shadow's first cell in the attribute mirror.
+@ $B41C label=shade_hbar_cell
+  $B41C,10 Shade the shadow's cells along the row, one for each cell of the bar.
 @ $B427 label=animation_template
 b $B427 Animated graphic template
-D $B427 The first fields of a new animation list entry for an animated graphic.
+D $B427 The fields that start each entry of the #R$C909(animation list), up to the screen address of its graphic.
+N $B427 #TABLE(default,,:w) { =h Byte | =h Content } { 0 | Calls of #R$D41A that each frame lasts } { 1 | Calls of #R$D41A since the current frame was drawn } { 2 | Number of frames } { 3 | Current frame, counted from 0 } { 4–5 | Address of the first frame's pixels } { 6 | Bytes from the start of one frame's pixels to the next } { 7–8 | Address of the current frame's pixels } { 9 | Width in cells } { 10 | Height in cells } TABLE#
+B $B427,2 Frame length and its counter
+B $B429,2 Frame count and current frame
+W $B42B,2 First frame
+B $B42D,1 Step from one frame to the next
+W $B42E,2 Current frame
+B $B430,2 Width and height
 @ $B432 label=stamp_hatch_pattern
-c $B432 Stamp a pattern into the hatchway graphic
-D $B432 Copies one cover pattern into the hatchway graphic's buffer at #R$99A0?
+c $B432 Stamp a pattern into the hatch
+D $B432 Copies a hatch pattern into a patch of #R$99A0(the hatch's bitmap).
+N $B432 The hatch is the centre of a hatchway, 3×3 cells. Its bitmap holds each pixel row across all three cells as three bytes, rows from the top. A hatch pattern covers 16×8 pixels, two bytes per pixel row.
+R $B432 I:A offset of the pattern in the hatch patterns, 16 bytes per pattern
+R $B432 I:DE address in the hatch's bitmap of the patch's top-left byte
+  $B432 Point at the pattern in the hatch patterns.
+  $B439 Cross into the next page.
+@ $B43A label=stamp_pattern_rows
+  $B43A Walk the pattern's pixel rows from the top.
+@ $B43C label=stamp_pattern_row
+  $B43C Start a pixel row.
+@ $B43E label=stamp_pattern_byte
+  $B43E Copy the pattern's two bytes for the row over the bitmap's first two.
+  $B444,4 Skip the bitmap's third byte, and go on to the next pixel row.
 @ $B449 label=draw_hatchway
 c $B449 Draw a hatchway
-D $B449 Draws a hatchway and records its cell at #R$D2C7. Its cover patterns depend on the screen number?
+D $B449 Draws a hatchway and its hatch, and records the hatchway's top-left cell as the #R$D2C7(hatchway cell). The screen number picks the two patterns on the hatch.
+R $B449 I:A graphic number of the hatchway
+R $B449 I:B character row of the hatchway's top-left cell
+R $B449 I:C column of the hatchway's top-left cell
+R $B449 I:D attribute of the hatchway
+  $B449 Draw the hatchway, and keep its cell.
+  $B44D Point at the hatch's upper patch, three pixel rows down from its top.
+  $B450 Fetch the ROM byte at $0400 plus the screen number, a fixed but arbitrary value for each screen. Keep its two nibbles, each from 0 to 7.
+  $B459 Stamp the pattern that the low nibble picks into the upper patch.
+  $B463 Stamp the pattern that the high nibble picks into the lower patch, thirteen pixel rows down.
+  $B46C Lay the hatch's bitmap out in the Skimmer's background store, in the cell order of a graphic.
+@ $B474 label=hatch_cell_row
+  $B474 Start a row of cells from its top pixel row.
+@ $B477 label=hatch_pixel_row
+  $B477 Start a pixel row across the row of cells.
+@ $B479 label=hatch_pixel_byte
+  $B479 Copy each byte of the pixel row to the same pixel row of the next cell along.
+  $B482 Was that the last pixel row of the row of cells?
+  $B483 Jump if so
+  $B485 Step back to the next pixel row of the first cell.
+@ $B48B label=next_hatch_row
+  $B48B Move on to the first cell of the next row of cells, until the hatch is done.
+  $B492 Record the hatchway's cell.
+  $B498 Find the screen address of the hatch's top-left cell, one cell in from the hatchway's.
+  $B49D,9 Draw the hatch over the hatchway's centre. The colour and mark passes start at the hatchway's own top-left cell, so they repaint cells that already hold its colour.
 @ $B4A7 label=draw_animated
 c $B4A7 Draw an animated graphic
-D $B4A7 Adds an animated graphic to the #R$C909(animation list) and draws its first frame?
+D $B4A7 Draws the first frame of an animated graphic and adds the graphic to the #R$C909(animation list). Each frame lasts as many calls of #R$D41A as the layout record's flags plus 2.
+R $B4A7 I:B character row of the graphic's top-left cell
+R $B4A7 I:C column of the graphic's top-left cell
+R $B4A7 I:D attribute of the graphic
+  $B4A7 Draw the first frame, 3×3 cells with no mask and no colour pattern, in the graphic's attribute.
+  $B4B3 Start a new entry at the end of the list with the template's fields. Nothing checks that the list has room.
+  $B4C0 Add the screen address of the graphic's top-left cell.
+  $B4CA Record the new end of the list, and close the list with its end byte.
+  $B4D1,7 Set how many calls each frame lasts from the layout record's flags.
 @ $B4D9 label=draw_screen
 c $B4D9 Draw the current screen
 D $B4D9 Draws a screen's layout, and shows the current sector's defence device on the control panel. Inside the hull, the WALL DONE screen draws no layout and ends the game.
@@ -484,7 +560,7 @@ N $B6DD The Skimmer is inside the hull.
 @ $B6F4 label=clear_device_slot
   $B6F4 Clear the slot.
   $B6F8,10 Set up the device at the cell. Copy its record into the slot, and draw it (#R$C204).
-@ $B703 label=record_inner_hatch
+@ $B703 label=record_inner_hatchway
   $B703 Record the hatchway's cell, and draw it.
 @ $B70B label=set_hostile_cell
 c $B70B Set the current hostile object's cell
@@ -529,15 +605,38 @@ B $B779,8
 B $B781,8
 @ $B789 label=colour_rectangle
 c $B789 Colour a rectangle of the screen
-D $B789 Gives bright white paper and black ink to the cells between the cell at #R$BD1D and this one?
+D $B789 Gives bright white paper and black ink to the rectangle of cells from the previous layout graphic's cell to this one. It never runs: the only jump to it needs the number that ends every layout.
+R $B789 I:B character row of the rectangle's bottom-right cell
+R $B789 I:C column of the rectangle's bottom-right cell
+  $B789 Was the previous layout graphic the number that ends a layout too? Return if not.
+  $B78F Find the attribute address of the previous graphic's cell, the rectangle's top-left corner.
+  $B797 Measure the rectangle from that corner to this cell, both included.
+  $B7A4 Colour each cell bright white paper and black ink, one row of attributes after another.
+@ $B7AA label=colour_rect_row
+  $B7AA Start a row of cells.
+@ $B7AD label=colour_rect_cell
+  $B7AD Colour the row's cells.
+  $B7B1,5 Step down to the next row, until the rectangle is done.
 @ $B7B7 label=shadow_cell
 c $B7B7 Shade one cell
-D $B7B7 Lays a shadow mask over a cell's pixels, unless the attribute mirror marks the cell as one that takes no shadow?
+D $B7B7 Shades one cell of a shadow through one of the #R$B7DA(shadow masks). A cell below the screen's bottom row, or one whose marks in the attribute mirror keep shadows off, stays as it is.
+R $B7B7 I:DE address of the shadow mask
+R $B7B7 I:HL attribute mirror address of the cell, kept on return
+  $B7B7 Does the cell carry a mark that keeps shadows off, such as a bright graphic's or a bar's? Return if so.
+  $B7BB Is the cell below the screen's bottom row? Return if so.
+  $B7BF Find the cell's top pixel row.
+@ $B7C5 label=shade_pixel_row
+  $B7C5 Clear the pixels that each row of the mask leaves out, from the cell's top pixel row down.
+  $B7CC,1 Recover the attribute mirror address.
 @ $B7CE label=mirror_pixel_addr
 c $B7CE Find a cell's pixel address from its attribute mirror address
+D $B7CE Gives the screen address of the top pixel row of the cell at an attribute mirror address.
+R $B7CE I:HL attribute mirror address of the cell
+R $B7CE O:HL screen address of the cell's top pixel row
+  $B7CE,11 The attribute page that matches the mirror's page gives the cell's screen third, which picks the high byte. The low byte stays as it is.
 @ $B7DA label=shadow_mask_full
 b $B7DA Shadow masks
-D $B7DA The pixel masks of the cells of a shadow.
+D $B7DA The pixel masks of the cells of a shadow, one byte per pixel row from the top. A set bit keeps its pixel, and a clear bit clears it.
 B $B7DA,8
 @ $B7E2 label=shadow_mask_lead
 B $B7E2,8
@@ -549,7 +648,8 @@ B $B7F2,8
 B $B7FA,8
 @ $B802 label=bar_cell_h
 b $B802 Bar cells
-D $B802 The patterns of the bars that join graphics, drawn by #R$BC70 and #R$BCB3.
+D $B802 The cells that repeat along a #R$B3F0(horizontal bar) and down a #R$B3B0(vertical bar).
+N $B802 #UDGTABLE { #UDG$B802,,4(bar_cell_h) | #UDG$B80A,,4(bar_cell_v) } { Horizontal bar | Vertical bar } TABLE#
 B $B802,8
 @ $B80A label=bar_cell_v
 B $B80A,8
@@ -764,10 +864,10 @@ c $BF19 Draw a shot
 D $BF19 Draws a shot in its new cell and saves what was there, or reports that the cell stops the shot.
 @ $BF6A label=find_hatch_graphic
 c $BF6A Find the graphic for a step of the hatchway animation
-D $BF6A Works out where the rows of the hatchway graphic for one animation step start, and how many rows it shows?
+D $BF6A Works out where the rows of the hatch's bitmap for one animation step start, and how many rows it shows?
 @ $BF8B label=animate_hatchway
 c $BF8B Step the hatchway animation
-D $BF8B Every fourth call, draws the next step of the hatchway as it opens or closes. It returns the step after that one, or zero once the animation is over?
+D $BF8B Every fourth call, draws the next step of the hatch as it opens or closes. It returns the step after that one, or zero once the animation is over?
 @ $C09B label=random_below
 c $C09B Random number below a limit
 D $C09B Returns a number from zero to one less than the limit, the remainder of the refresh register divided by the limit.

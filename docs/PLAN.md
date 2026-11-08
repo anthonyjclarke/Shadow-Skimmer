@@ -10,8 +10,8 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 |:--------------------|:------------------------------------------|
 | Phase               | 3 – depth pass, G2 screen layouts         |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
-| Baseline findings   | 52                                        |
-| Routines to the bar | 9 of 120 (`$B080–$B3AF`, `$B4D9–$B765`)  |
+| Baseline findings   | 49                                        |
+| Routines to the bar | 17 of 120 (`$B080–$B811`)                |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
 | Catalogs            | graphics, sound, data: not started        |
@@ -24,8 +24,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Target              | Lane | State                                |
 |:--------------------|:-----|:-------------------------------------|
-| Depth G2b `$B4D9–$B788` | code | spliced; review                 |
-| Depth G2a `$B3B0–$B4D8`, `$B789–$B811` | code | Worker deriving |
+| Depth G2a `$B3B0–$B4D8`, `$B789–$B811` | code | spliced; review |
 
 ---
 
@@ -60,6 +59,8 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | what stops a move        | blocked              | structure (for any block) |
 | the 50 Hz tick           | interrupt            | frame (frame = animation) |
 | `$D2B8` pointer          | attribute mirror address | colour cell          |
+| the 5×5 place to open    | hatchway             | hatch (for the whole) |
+| its 3×3 centre that opens | hatch               | cover                |
 
 ---
 
@@ -90,6 +91,9 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B20A`       | Split plot_graphic, plot_unmasked, cast_shadow, draw_shadow into entries |
 | `$D800`       | Split the layout tables and lists; record `#TABLE` |
 | `$9520`       | Title and render the defence device designs   |
+| `$95D0`       | Label the animated graphic frames             |
+| `$99A0`       | Label the hatch bitmap; split `$99E8` patterns (`@ssub`) |
+| `$FF10`       | `@equ` for the hatch workspace / background store |
 | `$B26D`       | Mask and pattern table addresses built from immediates (`@ssub`) |
 
 ### Game behaviour
@@ -108,7 +112,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$D48A`       | Score unit: trace `$D3C7–$D3F6` and `$D2FD`   |
 | `$BD44`       | Firing alignment: `$D2B2` = 2, pixel line 4   |
 | `$BF8B`       | Does the `$21` result end the opening?        |
-| `$BF6A`       | Rows and widths of the hatchway graphic       |
+| `$BF6A`       | Rows and widths of the hatch's bitmap        |
 | `$BEE0`       | Which cell pushes the Skimmer, and how?       |
 | `$D2CD`       | Other `$CC0B` patches: `$C47D`, `$C48A`, `$D10F` |
 | `$D343`       | Task run by the full interrupt routine        |
@@ -134,12 +138,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$CD86`       | Meaning of attribute mirror mark `$04`        |
 | `$CCD3`       | Meaning of the mark the flipped Skimmer ignores |
 | `$F30A`       | Is it the title tune's data?                  |
-| `$B3B0`       | Does the bar run from the previous graphic?   |
-| `$B432`       | Is `$99A0` the hatchway graphic's buffer?     |
-| `$B449`       | Do cover patterns depend on the screen number? |
-| `$B4A7`       | Does it draw the first frame?                 |
-| `$B7B7`       | Which mirror marks block a shadow?            |
-| `$B427`       | The 11 fields of the animation template       |
 | `$BC1F`       | Schema of the three control-key sets          |
 | `$BD40`       | Does `$FF` mean the device is destroyed?      |
 | `$C2DB`       | Does a pulse laser shot make it explode?      |
@@ -147,10 +145,12 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$C819`       | What do the blocking marks mean?              |
 | `$C880`       | Does it fire across its line of travel?       |
 | `$C957`       | What do the per-move flags mean?              |
-| `$B4A3`       | Colour pass reuses the hatchway's cell?       |
 | `$B812`       | Can the control panel shadow row 6?           |
 | `$C18B`       | Does steering override the start direction at once? |
 | `$B5F6`       | Column-0 vertical runs shade twice: visible?  |
+| `$B7B7`       | What writes mark bit 7 in the attribute mirror? |
+| `$B3B0`       | A zero-length bar loops 256 times: document?  |
+| `$B3F0`       | Why do the two bars' shadow offsets differ?   |
 | `$E141`       | Screen 55's last record runs into the next layout |
 | `$B4FB`       | Does anything call `$B04F` while `$B058` is a NOP? |
 | `$C955`       | Counter value `$17` for the defence device    |
@@ -164,7 +164,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 |:---------------|:----------------------------------------------|
 | hostile object | Register the name rulings in the glossary     |
 | `$95D0`        | Game name for the animated 3×3 graphic        |
-| hatchway       | One thing or two (place and opening cover)?   |
 | final goal     | Is the mothership entry-way its own entity?   |
 
 ### Skill (upstream)
@@ -217,3 +216,11 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$D800`  | 3-byte records, `$FF` ends; runs reach the next cell |
 | `$B789`  | Unreachable: `$FF` ends the list first             |
 | `$B5F0`  | Bug, latent: no outer-hull run ends on a join graphic |
+| `$B3B0`  | Yes: the bar runs from the previous layout graphic |
+| `$B432`  | `$99A0` is the 24×24 hatch bitmap; patterns `$99E8` |
+| `$B449`  | Yes: ROM byte `$0400` + screen number picks them    |
+| `$B4A7`  | Yes: frame 0, in the layout's attribute            |
+| `$B427`  | Fields tabled at `$B427`                            |
+| `$B4A3`  | Yes, but it repaints the same colour               |
+| `$B7B7`  | Marks with bit 0, 1 or 7 block a shadow            |
+| hatchway | Two things: the hatchway, and the hatch at its centre |

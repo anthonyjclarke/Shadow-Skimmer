@@ -121,12 +121,6 @@ message = "3400 bytes with no sub-directives. Fix it in this order: render it; s
 [[finding]]
 check = "data-structure"
 kind = "UNTYPED"
-at = "$B427"
-message = "11 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
-
-[[finding]]
-check = "data-structure"
-kind = "UNTYPED"
 at = "$BC1F"
 message = "24 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
 
