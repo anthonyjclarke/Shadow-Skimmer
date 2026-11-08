@@ -1,0 +1,43 @@
+; The .z80 header of SHADSKIM.Z80 (version 3, 86 bytes): the machine state
+; when the snapshot was taken. tools/z80snap.py reads the hex byte pairs of
+; each line and ignores everything after a semicolon.
+
+00                                                 ;   0: A
+50                                                 ;   1: F
+00 00                                              ;   2: BC
+34 5D                                              ;   4: HL
+00 00                                              ;   6: PC = 0: version 2/3 header follows
+52 FF                                              ;   8: SP ($FF52)
+3F                                                 ;  10: I
+16                                                 ;  11: R (bits 0-6)
+00                                                 ;  12: flags: bit 0 = R bit 7, bits 1-3 = border (0), bit 5 = 0: RAM blocks compressed
+39 5D                                              ;  13: DE
+21 17                                              ;  15: BC'
+9B 36                                              ;  17: DE'
+00 00                                              ;  19: HL'
+00                                                 ;  21: A'
+44                                                 ;  22: F'
+3A 5C                                              ;  23: IY ($5C3A, ERR-NR: the ROM's system-variable base)
+D4 03                                              ;  25: IX
+FF                                                 ;  27: IFF1
+FF                                                 ;  28: IFF2
+61                                                 ;  29: flags: interrupt mode 1
+36 00                                              ;  30: length of the extended header (54: version 3)
+3D 1F                                              ;  32: PC ($1F3D, the ROM PAUSE routine: BASIC line 30, PAUSE 0)
+00                                                 ;  34: hardware: 48K Spectrum
+00                                                 ;  35: last OUT to $7FFD (unused on 48K)
+00                                                 ;  36: Interface 1 ROM not paged
+02                                                 ;  37: emulation flags
+00                                                 ;  38: last OUT to $FFFD
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ;  39: AY-3-8912 registers
+E0 00 01                                           ;  55: T-state counter
+00                                                 ;  58: QL emulation flag
+00                                                 ;  59: MGT ROM paged
+00                                                 ;  60: Multiface ROM paged
+FF                                                 ;  61: $0000-$1FFF is ROM
+FF                                                 ;  62: $2000-$3FFF is ROM
+03 01 03 02 03 04 03 08 03 10                      ;  63: user-defined joystick key mappings
+31 00 32 00 33 00 34 00 35 00                      ;  73: ASCII words for the mappings (1, 2, 3, 4, 5)
+00                                                 ;  83: MGT type
+00                                                 ;  84: Disciple inhibit button
+00                                                 ;  85: Disciple inhibit flag

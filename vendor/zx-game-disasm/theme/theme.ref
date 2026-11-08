@@ -1,0 +1,92 @@
+; Default site theme for every zx-game-disasm project.
+;
+; skool2html parses this file LAST, after every project ref, and last wins
+; (skool2html.py:183-196; refparser.py:30-33 for replace-vs-extend). So a key
+; here is not a default a project can restate — it is final, and a plain
+; [Template:*] here cannot be reclaimed at all. This file therefore states only
+; what is genuinely the theme's own: the markup it draws and the assets it ships.
+; Everything a project should be able to change lives in assets/game.ref.template,
+; which is the project's own file and is parsed first — StyleSheet, AddressAnchor,
+; CodeFiles, Release, Copyright are all there. The script slot is composed on the
+; skool2html command line (site.mk, HTML_JS), because `-c` applies
+; after every ref and can append rather than replace.
+
+[Template:Layout]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>{Game[Game]}: {SkoolKit[title]}</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<# foreach($css,SkoolKit[stylesheets]) #>
+<link rel="stylesheet" type="text/css" href="{$css[href]}" />
+<# endfor #>
+<# foreach($js,SkoolKit[javascripts]) #>
+<script type="text/javascript" src="{$js[src]}"></script>
+<# endfor #>
+</head>
+<body class="{SkoolKit[page_id]}">
+<a class="skip-link" href="#content">Skip to content</a>
+<table class="header" role="presentation">
+<tr>
+<# if(SkoolKit[page_header][0]) #>
+<td class="page-header">{SkoolKit[page_header][0]}</td>
+<# endif #>
+<# if(SkoolKit[page_id]=='GameIndex') #>
+<td class="logo">{Game[Logo]}</td>
+<# else #>
+<td class="logo"><a href="{SkoolKit[index_href]}">{Game[Logo]}</a></td>
+<# endif #>
+<td class="page-header"><h1>{SkoolKit[page_header][1]}</h1></td>
+</tr>
+</table>
+<main class="page-content" id="content">
+<# include({SkoolKit[include]}) #>
+<# include(footer) #>
+</main>
+</body>
+</html>
+
+[Template:GameIndex]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>{Game[Game]}: {SkoolKit[title]}</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<# foreach($css,SkoolKit[stylesheets]) #>
+<link rel="stylesheet" type="text/css" href="{$css[href]}" />
+<# endfor #>
+<# foreach($js,SkoolKit[javascripts]) #>
+<script type="text/javascript" src="{$js[src]}"></script>
+<# endfor #>
+</head>
+<body class="{SkoolKit[page_id]}">
+<a class="skip-link" href="#content">Skip to content</a>
+<div class="container">
+<header>
+<h1 class="game-title">{Game[Game]}</h1>
+<div class="subtitle">{Game[Release]}</div>
+</header>
+<div class="divider"></div>
+<main id="content">
+<# include({SkoolKit[include]}) #>
+</main>
+<# include(footer) #>
+</div>
+</body>
+</html>
+
+[Template:GameIndex-home]
+<nav>
+<# foreach($section,sections) #>
+<div class="section">
+<div class="section-label">{$section[header]}</div>
+<div class="link-grid">
+<# foreach($item,$section[items]) #>
+<a class="link-card" href="{$item[href]}">{$item[link_text]}</a>
+<# endfor #>
+</div>
+</div>
+<# endfor #>
+</nav>

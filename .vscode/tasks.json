@@ -1,0 +1,63 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "env": { "PATH": "${workspaceFolder}/.venv/bin:/opt/homebrew/bin:${env:PATH}" }
+  },
+  "tasks": [
+    {
+      "label": "Restore: rebuild SHADSKIM.Z80 and compare",
+      "type": "shell",
+      "command": "gmake restore",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run in Fuse (source build)",
+      "type": "shell",
+      "command": "gmake fuse FUSE_APP=\"${workspaceFolder}/external/fuse-for-macos/fuse/fusepb/build/Deployment/Fuse.app\"",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run in Fuse (installed app)",
+      "type": "shell",
+      "command": "gmake fuse",
+      "problemMatcher": []
+    },
+    {
+      "label": "Skill gate (needs pasmo)",
+      "type": "shell",
+      "command": "gmake gate",
+      "problemMatcher": []
+    },
+    {
+      "label": "Coverage gauge",
+      "type": "shell",
+      "command": "gmake coverage",
+      "problemMatcher": []
+    },
+    {
+      "label": "HTML site",
+      "type": "shell",
+      "command": "gmake html && open build/html/index.html",
+      "problemMatcher": []
+    },
+    {
+      "label": "Code-coverage play session (trace map)",
+      "type": "shell",
+      "command": "python3 tools/coverage_trace.py SHADSKIM.Z80 build/play.map --frames 60000 --shots build/shots",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build Fuse for macOS (arm64) from source",
+      "type": "shell",
+      "command": "tools/build_fuse.sh",
+      "problemMatcher": []
+    },
+    {
+      "label": "Bootstrap toolchain",
+      "type": "shell",
+      "command": "tools/bootstrap.sh",
+      "problemMatcher": []
+    }
+  ]
+}

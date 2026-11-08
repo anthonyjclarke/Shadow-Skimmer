@@ -1,0 +1,1011 @@
+/* Default site theme for every zx-game-disasm project.
+ *
+ * Every declaration in this file is a default. A project's stylesheet loads
+ * after it and is meant to get its way by ADDING — a variable, a new rule, a
+ * more specific selector. If the only way for a project to get what it wants is
+ * to write `none`, `static`, `auto`, `0`, `unset` or a copy of a rule here in
+ * order to undo it, that declaration is a mandate and a defect: name the
+ * constant in :root and read it at the use site instead.
+ *
+ * The test, for each new declaration: write the line a project would put in
+ * {game}.css to get the opposite. If that line sets a variable or a value, the
+ * declaration is a default — ship it. If it neutralizes, it is not.
+ */
+
+/* ── Reset & variables ───────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Text faces. A built site is a directory of files opened from disk, so its
+     text must render without a network fetch: no @font-face, no webfont import.
+     Every name below is a face the platform already has, and the generic at the
+     end is reached only by a system carrying none of them — an unstyled generic
+     is what puts a serif slab (Courier New on Windows) under a code listing.
+     A project that wants a webfont declares its own @font-face and prepends the
+     family here; the fallbacks stay behind it. */
+  --font-sans: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+               'DejaVu Sans Mono', 'Liberation Mono', monospace;
+
+  /* A neutral, game-agnostic palette. A project's stylesheet overrides these
+     variables with colors derived from the game itself. */
+  --bg:          #16181d;
+  --surface:     #1f232b;
+  --surface-mid: #3a4150;
+  --yellow:      #c8a24a;
+  --cyan:        #6aa9d8;
+  --magenta:     #b083c4;
+  --green:       #7fae7f;
+  --red:         #c47070;
+  --text:        #d6d8dd;
+  --text-dim:    #7a8290;
+  --border:      #2a2f3a;
+
+  /* The link ink, apart from the cyan that registers and map entries also
+     wear, so a project can move one without the other. */
+  --link:        var(--cyan);
+
+  /* The tints and rules the components paint with. These are the same family as
+     the palette above and are named for the same reason: a project that sets
+     --bg to its own game's black and nothing else would otherwise get navy
+     banding on its memory map from a stylesheet that declares no blue. */
+  --tint:        rgba(10, 20, 50, 0.35);   /* zebra row, quiet surface       */
+  --tint-strong: rgba(8, 18, 50, 0.4);     /* the -2 box and list variants   */
+  --hover:       rgba(20, 55, 130, 0.65);  /* link card, contents pill       */
+  --rule:        rgba(22, 36, 72, 0.4);    /* row separator inside a table   */
+  --rule-strong: rgba(22, 36, 72, 0.7);    /* the -2 variants' border        */
+
+  /* The lamp. Hovering an annotated group of the listing lights it: this much
+     white falls on every surface in the group, over whatever color that surface
+     already carries. Each of them derives its lit value from its own token with
+     color-mix, which premultiplies alpha and so gives the same source-over as a
+     white veil laid over the group. */
+  --lit: 0%;
+  --code-punct:  #8a9099;                  /* punctuation, unnamed tokens    */
+  --header-bg:   rgba(7, 13, 26, 0.95);
+  --header-blur: blur(10px);
+  --audio-filter: invert(1) hue-rotate(165deg) brightness(0.85);
+
+  /* Layout constants, each named once and read everywhere it applies. The
+     measure lives on body, so the header bar and the reading column share one
+     boundary and a project that changes --measure moves both. --header-height
+     is what an anchor has to clear, and scroll-padding-top computes from it
+     rather than carrying a second number that can disagree. */
+  --measure:       1200px;
+  --index-measure: 720px;
+  --gutter:        32px;
+
+  /* Type scale. Six steps, one role each. A size that is not one of these is a
+     size with no role. */
+  --type-display:  30px;   /* the index title */
+  --type-heading:  24px;   /* h2, a page section */
+  --type-subhead:  20px;   /* h3, an entry title, a card title */
+  --type-body:     18px;   /* prose, descriptions, comments, list entries */
+  --type-small:    15px;   /* the listing, table cells, secondary notes */
+  --type-micro:    12px;   /* table heads, labels, the header bar */
+  /* Dim text on a raised surface - a card, a table head. --text-dim is
+     tuned against the page background and measures under 4.5:1 there. */
+  --text-dim-raised: #9aa1ad;
+  --header-height: 80px;
+}
+
+html {
+  scrollbar-color: var(--surface-mid) var(--bg);
+  scroll-padding-top: calc(var(--header-height) + var(--gutter));
+}
+
+/* ── Prose baseline ──────────────────────── */
+
+/* The reset zeroes every element margin, so hand-authored .ref prose would
+   render as one unbroken block whatever elements it emits. These give it a
+   reading rhythm. They come first, so every component below re-states its own
+   spacing and wins on order or specificity. */
+p, ul, ol, blockquote, pre {
+  margin-bottom: 14px;
+}
+
+h1, h2, h3, h4 {
+  margin: 28px 0 10px;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+h1 { font-size: var(--type-display); }
+h2 { font-size: var(--type-heading); }
+h3 { font-size: var(--type-subhead); }
+h4 { font-size: var(--type-subhead); }
+
+blockquote {
+  padding-left: 14px;
+  border-left: 2px solid var(--border);
+  color: var(--text-dim);
+}
+
+/* ── Body ────────────────────────────────── */
+
+/* body carries the measure, so it is the page's one vertical boundary and every
+   child — the header bar as much as the reading column — sits inside it. A
+   wrapper that capped itself would draw a second boundary, and a project that
+   wants chrome around the whole page (a border, a frame) would have nowhere to
+   hang it that contains both. */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  max-width: var(--measure);
+  margin: 0 auto;
+}
+
+/* ── Header bar (all non-index pages) ───── */
+
+table.header {
+  display: block;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--header-bg);
+  backdrop-filter: var(--header-blur);
+  -webkit-backdrop-filter: var(--header-blur);
+  border-bottom: 1px solid var(--border);
+  font-size: inherit;
+  font-weight: normal;
+}
+
+table.header tbody {
+  display: block;
+}
+
+/* The bar spans body's content box, and body carries the measure, so the row
+   needs no cap of its own — it inherits the one boundary. Its inset is the same
+   gutter the wrappers below it use, so the logo and the page label start on the
+   reading column's own left edge. */
+table.header tr {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 var(--gutter);
+}
+
+table.header td {
+  font-size: inherit;
+  font-weight: normal;
+  padding: 14px 0;
+  vertical-align: middle;
+}
+
+td.logo {
+  flex: 0 0 auto;
+  margin-right: auto;
+}
+
+td.logo a {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-size: var(--type-micro);
+  color: var(--yellow);
+  text-decoration: none;
+}
+
+/* The page title. It is the h1, so it outranks the section headings below it
+   rather than sitting under them at label size. Family and transform come from
+   the cell, which a project may set to its own display face. */
+td.page-header h1 {
+  margin: 0;
+  font-family: inherit;
+  font-size: var(--type-display);
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: inherit;
+  color: var(--text);
+}
+
+td.page-header {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+/* ── Page content wrapper ────────────────── */
+
+.page-content {
+  padding: var(--gutter) var(--gutter) 0;
+}
+
+/* ── Index layout ────────────────────────── */
+
+/* The index reads as a single column of links, so it takes a narrower measure
+   than a page of listing. A project that wants one width everywhere sets
+   --index-measure to var(--measure). */
+.container {
+  max-width: var(--index-measure);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+header {
+  padding: 56px 0 40px;
+  text-align: center;
+}
+
+
+.game-title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-size: clamp(24px, 5.5vw, 52px);
+  color: var(--yellow);
+  line-height: 1.4;
+}
+
+.subtitle {
+  font-family: var(--font-sans);
+  font-size: var(--type-small);
+  font-weight: 300;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 22px;
+}
+
+/* An unset [Game] Release= emits the div anyway. Empty, it is not a line that
+   says nothing — it is 22px of margin above nothing, which reads as a design
+   with a hole in it. */
+.subtitle:empty {
+  display: none;
+}
+
+.divider {
+  position: relative;
+  height: 2px;
+  margin: 32px 0 36px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border) 15%,
+    var(--surface-mid) 50%,
+    var(--border) 85%,
+    transparent 100%
+  );
+}
+
+.divider::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: var(--surface-mid);
+  border-radius: 50%;
+}
+
+/* ── Index navigation ────────────────────── */
+
+nav {
+  padding-bottom: 24px;
+}
+
+/* A project may re-declare --section-color per section for a game palette. */
+.section {
+  --section-color: var(--text-dim);
+  margin-bottom: 34px;
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--section-color);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--section-color), transparent);
+  opacity: 0.3;
+}
+
+.link-grid {
+  display: grid;
+  /* auto-fill keeps the tracks a short section cannot fill, so a two-link
+     group sits beside three reserved columns and the page reads as a broken
+     grid. auto-fit drops the empty tracks instead. */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.link-card {
+  display: block;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: var(--type-subhead);
+  font-weight: 600;
+  line-height: 1.35;
+  transition: background 0.12s, border-color 0.12s, transform 0.12s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* What is behind the card, under its name. */
+.link-note {
+  display: block;
+  margin-top: 5px;
+  font-weight: 400;
+  font-size: var(--type-small);
+  line-height: 1.45;
+  color: var(--text-dim-raised);
+}
+
+.link-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--section-color);
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform 0.12s;
+  border-radius: 6px 0 0 6px;
+}
+
+.link-card:hover {
+  background: var(--hover);
+  border-color: var(--section-color);
+  color: var(--text);
+  transform: translateX(5px);
+}
+
+.link-card:hover::before {
+  transform: scaleY(1);
+}
+
+/* ── ASM navigation ──────────────────────── */
+
+table.asm-navigation {
+  width: 100%;
+  margin-bottom: 0;
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-collapse: collapse;
+}
+
+table.asm-navigation td {
+  background: transparent;
+  padding: 8px 0;
+  font-family: var(--font-mono);
+  font-size: var(--type-small);
+  color: var(--text-dim);
+}
+
+table.asm-navigation a {
+  color: var(--link);
+}
+
+table.asm-navigation td.prev { width: 30%; text-align: left; }
+table.asm-navigation td.up   { width: 40%; text-align: center; }
+table.asm-navigation td.next { width: 30%; text-align: right; }
+
+/* ── Routine description ─────────────────── */
+
+div.description {
+  font-family: var(--font-mono);
+  font-size: var(--type-subhead);
+  font-weight: 700;
+  color: var(--yellow);
+  margin: 24px 0 0;
+  padding: 11px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border-left: 3px solid var(--yellow);
+  border-radius: 0 4px 4px 0;
+}
+
+/* An entry's description is the page's primary prose - what the routine does -
+   so it takes the reading color and the reading size. --text-dim is the token
+   for de-emphasis, and it measures 4.85:1 where this measures 15.7:1. */
+div.details {
+  font-family: var(--font-sans);
+  font-size: var(--type-body);
+  line-height: 1.7;
+  color: var(--text);
+  padding: 4px 0;
+}
+
+div.comments {
+  font-family: var(--font-sans);
+  font-size: var(--type-body);
+  line-height: 1.75;
+  color: var(--text);
+  padding: 8px 0 4px;
+}
+
+div.paragraph {
+  margin-top: 8px;
+  font-size: var(--type-body);
+  line-height: 1.75;
+}
+
+/* ── Disassembly table ───────────────────── */
+
+/* Columns size to their content and code never wraps — a wrapped instruction
+   reads as two lines. The cap keeps a wide listing inside the measure so only
+   the prose comment column takes up the slack. */
+table.disassembly {
+  /* Fit the reading column rather than set it: the comment column takes what
+     is left and wraps, so the listing shares the page's one edge. */
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--type-small);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+td.routine-comment {
+  padding: 4px 0;
+  font-family: var(--font-sans);
+  color: var(--text);
+  border: none;
+}
+
+td.address-1 {
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  vertical-align: top;
+  padding: 1px 14px 1px 0;
+  white-space: pre;
+  font-size: var(--type-small);
+}
+
+td.address-2 {
+  font-family: var(--font-mono);
+  color: var(--red);
+  font-weight: 700;
+  vertical-align: top;
+  padding: 1px 14px 1px 0;
+  white-space: pre;
+  font-size: var(--type-small);
+}
+
+td.asm-label {
+  font-family: var(--font-mono);
+  color: var(--cyan);
+  font-weight: 700;
+  vertical-align: top;
+  padding: 1px 14px 1px 0;
+  white-space: pre;
+}
+
+td.bytes {
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  vertical-align: top;
+  padding: 1px 14px 1px 0;
+  white-space: pre;
+  font-size: var(--type-small);
+}
+
+td.instruction {
+  font-family: var(--font-mono);
+  color: var(--code-punct);
+  vertical-align: top;
+  padding: 1px 14px 1px 0;
+  white-space: pre;
+}
+
+/* Z80 syntax highlighting tokens */
+td.instruction .hljs-keyword  { color: var(--green); } /* mnemonics  */
+td.instruction .hljs-built_in { color: var(--cyan); }   /* registers  */
+td.instruction .hljs-number   { color: var(--yellow); } /* immediates */
+td.instruction .hljs-string   { color: var(--magenta); }
+td.instruction .hljs-comment  { color: var(--text-dim); font-style: italic; }
+
+td.comment-0 {
+  color: var(--text-dim);
+  vertical-align: top;
+  padding: 1px 0;
+  font-family: var(--font-mono);
+  font-style: italic;
+  font-size: var(--type-small);
+}
+
+td.comment-1 {
+  --paper: rgba(255, 255, 255, 0.03);
+  /* The edges are flattened onto the page's black rather than laid over the
+     paper as a translucent white. Collapsed borders paint the same pixels where
+     they cross, so two translucent lines compound there and the crossing comes
+     out brighter than either of them. Opaque, a crossing is one of the two. */
+  --edge: color-mix(in srgb, #fff 10%, var(--bg));
+  color: var(--text);
+  border-left: 1px solid color-mix(in srgb, #fff var(--lit), var(--edge));
+  padding: 1px 14px;
+  vertical-align: top;
+  width: 45%;
+  font-family: var(--font-sans);
+  font-size: var(--type-small);
+  line-height: 1.6;
+}
+
+/* A comment group opens with a rule across the whole listing, so the comment
+   column reads as a column of the listing rather than a box beside it. SkoolKit
+   puts a comment-1 cell on every row of an annotated entry, and a row with
+   nothing to say gets an empty one, so only a row whose cell holds a comment
+   starts a group. */
+table.disassembly tr:has(> td.comment-1:not(:empty)) > td {
+  border-top: 1px solid color-mix(in srgb, #fff var(--lit), color-mix(in srgb, #fff 8%, var(--bg)));
+}
+
+/* Every cell of the listing paints its own paper through the lamp, so the light
+   is one quantity added over whatever that cell carries rather than a color per
+   cell. The child chain keeps the paint off the register tables nested in an
+   entry description, which set their own. */
+table.disassembly > tbody > tr > td {
+  background-color: color-mix(in srgb, #fff var(--lit), var(--paper, transparent));
+}
+
+/* --lit inherits into every cell of the group, so the one declaration lights the
+   listing's paper, the comment band and its edges by the same amount. */
+table.disassembly tr.asm-group-hover {
+  --lit: 4%;
+}
+
+span.register {
+  color: var(--cyan);
+  font-family: var(--font-mono);
+}
+
+/* ── Input/output register tables ─────────── */
+
+table.input,
+table.output {
+  border-collapse: collapse;
+  margin-bottom: 14px;
+}
+
+table.input th,
+table.output th {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  text-align: left;
+}
+
+table.input td,
+table.output td {
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--type-small);
+  padding: 4px 12px;
+}
+
+/* Input and Output are separate tables, so an auto width would size each one's
+   register column to its own content and start the two description columns at
+   different offsets. A fixed width that fits a primed pair (HL') lines them up. */
+td.register {
+  color: var(--cyan);
+  width: 4ch;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* ── Memory map tables ───────────────────── */
+
+div.map-intro {
+  margin-bottom: 16px;
+}
+
+table.map {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.map th {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+table.map th.map-length {
+  text-align: center;
+}
+
+table.map tr:nth-child(odd)  td { background: var(--tint); }
+table.map tr:nth-child(even) td { background: rgba(255, 255, 255, 0.04); }
+
+table.map td {
+  padding: 7px 16px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--type-small);
+}
+
+/* Address cells by entry type */
+td.map-c, td.map-g, td.map-b, td.map-w, td.map-s, td.map-u,
+td.map-page, td.map-byte {
+  font-family: var(--font-mono);
+  font-size: var(--type-small);
+  white-space: nowrap;
+}
+
+td.map-c { color: var(--cyan); }
+td.map-g { color: var(--yellow); }
+td.map-b, td.map-w { color: var(--green); }
+td.map-s, td.map-u { color: var(--text-dim); }
+td.map-page, td.map-byte { color: var(--text-dim); text-align: center; }
+
+td.map-length {
+  font-family: var(--font-mono);
+  font-size: var(--type-small);
+  color: var(--text-dim);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Description cells — color only applied to address column above;
+   description text uses consistent neutral tone */
+td.map-c-desc,
+td.map-g-desc,
+td.map-b-desc,
+td.map-w-desc,
+td.map-s-desc,
+td.map-u-desc,
+td.map-t-desc { color: var(--text); }
+
+div.map-entry-title-10 {
+  font-family: var(--font-sans);
+  font-size: var(--type-body);
+  font-weight: 500;
+  color: var(--text);
+}
+
+div.map-entry-title-11 {
+  font-family: var(--font-sans);
+  font-size: var(--type-body);
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* SkoolKit's own stylesheet sets `font-family: sans` on these four selectors.
+   `sans` is not a CSS generic, so a browser discards it and falls back to its
+   default serif. The theme's `body` rule cannot win against them, being less
+   specific, so they are named here. */
+div.map-entry-title-11,
+div.map-entry-desc,
+td.map-s-desc,
+td.map-u-desc { font-family: var(--font-sans); }
+
+div.map-entry-desc {
+  font-size: var(--type-small);
+  color: var(--text-dim);
+  margin-top: 3px;
+  line-height: 1.5;
+}
+
+/* ── Box entries (facts, notes, bugs…) ───── */
+
+div.box {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 14px;
+  width: auto;
+}
+
+div.box-1 {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+div.box-2 {
+  background: var(--tint-strong);
+  border-color: var(--rule-strong);
+}
+
+div.box-title {
+  font-family: var(--font-mono);
+  font-size: var(--type-subhead);
+  font-weight: 700;
+  color: var(--yellow);
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+
+div.box p {
+  margin-bottom: 0;
+}
+
+/* ── List entries (graphics…) ────────────── */
+
+div.list-entry {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 14px;
+  width: auto;
+}
+
+div.list-entry-1 { background: rgba(255, 255, 255, 0.035); }
+div.list-entry-2 { background: var(--tint-strong); }
+
+div.list-entry-title {
+  font-family: var(--font-mono);
+  font-size: var(--type-subhead);
+  font-weight: 700;
+  color: var(--yellow);
+  margin-bottom: 8px;
+}
+
+div.list-entry-desc {
+  font-size: var(--type-body);
+  color: var(--text);
+  margin-top: 6px;
+  line-height: 1.6;
+}
+
+ul.list-entry {
+  margin-top: 8px;
+  margin-bottom: 0;
+  padding-left: 20px;
+  color: var(--text);
+  font-size: var(--type-body);
+  line-height: 1.7;
+}
+
+/* ── Default content tables ──────────────── */
+
+table.default {
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+
+table table.default th,
+table.default th {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: var(--type-micro);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+table table.default td,
+table.default td {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  font-size: var(--type-body);
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--rule);
+}
+
+td.centre { text-align: center; }
+
+/* ── Contents list ───────────────────────── */
+
+ul:not(.contents):not(.list-entry) {
+  padding-left: 1.4em;
+}
+
+ul.contents {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+ul.contents li a {
+  font-family: var(--font-mono);
+  font-size: var(--type-small);
+  color: var(--link);
+  text-decoration: none;
+  padding: 5px 11px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: block;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+ul.contents li a:hover {
+  background: var(--hover);
+  border-color: var(--link);
+  color: var(--yellow);
+}
+
+/* ── Images (sprites) ────────────────────── */
+
+/* Chunky 8x8-derived art scales by integer nearest-neighbor, never blurred.
+   crisp-edges first, pixelated second: the later declaration is the one that
+   wins, so the modern keyword has to be the one that lands. */
+img {
+  border: 0;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+/* ── Audio controls ──────────────────────── */
+
+audio {
+  display: block;
+  width: 100%;
+  max-width: 380px;
+  height: 36px;
+  margin: 10px 0;
+  accent-color: var(--link);
+  filter: var(--audio-filter);
+}
+
+/* ── Links ───────────────────────────────── */
+
+a {
+  color: var(--link);
+  text-decoration: none;
+  transition: color 0.1s;
+}
+
+/* Color alone must not carry a link (WCAG 1.4.1) - but only where color is
+   the only signal, which is a link sitting inside a run of prose. A link that
+   is the whole of its cell or card is already marked by being the cell's
+   content, and underlining those turns a map into a column of underlines.
+   So this names the prose containers rather than matching every href. */
+.page-content div.paragraph a,
+.page-content div.details a,
+.page-content div.comments a,
+.page-content li a,
+.page-content td.comment-1 a,
+.page-content table.default td a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+}
+
+.page-content a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Off-canvas until focused, so a keyboard reader can pass the sticky bar. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 200;
+  padding: 10px 16px;
+  background: var(--surface-mid);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--type-small);
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+a:hover,
+a.map-entry-title:hover {
+  color: var(--yellow);
+}
+
+a.map-entry-title {
+  color: inherit;
+}
+
+/* ── Footer ──────────────────────────────── */
+
+footer {
+  clear: both;
+  margin-top: 48px;
+  padding: 20px 0 32px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--type-small);
+  color: var(--text-dim);
+}
+
+/* [Game] Release= and Copyright= name and credit the site, so a set value has
+   to reach the page. Only the empty slot is hidden. */
+footer .release:empty,
+footer .copyright:empty {
+  display: none;
+}
+
+footer .release {
+  color: var(--text);
+}
+
+footer a {
+  color: var(--link);
+}
+
+footer a:hover {
+  color: var(--yellow);
+}
+
+/* ── Inline code ─────────────────────────── */
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  color: var(--cyan);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* A $-hex value in running text sets as inline code does: the monospace face, a
+   lighter ground and a small rounded outline, in the prose's own color so it
+   marks the value without competing with it. html/hex_mono.py wraps the values after the site is built; the listing's
+   own instruction cells are left as they are. */
+.hex {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 3px;
+  padding: 0 4px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Inside a link into the listing the link's own size already applies. */
+a .hex { font-size: inherit; }
+
+/* A label named in running text without a link is set in the face its linked
+   mentions use, so a name reads as code whether or not it links.
+   html/sym_mono.py wraps the names after the site is built. */
+.sym {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  line-height: 1;
+}
+
+/* A link into the disassembly reads as code. Matching on the path is what
+   SkoolKit's generated markup allows — it puts no class on a #R link — so the
+   match is at least held to a site-relative href, and a third-party URL that
+   happens to contain the same characters is left alone. */
+a:not([href^="http"])[href*="asm/"] {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}

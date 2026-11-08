@@ -1,0 +1,6 @@
+; Shadow Skimmer has no tape image in this project: the source is the snapshot
+; SHADSKIM.Z80 (dated 31-10-1996, 41483 bytes, from ShadowSkimmer.z80.zip),
+; taken after the BASIC loader had loaded the code block and while it waited
+; at line 30 (PAUSE 0). The Makefile copies it to build/shadskim.z80 instead
+; of running tap2sna.py, so this file is a provenance record only; the skill's
+; snapshot rule still names it as a prerequisite.
