@@ -905,198 +905,650 @@ D $BF8B Every fourth call, draws the next step of the hatch as it opens or close
 @ $BFCF ssub=LD HL,skimmer_bg_store+$5E
 @ $C09B label=random_below
 c $C09B Random number below a limit
-D $C09B Returns a number from zero to one less than the limit, the remainder of the refresh register divided by the limit.
+D $C09B Returns a random number below a limit: the remainder of the refresh register divided by the limit.
+R $C09B I:A limit, 1–128
+R $C09B O:A number from 0 to one less than the limit
+  $C09B Take the refresh register as the random number. Divide it by the limit one bit at a time, from its top bit down.
+@ $C0A2 label=random_bit
+  $C0A2 Shift the next bit of the number into the remainder, and take the limit off it. Jump if the remainder held the limit
+  $C0A8 If not, put the limit back.
+@ $C0A9 label=random_next_bit
+  $C0A9,2 Do the next bit while one is left.
 @ $C0AC label=hostile_image_bufs
 b $C0AC Image buffers of the hostile objects
-D $C0AC The address of each hostile object's image buffer, which holds its shifted images and masks.
+D $C0AC The address of each hostile object's image buffer, one for each slot at #R$F800(the hostile object slots). The two slots that move on even counts of #R$C958(the tick) come first.
+N $C0AC A buffer holds the four images of the object's design, then the four masks, 48 bytes each. Each copy sits 2 pixels further right than the one before it. #R$C227 fills them.
 W $C0AC,8,2
 @ $C0B4 label=move_hostile_objects
 c $C0B4 Move the hostile objects
-D $C0B4 Moves two of the four hostile objects on each call and the other two on the call after.
-D $C0B4 It brings a new hostile object in while fewer are out than the limit at #R$BD33?
+D $C0B4 Moves the hostile objects of one pair of slots, and those of the other pair on the next call. After the hold that starts each screen, it can also launch a new hostile object.
+  $C0B4 Make the draw of the Skimmer step its cover map three cells per row, the width of a hostile object.
 @ $C0B5 ssub=LD ($CC32),A
+  $C0B8 Start the counts of the call's objects and removals at zero.
+  $C0BE Count the call. Take the first pair of slots on an even count and the second pair on an odd count.
+@ $C0CA label=move_hostile_slot
+  $C0CA Make this slot the current one. Clear the record of a move or a turn, and let the object toggle the hostile object mark.
 @ $C0D6 ssub=LD ($C80D+1),A
+  $C0D9 Is the slot empty?
+  $C0E0 Jump if so
+  $C0E2 Copy the slot's record into the current hostile object, move the object and let it fire.
+  $C0F4 Copy the record back into the slot.
+@ $C104 label=next_hostile_slot
+  $C104 Step to the next slot, and go back while the pair has one left.
+  $C10F Does the hold after a new screen run?
+  $C114 Jump if not
+  $C116,4 Count it on. It lasts two calls, so each pair of slots gets one move of the hold.
+@ $C11B label=try_launch
+N $C11B A launch needs a call that removes no object. The pair must hold fewer objects of the screen than the screen has launch cells.
+  $C11B Does the pair hold as many of the screen's objects as the screen has launch cells? Return if so.
+  $C123 Did an object leave the game on this call? Return if so.
+  $C129 Give the new object the hostile object mark, which an explosion changes.
 @ $C12B ssub=LD ($C80D+1),A
+  $C12E Look for an empty slot in the pair, from the first, and count the slots passed.
+@ $C13E label=seek_empty_slot
+  $C13E Is this slot empty?
+  $C141 Jump if so
+  $C143 Count the slot, and try the next one while the pair has one left.
+  $C14E Both slots hold objects. Look for one whose object belongs to another screen, and count the slots passed.
+@ $C15B label=seek_stale_slot
+  $C15B Does this slot's object belong to the current screen?
+  $C15F Jump if not
+  $C161,11 Count the slot, and try the next one while the pair has one left.
+N $C16C No slot is free.
+@ $C16D label=stale_slot_found
+  $C16D Step back from the object's screen number to the start of its slot.
+@ $C172 label=empty_slot_found
+  $C172 Step back from the slot's state byte to the start of the slot.
+@ $C175 label=launch_in_slot
+  $C175 Make it the current slot.
+  $C179 Never returns: a screen with no launch cells has already ended the call.
+  $C17F Pick one of the screen's launch cells at random.
+@ $C183 ssub=ADD A,launch_cells%$100
+@ $C186 ssub=LD H,launch_cells/$100
+@ $C18B label=read_launch_cell
+  $C18B Place the new object at the launch cell. The column byte's low five bits give the column, and the next byte the row.
+  $C196 Take the start direction from the column byte. See #R$B67C(the store of a launch cell) for why it comes out up or left.
+  $C19F Find the cell's screen address and its attribute mirror address. The object starts at the left edge of its column.
 @ $C1A6 ssub=ADD A,(attr_mirror-$5800)/256
+  $C1B1 Does something block a cell under it? Return if so, and launch nothing on this call.
+  $C1B5 Its cover map starts the slot, and its background store follows it.
+  $C1C2 Pick the slot's image buffer, by the page and the slot within it.
+@ $C1CD ssub=ADD A,hostile_image_bufs%$100
+@ $C1D0 ssub=LD H,hostile_image_bufs/$100
+@ $C1D5 label=read_image_buf
+  $C1D5 Keep the buffer's address.
+  $C1DC Pick a hostile object design at random.
+  $C1E1,23 Find the design, 64 bytes per design: a 16×16 image, then its mask.
+  $C1FB It first steers toward the Skimmer on its fifth whole cell on the play area.
+  $C200 Point at the new object's slot.
 @ $C204 label=add_hostile
+N $C204 This entry point adds the current hostile object to the slot at #REGde, as an object of the current screen. It draws nothing, so the object first shows at its next move.
+  $C204 Tie the object to the current screen, and copy its record into the slot.
+@ $C216 label=place_hostile
+  $C216,16 Save the background behind the object, note the cells that hide it, and give its cells the hostile object mark.
 @ $C227 label=preshift_hostile
 c $C227 Build a hostile object's shifted images
-D $C227 Builds the four images and four masks of the current hostile object from its design, each copy shifted 2 pixels further right.
+D $C227 Builds the four images and four masks of a hostile object design in an image buffer. Each copy sits 2 pixels further right than the one before.
+N $C227 A design holds 16 pixel rows of its image, 2 bytes per row, then 16 rows of its mask. A mask bit of 1 lets the background show. Each copy in the buffer takes 3 bytes per pixel row.
+R $C227 I:DE address of the design
+R $C227 I:HL address of the image buffer
+  $C227 Start at the first image in the buffer, with the design's first image row.
 @ $C22D label=preshift_hostile_image
+  $C22D Write each image row four ways, blank around the design.
+  $C23C Move the build position past the four images to the first mask, and take the design's mask rows.
 @ $C244 ssub=LD A,($C95F+1)
 @ $C249 ssub=LD ($C95F+1),A
 @ $C24E label=preshift_hostile_mask
+  $C24E,15 Write each mask row four ways, open to the background around the design.
 @ $C25E label=shift_image_row
 c $C25E Shift one design row four ways
-D $C25E Writes one row of a design four times, each copy shifted 2 pixels further right, and moves the build position to the next row.
+D $C25E Writes one row of a design into the four images or the four masks at the build position, each copy shifted 2 pixels further right. It moves the build position on to the next row.
+R $C25E I:C left byte of the design row
+R $C25E I:D right byte of the design row
+R $C25E I:E 0 for an image row, $FF for a mask row
+  $C25E Take the build position. The fill byte's low bit fills the pixels that each shift opens on the left, so keep it aside.
 @ $C269 label=shift_image_row_copy
+  $C269 Write the copy's three bytes, and step to the same row of the next copy.
 @ $C275 label=shift_image_row_bits
+  $C275 Shift the row 2 pixels right, and let the fill bit in on the left. The last shift goes unused.
+  $C285,7 Move the build position to the next row.
 @ $C28D label=draw_hostile
 c $C28D Draw a hostile object
-D $C28D Draws the current hostile object's image for its pixel offset through its mask.
+D $C28D Draws the current hostile object's image for its pixel offset, through its mask, over its saved background. It leaves out the cells that hide it (#R$C76A).
+  $C28D Find the image's distance from the first image, by the pixel offset.
 @ $C299 label=draw_hostile_offset
+  $C299 Add it to the address of the object's images.
 @ $C2A2 label=draw_hostile_mask
+  $C2A2 Keep the image's address. Its mask lies four images further on.
 @ $C2A9 label=draw_hostile_mask_ok
+  $C2A9 Is it the defence device?
+  $C2AF Jump if not
+  $C2B1 The device draws through the first explosion mask, solid across its two columns.
 @ $C2B4 label=draw_hostile_args
+  $C2B4 Hand the draw the background store, the mask and the cover map in the other register set. Each byte it writes is the background through the mask, with the image over it.
 @ $C2BD label=plot_hostile_image
+N $C2BD This entry point draws an image at the object's screen address. The caller holds the image in #REGhl, and the background store, the mask and the cover map in the other register set.
+  $C2BD Draw the object's 16 pixel rows through the draw loop of the Skimmer.
 @ $C2C7 label=save_hostile_bg
 c $C2C7 Save the background behind a hostile object
-D $C2C7 Copies the screen under the current hostile object into its background store.
+D $C2C7 Copies the screen under a hostile object into its background store.
+R $C2C7 I:DE address of the background store
+R $C2C7 I:HL screen address of the object's top-left byte
+  $C2C7 Take each column in turn.
 @ $C2C9 label=save_hostile_bg_col
-b $C2DA
+  $C2C9,16 Copy the column down the object's 16 pixel rows into every third byte of the store. Then step one column right.
+u $C2DA Unused bytes
 @ $C2DB label=update_hostile
 c $C2DB Update a hostile object
-D $C2DB Runs one move of the current hostile object, in which it steers toward the Skimmer along the axis of the larger distance. It explodes when a pulse laser shot hits it?
+D $C2DB Runs one move of the current hostile object if it belongs to the current screen. A hit makes it explode, and otherwise it steers toward the Skimmer.
+  $C2DB Does its explosion run?
+  $C2E0 Jump if so
+  $C2E3 Does it belong to another screen? Return if so, and leave it as it is.
+  $C2EB Count it among the objects of the screen.
+  $C2EF Does any hit cell wait?
+  $C2F4 Jump if not
+  $C2F6 Find the object's cells on the play area. Jump if it has none there.
 @ $C2FD label=scan_hit_row
+  $C2FD Take the next row of its cells.
 @ $C300 label=scan_hit_cell
+  $C300 Is this cell hit?
+  $C305 Jump if not
+  $C307 Clear the hit from the cell but keep the hostile object mark, and count the cell.
 @ $C30E label=scan_hit_next
+  $C30E Step along the row.
+  $C311 Step down to the next row of cells.
 @ $C31A label=scan_hit_down
+  $C31A Scan the next row while one is left.
+  $C31C Is any of its cells hit?
+  $C31F Jump if not
+  $C321 Take its cells off the count of hits, and make it explode.
 @ $C330 label=update_hostile_hold
+  $C330 Does the hold after a new screen run?
+  $C335 Jump if not
+N $C337 The hold. The object belongs to the screen the Skimmer has come back to. It shows again where it was, unless the new screen blocks it.
+  $C337 Is it the defence device? Return if so: the device first draws after the hold.
+  $C33D Does something block a cell under it? Jump if so, and let it vanish.
+  $C343 Put it back in place, and draw it.
 @ $C349 label=update_hostile_steer
+  $C349 Is it the defence device?
+  $C34E Jump if so: the device sits where it is and only draws again.
+N $C351 The object steers only on a whole cell, wholly on the play area, and only once its count of cells runs out.
+  $C351 Does it lie between two cells?
 @ $C354 ssub=LD A,($C947+1)
+  $C35A Jump if so
+  $C35D Does it lie partly off the left or the right of the screen?
+  $C362 Jump if so
+  $C365 Does it lie partly above the play area?
+  $C36A Jump if so
+  $C36D Does it lie partly below the play area?
+  $C36F Jump if so
+  $C372 Count down the cells to its next turn. Jump unless the count runs out.
+N $C37C It steers. It heads the way in which the Skimmer lies furthest, for as many cells as that distance.
+  $C37C Store the distances in cells from the object to the Skimmer up, down, left and right, in the first four bytes of the attribute mirror. A distance the wrong way is negative.
+  $C399 Look for the longest distance, from none.
 @ $C39D label=steer_pick_axis
+  $C39D Is the distance negative?
+  $C3A0 Jump if so
+  $C3A3 Is it shorter than the longest so far?
+  $C3A4 Jump if so: a tie goes to the later direction.
+  $C3A6 Keep it as the longest, with its direction.
 @ $C3A8 label=steer_next_axis
+  $C3A8 Try the next direction.
+  $C3AB Head that way, and count that distance in cells to the next turn.
 @ $C3B7 label=remove_hostile
 c $C3B7 Remove a hostile object
-D $C3B7 Empties the current hostile object's slot and puts back the background behind it.
+D $C3B7 Takes the current hostile object off the screen and empties its slot.
+  $C3B7 Take its mark off its cells, and count it as removed.
+  $C3BE Empty its slot.
+  $C3CB Put back the background behind it, one column at a time. Leave out the cells that hide it.
 @ $C3DB label=remove_hostile_col
+  $C3DB,25 Restore the column down the object's 16 pixel rows. Then step one column right on the screen, in the store and in the cover map.
 @ $C3F5 label=advance_hostile
 c $C3F5 Advance a hostile object
-D $C3F5 Moves the current hostile object 2 pixels in its direction. A blocked hostile object turns back, and one that reaches the edge of the play area leaves the game.
+D $C3F5 Moves the current hostile object 2 pixels in its direction, and draws it there. A blocked object turns back or explodes, and one that has passed off the play area leaves the game.
+  $C3F5 Lift its mark off its cells while it moves.
+  $C3F8 Does it head left?
+  $C3FD Jump if not
+  $C3FF Step it left.
 @ $C404 label=advance_hostile_right
+  $C404 Does it head right?
+  $C406 Jump if not
+  $C408 Step it right.
 @ $C40D label=advance_hostile_up
+  $C40D Does it head up?
+  $C40F Jump if not
+  $C411 Step it up.
 @ $C416 label=advance_hostile_down
+  $C416 Does it head down?
+  $C418 Jump if not
+  $C41A Step it down.
 @ $C41D label=advance_hostile_done
+  $C41D Put its mark back on its cells.
+  $C420 Did it turn back?
+  $C425 Jump if not
+  $C427 Did it strike a shot, a hit or the Skimmer?
+  $C42C,2 Jump if so, to start its explosion
 @ $C42F label=advance_hostile_moved
+  $C42F Did it move?
+  $C434 Jump if not: it lies wholly off the play area and leaves the game.
 @ $C437 label=redraw_hostile
+  $C437,6 Note the cells that hide it, and draw it.
 @ $C43E label=finish_explosion
 c $C43E End a hostile object's explosion
 D $C43E Paints the current hostile object's cells white on black and removes the hostile object.
+  $C43E Paint its cells white ink on black paper.
+  $C443 Take the explosion mark off its cells as the object goes.
 @ $C445 ssub=LD ($C80D+1),A
 @ $C44B label=explode_hostile
 c $C44B Animate a hostile object's explosion
-D $C44B Starts the current hostile object's explosion or shows its next frame.
+D $C44B Starts the current hostile object's explosion or shows its next frame. An explosion inside the hull destroys the sector's defence device.
+R $C44B I:A state of the hostile object, $E0 or more to start the explosion
+  $C44B Keep the state. Does the hold after a new screen run? Jump if so, and let the object vanish.
+  $C453 Count it among the objects of the screen.
+  $C457 Does its explosion start now?
+  $C45A Jump if not
+N $C45C The explosion starts.
+  $C45C Swap its hostile object mark for the explosion mark.
 @ $C45E ssub=LD ($C80D+1),A
+  $C464 Is the Skimmer inside the hull?
+  $C469 Jump if not
+  $C46B Inside the hull the only hostile object is the defence device. Mark it destroyed.
 @ $C470 label=explode_hostile_first
+  $C470 Start from the first frame.
 @ $C472 label=explode_hostile_frame
+  $C472 Step to the next frame. Has the last one shown?
+  $C475 Jump if so
+  $C478 Keep the frame. The draw clicks the speaker on fewer pixel rows of each cell at each later frame.
 @ $C47D ssub=LD ($CC0A+1),A
+  $C480 Paint its cells bright yellow ink on black paper, and draw the frame.
+  $C488,5 Stop the clicks of the draw.
 @ $C48A ssub=LD ($CC0A+1),A
 @ $C48E label=vanish_hostile
+  $C48E,5 Empty its slot, and leave the screen as it is.
 @ $C494 label=colour_hostile_cells
 c $C494 Colour a hostile object's cells
-D $C494 Colours the current hostile object's cells that hold no ink, and clicks the speaker once per cell row?
+D $C494 Paints the current hostile object's cells on the play area in an attribute, and clicks the speaker once for each row of cells. It leaves out the cells that hide the object.
+R $C494 I:A attribute to paint the cells
+  $C494 Keep the attribute. Find the object's cells on the play area, and return if it has none there.
+  $C49B Hold the attribute aside, and turn the attribute mirror address into the attribute address.
 @ $C4A0 ssub=SUB (attr_mirror-$5800)/256
 @ $C4A3 label=colour_hostile_row
+  $C4A3 Take the next row of its cells.
 @ $C4A7 label=colour_hostile_cell
+  $C4A7 Does this cell hide the object?
+  $C4A9 Jump if so
+  $C4AB Paint the cell.
 @ $C4AE label=colour_hostile_next
+  $C4AE Step along the row.
+  $C4B2 Click the speaker.
+  $C4BB Step down to the next row of cells and of the cover map.
 @ $C4C7 label=colour_hostile_down
+  $C4C7,3 Colour the next row while one is left.
 @ $C4CB label=image_offsets
 b $C4CB Image offsets
 D $C4CB The distance of each image from the start of a hostile object's shifted images or of the explosion frames. There are eight, one word each, in steps of 48 bytes, the size of one image.
 W $C4CB,16,2
 @ $C4DB label=add_image_offset
 c $C4DB Add an image offset
+D $C4DB Turns the address of the first image of a set into the address of one of its images.
+R $C4DB I:A number of the image, 0–7
+R $C4DB I:HL address of the first image
+R $C4DB O:HL address of the image
+  $C4DB Keep the first image's address, and point at the image's word in #R$C4CB(the image offsets), 2 bytes per image.
+@ $C4DD ssub=ADD A,image_offsets%$100
+@ $C4E0 ssub=LD H,image_offsets/$100
+  $C4E4 Never runs: the image offsets do not cross a page.
 @ $C4E5 label=add_image_offset_get
+  $C4E5,12 Add the image's distance to the first image's address.
 @ $C4F2 label=draw_explosion
 c $C4F2 Draw a hostile object's explosion frame
 D $C4F2 Draws the current explosion frame at the hostile object's position, after it shifts the frame to the hostile object's pixel offset when they differ.
+  $C4F2 Take the explosion frame from the object's state, 0 for the first.
+  $C4F8 Find the frame's image among the explosion frames.
+  $C500 Point at the pixel offset that the frame's image sits at, one byte per frame after the explosion masks.
+  $C507 Never runs: those bytes do not cross a page.
 @ $C508 label=draw_explosion_shift
+  $C508 Does the frame sit at another pixel offset than the object's? If so, shift it to the object's.
+  $C50F Keep the frame's image for the draw.
+  $C511 Find the explosion mask for the object's pixel offset, one of the four explosion masks.
+  $C51B,8 Draw the frame through the mask over the object's background store, except in the cells its cover map hides.
 @ $C526 label=shift_explosion
 c $C526 Shift an explosion frame
 D $C526 Shifts one explosion frame in place to the current hostile object's pixel offset and records that offset.
+R $C526 I:A pixel offset to shift the frame to, 0–3
+R $C526 I:DE address of the frame's image
+R $C526 I:HL address of the frame's recorded pixel offset
+  $C526 Find how many 2-pixel steps the object's pixel offset lies right of the frame's. Does it lie left of it instead?
+  $C527 Jump if so
+  $C529 Shift right by 2 pixels per step, over each of the frame's pixel rows.
+  $C52D Record the object's pixel offset as the frame's.
+  $C531 Start at the frame's top row.
 @ $C533 label=expl_right_row
+  $C533 Count the pixels to shift this row by.
 @ $C535 label=expl_right_pass
+  $C535 Shift the row's 24 pixels one pixel right, with a blank pixel in at the left.
+  $C542,6 Move on to the next row, 3 bytes per row.
 @ $C549 label=expl_left
+  $C549 Shift left by 2 pixels per step, over each of the frame's pixel rows.
+  $C54F Record the object's pixel offset as the frame's.
+  $C553 Start at the last byte of the frame's top row.
 @ $C557 label=expl_left_row
+  $C557 Count the pixels to shift this row by.
 @ $C559 label=expl_left_pass
+  $C559 Shift the row's 24 pixels one pixel left, with a blank pixel in at the right.
+  $C566,6 Move on to the next row, 3 bytes per row.
 @ $C56D label=step_hostile_left
 c $C56D Move a hostile object left
-D $C56D Moves the current hostile object 2 pixels left, and turns it back when a new column is blocked.
+D $C56D Moves the current hostile object 2 pixels left, with its background store. A blocked new column turns it back, and once it is clear of the screen's left edge it does not move.
+  $C56D Step the pixel offset one place left. Is the image back at the left edge of its column?
+  $C571 Jump if so
+  $C573 Was it at the left edge already?
+  $C575 If not, store the new pixel offset
+  $C577 Step into the column to the left.
 @ $C57A label=step_left_vacate
+  $C57A The image now leaves the third byte of its rows blank, so its cover map hides that column. Put back that column of the background, except in the cells that hide the object.
+  $C594 Store the pixel offset of the left edge.
 @ $C598 label=step_left_column
+  $C598 Is the object clear of the screen's left edge already?
+  $C59D Return if so, without a move
+  $C59E Move its cells one column left.
+  $C5A9 Are the cells there blocked?
+  $C5AC Jump if not
+  $C5AE Move its cells back, and turn it round.
 @ $C5B8 label=step_left_open
+  $C5B8 Shift the background store one byte right, to make room at the left of each row. As one run, the copy puts each row's last byte in the next row's first, which the save of the new column overwrites.
+  $C5C7 Move the screen address one byte left.
+  $C5CE Save the new left column of the background.
+  $C5D8 Put the image 6 pixels into its new column.
 @ $C5DA label=step_left_store
+  $C5DA,7 Store the new pixel offset, and record the move.
 @ $C5E2 label=undo_step_right
 c $C5E2 Turn back a hostile object blocked on the right
-D $C5E2 Undoes the current hostile object's last step right and reverses its direction.
+D $C5E2 Takes back the current hostile object's last step right, then turns it round.
+  $C5E2 Take back the step.
 @ $C5E6 label=reverse_hostile
+  $C5E6 Turn the object round: up and down swap, and so do left and right. A struck object stays struck.
+  $C5EE,4 Record the turn.
 @ $C5F3 label=step_hostile_right
 c $C5F3 Move a hostile object right
-D $C5F3 Moves the current hostile object 2 pixels right, and turns it back when a new column is blocked.
+D $C5F3 Moves the current hostile object 2 pixels right, with its background store. A blocked new column turns it back, and once it is clear of the screen's right edge it does not move.
+  $C5F3 Step the pixel offset one place right.
+  $C5FA Does the image now reach into the third byte of its rows?
+  $C5FC Jump if not
+  $C5FE Is the object clear of the screen's right edge already?
+  $C603 Return if so, without a move
+  $C604 Are the object's cells, now three columns wide, blocked?
+  $C607 If so, take the step back and turn round
+  $C609 Save the third byte column of the background, which the image now reaches into.
+  $C61A Recover the new pixel offset.
 @ $C61C label=step_right_column
+  $C61C Has the image passed the right edge of its column?
+  $C61E Jump if not
+  $C620 Move its cells one column right. They lay under the object already, so nothing can block them.
+  $C627 Put back the first byte column of the background, except in the cells that hide the object.
+  $C63B Shift the background store one byte left, so its second and third columns become the first two.
+  $C648 Move the screen address one byte right, and put the image at the left edge of its new column.
 @ $C650 label=step_right_store
+  $C650,7 Store the new pixel offset, and record the move.
 @ $C658 label=step_hostile_up
 c $C658 Move a hostile object up
-D $C658 Moves the current hostile object 2 pixels up, and turns it back when a new row is blocked.
+D $C658 Moves the current hostile object 2 pixel rows up, with its background store. A blocked new cell row turns it back, and once it is clear of the play area's top it does not move.
+  $C658 Ready the cover map's bottom row, where the image's lowest pixel rows lie unless the image is square on a cell row.
 @ $C661 ssub=LD A,($C947+1)
+  $C661 Is the image square on a cell row?
+  $C666 Jump if not
+  $C668 Is the object clear of the play area's top already?
+  $C66D Return if so, without a move
+  $C66E Move its cells one row up, and keep the old attribute mirror address.
+  $C67D Are the cells there blocked?
+  $C681 Jump if not
+  $C683 Move its cells back, and turn it round.
 @ $C68D label=step_up_open
+  $C68D The image is square on a cell row, so its lowest pixel rows lie in the cover map's middle row.
 @ $C692 label=step_up_pixels
+  $C692 Is the image's top row the top row of its cell?
+  $C69A Jump if not
+  $C69C Move the address up a cell row, on the same pixel row.
+  $C6A1 Jump if that crosses into the screen third above
+  $C6A3 Within a third, add a cell's height, so that the step up lands in the cell row above.
 @ $C6A5 label=step_up_line
+  $C6A5 Step up to the image's new top.
+  $C6A9 Find the address 16 pixel rows below the new top, where the image's 2 lowest pixel rows lay.
+  $C6AD Jump unless that crosses into the next screen third
+  $C6AF Move into the next third.
 @ $C6B3 label=step_up_shift
+  $C6B3 Put back the background's last 2 pixel rows there, except in the cells that hide the object.
+  $C6C0 Shift the background store down by 2 pixel rows.
+  $C6D1 Store the image's new top.
+  $C6D6 Save the 2 new pixel rows of the background into the store's first rows.
+  $C6DC,4 Record the move.
 @ $C6E1 label=step_hostile_down
 @ $C6E1 ssub=LD A,($C947+1)
 c $C6E1 Move a hostile object down
-D $C6E1 Moves the current hostile object 2 pixels down, and turns it back when a new row is blocked.
+D $C6E1 Moves the current hostile object 2 pixel rows down, with its background store. A blocked new cell row turns it back, and once it is clear of the screen's bottom it does not move.
+  $C6E1 Is the image square on a cell row?
+  $C6E8 Jump if not
+  $C6EA Is the object clear of the screen's bottom already?
+  $C6EF Return if so, without a move
+  $C6F0 Check the three cell rows that the step reaches. With the image's top a pixel row lower, the cell search counts a third row.
 @ $C6F2 ssub=LD ($C947+1),A
 @ $C6F8 ssub=LD A,($C947+1)
+  $C6F8 Put the image's top back.
 @ $C6FC ssub=LD ($C947+1),A
+  $C6FF If the cells are blocked, turn round
 @ $C702 label=step_down_pixels
+  $C702 Will the step take the image's top into the next cell row?
+  $C706 Jump if not
+  $C708 Move its cells one row down.
 @ $C716 label=step_down_shift
-@ $C743 label=step_down_draw
+  $C716 Put back the background's first 2 pixel rows at the image's top, except in the cells that hide the object.
+  $C728 Shift the background store up by 2 pixel rows.
+  $C736 Find the address 16 pixel rows below the image's top, the first of the 2 pixel rows that the image moves onto.
+  $C73D Jump unless that crosses into the next screen third
+  $C73F Move into the next third.
+@ $C743 label=step_down_save
+  $C743 Save those 2 pixel rows of the background into the store's last rows.
+  $C749 Move the image's top down one step. Does it cross into the next cell row?
+  $C752 Jump if not
+  $C754 Move down a cell row. Does that cross into the next screen third?
+  $C758 Jump if so
+  $C75A Within a third, go back to the cell row's top pixel row.
 @ $C75E label=step_down_store
-@ $C766 label=mark_cell_inked
-c $C766 Mark an inked cell
-@ $C76A label=mark_hostile_cells
-c $C76A Mark the inked cells under a hostile object
-D $C76A Marks each cell of the current hostile object on the play area whose colour has ink?
-@ $C770 label=mark_cells_clear
-@ $C779 label=mark_cells_row
-@ $C77D label=mark_cells_cell
-@ $C785 label=mark_cells_store
+  $C75E,7 Store the image's new top, and record the move.
+@ $C766 label=cover_hostile_cell
+c $C766 Hide a hostile object in a cell
+D $C766 Marks a cell of the current hostile object's cover map as one that hides the object, and continues at #R$C785(the store of the map byte).
+  $C766 Use the high byte of the map's address as the byte. The store at the join writes it a second time.
+@ $C76A label=map_hostile_cover
+c $C76A Find the cells that hide a hostile object
+D $C76A Builds the current hostile object's cover map: the cells under it where a bright graphic, a bar or the Skimmer hides it.
+N $C76A The map holds one byte for each of the object's 3×3 cells, in rows from the top. A byte holds the high byte of the map's own address for a cell where the game does not draw the object. Any other byte holds 0.
+  $C76A Start at the map's first cell, with the high byte of its address to hand.
+@ $C770 label=cover_fill
+  $C770 Hide the object in every cell. A cell off the play area stays that way.
+  $C774 Find the object's cells on the play area.
+  $C777 Return if none lies there
+  $C778 Walk the attribute mirror with one address and the map with the other.
+@ $C779 label=cover_row
+  $C779 Start a row of cells.
+@ $C77D label=cover_cell
+  $C77D Does a bright graphic, a bar or the Skimmer mark the cell?
+  $C780 If so, hide the object there
+  $C783 If not, show it there.
+@ $C785 label=cover_store
+  $C785 Store the cell's byte, and move to the next cell of the row.
+  $C78A Move to the map's next row, 3 bytes per row.
+  $C78E Move to the attribute mirror's next row. The count of cells is 0 here, so only the carry goes into the high byte.
+  $C796,3 Count the row.
 @ $C79A label=clip_hostile
 c $C79A Find a hostile object's cells on the play area
-D $C79A Clips the cells of the current hostile object to the play area.
+D $C79A Finds the cells of the current hostile object that lie on the play area, as a block of rows and columns.
+N $C79A An image at pixel offset 0 fills 2 cells across, and at any other offset 3. An image square on a cell row fills 2 cells down, and otherwise 3.
+R $C79A O:B number of cell rows on the play area, 0–3
+R $C79A O:C number of cell columns on the play area, 0–3
+R $C79A O:DE address in the cover map of the first cell on the play area
+R $C79A O:HL attribute mirror address of the first cell on the play area
+R $C79A O:F zero set if no cell lies on the play area
+  $C79A Start from the object's top-left cell in the attribute mirror and in its cover map, with 3×3 cells.
+  $C7A4 Is the image at the left edge of its column?
+  $C7A9 Jump if not
+  $C7AB It fills only 2 columns.
 @ $C7AC label=clip_hostile_rows
 @ $C7AC ssub=LD A,($C947+1)
+  $C7AC Is the image square on a cell row?
+  $C7B1 Jump if not
+  $C7B3 It fills only 2 rows.
 @ $C7B4 label=clip_hostile_right
+  $C7B4 Does the object start off the screen's left edge?
+  $C7B9 Jump if so
+  $C7BC Find the column past its last cell.
 @ $C7BD label=clip_right_loop
+  $C7BD Does its last column lie off the right edge?
+  $C7BF Jump if not
+  $C7C1 Drop the last column, and check again while any column is left.
+  $C7C5 None is left. Go on to the rows.
 @ $C7C8 label=clip_left_loop
+  $C7C8 Is the first column on the screen?
+  $C7CA Jump if so
+  $C7CD Drop the first column, and step both addresses one cell right. Check again while any column is left.
 @ $C7D3 label=clip_hostile_bottom
+  $C7D3 Does the object start above the play area?
+  $C7D8 Jump if so
+  $C7DA Find the row past its last cell.
 @ $C7DB label=clip_bottom_loop
+  $C7DB Does its last row lie below the screen's bottom?
+  $C7DD Jump if not
+  $C7DF Drop the last row, and check again while any row is left.
+  $C7E3 None is left. Go on to the result.
 @ $C7E6 label=clip_top_loop
+  $C7E6 Is the first row on the play area?
+  $C7E8 Jump if so
+  $C7EA Drop the first row, and step the attribute mirror address one row down.
+  $C7EF Jump unless that crosses a page
+  $C7F1 Cross into the next page.
 @ $C7F2 label=clip_top_next
+  $C7F2 Step the cover map address one row down, and check again while any row is left.
 @ $C7FA label=clip_hostile_done
-@ $C802 label=toggle_hostile_flag
-c $C802 Toggle a hostile object's flag in the attribute mirror
-D $C802 Flips a flag bit in each attribute mirror cell under the current hostile object, so a second call puts it back?
-@ $C809 label=toggle_flag_row
-@ $C80C label=toggle_flag_cell
-@ $C80D label=hostile_flag_bits
+  $C7FA Is any row left?
+  $C7FD Return if not
+  $C7FE,3 Is any column left? That is the answer.
+@ $C802 label=toggle_hostile_marks
+c $C802 Toggle a hostile object's marks in the attribute mirror
+D $C802 Toggles the marks that #R$C80D(its operand) holds in each attribute mirror cell under the current hostile object on the play area. A second call with the same marks takes them away again.
+N $C802 The operand holds one of these sets of marks:
+N $C802 #TABLE(default) { =h Marks | =h When } { Hostile object | A move, and the set-up of a hostile object } { Hostile object and explosion | The start of an explosion, to swap the one mark for the other } { Explosion | The end of an explosion } TABLE#
+  $C802 Find the object's cells on the play area.
+  $C805 Return if none lies there
+  $C806 Step one attribute mirror row per row of cells.
+@ $C809 label=toggle_marks_row
+  $C809 Start a row of cells.
+@ $C80C label=toggle_marks_cell
+  $C80C Toggle the marks in each cell of the row.
+@ $C80D label=toggle_marks_bits
+  $C813,5 Move down a row, until every row is done.
 @ $C819 label=hostile_collision
 c $C819 Handle a hostile object's collision
-D $C819 Reports a blocked cell to the caller, and makes the hostile object explode on a cell of the Skimmer or one marked by a hit? A hit cell also adds 160 to the score total at #R$D48A, and a Skimmer cell pushes the Skimmer.
+D $C819 Ends #R$C866(the block check) on a blocked cell, and makes the hostile object explode if the cell holds a shot, a hit or the Skimmer. A shot or a hit adds 20 points, and the Skimmer gets a push.
+R $C819 I:HL attribute mirror address of the blocked cell
+R $C819 O:F carry set
+  $C819 Does the cell hold a shot or a hit?
+  $C81E Jump if not
+  $C820 Add 20 points.
+N $C826 BUG: in a hit cell this also clears the mark of the hostile object that the hit belongs to. #R$C95B(The hit count) keeps the hit. So the struck object does not explode from it.
+  $C826 Take the shot or the hit out of the cell, and make the object explode.
 @ $C82D label=hostile_hit_skimmer
+  $C82D Does the cell hold the Skimmer?
+  $C82F Jump if not: the cell only blocks the object
+  $C831 Push the Skimmer the way the object moves, and time the push.
 @ $C83C label=hostile_hit_explode
+  $C83C Make the object explode.
 @ $C841 label=hostile_hit_done
+  $C841,3 Drop the row and the count that the block check saved, and return to its caller with the cell blocked.
 @ $C845 label=push_skimmer
 c $C845 Start a push on the Skimmer
-D $C845 Starts a push on the Skimmer up, down, left or right.
+D $C845 Gives the Skimmer its top speed in a direction, the start of a push.
+R $C845 I:A direction of the push, 0–3 for up, down, left or right
+  $C845 Is the push up?
+  $C84A Jump if not
+  $C84C,2 Give the Skimmer the top speed upward.
 @ $C84F label=push_skimmer_down
+  $C84F Is it down?
+  $C851 Jump if not
+  $C853,2 Give the Skimmer the top speed downward.
 @ $C856 label=push_skimmer_left
+  $C856 Is it left?
+  $C85B Jump if not
+  $C85D,2 Give the Skimmer the top speed to the left.
 @ $C860 label=push_skimmer_right
+  $C860 Is it right?
+  $C862 Return if not
+  $C863,2 Give the Skimmer the top speed to the right.
 @ $C866 label=check_hostile_block
 c $C866 Check a hostile object's cells for a block
-D $C866 Reports whether an attribute mirror cell under the current hostile object blocks it, and handles the collision there?
+D $C866 Reports whether a mark in the attribute mirror blocks the current hostile object in any of its cells on the play area. A blocked cell goes to #R$C819(the collision), which can make the object explode.
+R $C866 O:F carry set if a cell blocks the object
+  $C866 Find the object's cells on the play area.
+  $C869 Jump if none lies there
+  $C86B Step one attribute mirror row per row of cells.
 @ $C86E label=check_block_row
+  $C86E Start a row of cells.
 @ $C871 label=check_block_cell
+  $C871 Does a bright graphic, the Skimmer, a hostile object or an explosion mark the cell?
+  $C874 If so, handle the collision there
+  $C876 Move to the next cell of the row.
+  $C879 Move down a row, until every row is done.
 @ $C87E label=check_block_clear
+  $C87E,1 No cell blocks the object.
 @ $C880 label=hostile_fire
 c $C880 Let a hostile object fire
-D $C880 Fires the hostile objects' shot from the current hostile object toward the Skimmer, across the object's line of travel?
+D $C880 Fires the hostile objects' shot from the current hostile object at right angles to its travel, toward the Skimmer's side. The defence device never fires.
+N $C880 A hostile object turns only when it lies square on a cell, so it always lies square on a cell across its travel. The first test joins its pixel offset across and its pixel row down its cell. So it passes only when the object lies half a cell into its travel, where its middle meets a cell's middle.
+  $C880 Is the object half a cell into its travel?
+  $C88B Return if not
+  $C88C Is the hostile objects' shot free?
+  $C891 Return if not
+  $C892 Will the object steer when it next lies square on a cell?
+  $C897 Return if so
+  $C898 Is the object on the current screen?
+  $C89F Return if not
+  $C8A0 Is its explosion under way?
+  $C8A5 Return if so
+  $C8A6 Does it move left or right?
+  $C8A8 If so, fire up or down
+N $C8AA The object moves up or down, so it fires left or right.
+  $C8AA Does the object reach off the screen's right edge?
+  $C8B2 Return if so
+  $C8B3 Is it left of the Skimmer's column?
+  $C8B4 If so, fire right
+  $C8B6 Is it in the screen's first column?
+  $C8B8 Return if so: no cell lies to its left
+  $C8B9 Fire left from beside the object's middle cell row, as far as the screen's left edge.
 @ $C8C1 label=hostile_fire_right
+  $C8C1 Is the object too near the right edge for a shot?
+  $C8C3 Return if so
+  $C8C4 Set the range to reach the column before the right edge.
+  $C8C8 Fire right from beside the object's middle cell row.
 @ $C8D0 label=hostile_fire_vert
+  $C8D0 The object moves left or right, so it fires up or down. Does it reach above the play area?
+  $C8D8 Return if so
+  $C8D9 Does it reach below the screen's bottom?
+  $C8DB Return if so
+  $C8DC Is it above the Skimmer's row?
+  $C8DD If so, fire down
+  $C8DF Count the cell rows of the play area above the object.
+  $C8E1 Return if there are none
+  $C8E3 Fire up from beside the object's middle cell column, as far as the play area's top.
 @ $C8EB label=hostile_fire_down
+  $C8EB Is the object too near the bottom for a shot?
+  $C8ED Return if so
+  $C8EE Set the range to reach the screen's bottom.
+  $C8F2 Fire down from beside the object's middle cell column.
 @ $C8F7 label=hostile_fire_launch
+  $C8F7 Find the attribute mirror address of the shot's first cell, and set the shot's range.
+N $C8FE BUG: a first cell that holds the Skimmer pushes it in a direction from #REGc, which this routine never sets.
+  $C8FE Does the first cell stop the shot?
+  $C901 Return if so
+  $C902 Launch the hostile objects' shot in its direction.
 @ $C909 label=animation_list
 g $C909 Animation list
 D $C909 The animated graphics of the current screen, 13 bytes each: the fields of #R$B427, then the screen address of the graphic. A $FF byte follows the last entry, and the list has room for two.
@@ -1107,7 +1559,7 @@ W $C924,2 Address of the end byte of the #R$C909(animation list), where the next
 u $C926 Unused bytes
 @ $C927 label=shot_range
 g $C927 Shot range
-B $C927,1 Range in cells of the current shot
+B $C927,1 Range in cells of the shot that is launched or moved
 @ $C928 label=pulse_laser_shot
 g $C928 Pulse laser shot
 B $C928,1 Direction of the shot, 0–3 for left, right, up or down, or $FF for no shot, with bit 7 set before its first move
@@ -1128,44 +1580,46 @@ g $C944 Current shot
 W $C944,2 Address of the shot to move, #R$C928 or #R$C936
 @ $C946 label=hostiles_counted
 g $C946 Hostile objects counted
-B $C946,1 Number of hostile objects counted on the current screen during one move of the hostile objects
+B $C946,1 Number of hostile objects that lie on the current screen or explode, in the pair that moves
 @ $C947 label=hostile_screen_pos
 g $C947 Current hostile object
 D $C947 A copy of the record of the hostile object that moves, from its slot.
+N $C947 The state of the hostile object takes these values:
+N $C947 #TABLE(default) { =h State | =h What it is } { 0–3 | It moves up, down, left or right } { $17 | It is the defence device, which never moves } { $80–$86 | It shows explosion frame 1–7 } { $FE | The slot is empty, or a struck object turned back in its move } { $FF | A struck object, whose explosion starts in its move } TABLE#
 W $C947,2 Screen address of the hostile object's top pixel row
 @ $C949 label=hostile_pixel_offset
-B $C949,1 Pixel offset of the hostile object to the right of its column, in steps of 2 pixels?
+B $C949,1 Pixel offset of the hostile object's image from the left edge of its column, 0–3 in steps of 2 pixels
 @ $C94A label=hostile_column
-B $C94A,1 Column of the hostile object's left cell
+B $C94A,1 Column of the hostile object's left cell, from −2 to 32, where a column outside 0–31 lies off the screen
 @ $C94B label=hostile_row
-B $C94B,1 Character row of the hostile object's top cell
+B $C94B,1 Character row of the hostile object's top cell, from 4 to 24, where a row outside 6–23 lies off the play area
 @ $C94C label=hostile_attr_pos
 W $C94C,2 Attribute mirror address of the hostile object's top-left cell
 @ $C94E label=hostile_state
-B $C94E,1 Direction 0–3 for up, down, left or right, $17 for the defence device, or a negative value during an explosion or after removal?
-@ $C94F label=hostile_marks_ptr
-W $C94F,2 Address of the hostile object's marks of inked cells
+B $C94E,1 State of the hostile object
+@ $C94F label=hostile_cover_ptr
+W $C94F,2 Address of the hostile object's cover map, one byte for each of its 3×3 cells
 @ $C951 label=hostile_bg_ptr
-W $C951,2 Address of the hostile object's background store
+W $C951,2 Address of the hostile object's background store, 16 pixel rows of 3 bytes
 @ $C953 label=hostile_image_ptr
-W $C953,2 Address of the hostile object's shifted images
-@ $C955 label=hostile_counter
-B $C955,1 Moves until the hostile object next steers toward the Skimmer?
-@ $C956 label=hostile_spawn_key
+W $C953,2 Address of the hostile object's shifted images and their masks, or of the defence device's design
+@ $C955 label=hostile_steer_count
+B $C955,1 Cells left before the hostile object next steers toward the Skimmer, or 23 for the defence device, which never steers
+@ $C956 label=hostile_screen_num
 B $C956,1 Number of the screen that the hostile object is on
 @ $C957 label=hostile_moved
 g $C957 Hostile object moved
-B $C957,1 1 if the current hostile object moved during its move, 0 if not?
+B $C957,1 1 if the current hostile object stepped during its move, 0 if not
 @ $C958 label=hostile_tick
 g $C958 Hostile object tick
 B $C958,1 Count of the moves of the hostile objects, 0–255
 u $C959 Unused bytes
 @ $C95B label=hit_count
 g $C95B Hit count
-B $C95B,1 Number of cells that pulse laser shots marked as hit
+B $C95B,1 Number of hit cells that wait for their hostile object's move
 @ $C95C label=hostile_turned
 g $C95C Hostile object turned
-B $C95C,1 1 if the current hostile object turned back during its move, 0 if not?
+B $C95C,1 1 if the current hostile object turned back during its move, 0 if not
 @ $C95D label=hostile_slot
 g $C95D Current hostile object's slot
 W $C95D,2 Address of the slot of the hostile object that moves

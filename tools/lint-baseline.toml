@@ -98,7 +98,7 @@ message = "4445 bytes with no sub-directives. Fix it in this order: render it; s
 check = "data-structure"
 kind = "UNTYPED"
 at = "$7CD4"
-message = "9219 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
+message = "9123 of 9219 bytes fall outside every render's extent, the first at $7CD4. The macros draw 96 bytes and declare nothing about the rest. Fix it in this order: widen the render; state the record length the code walks; never a width chosen to clear this check"
 
 [[finding]]
 check = "data-structure"
@@ -273,12 +273,6 @@ check = "identity"
 kind = "UNTITLED_ENTRY"
 at = "$BC68"
 message = "`b $BC68` has no title and publishes as a page headed \"Data at BC68\". There is no record to fold it into — the entry above it is c $BC57 — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$C2DA"
-message = "`b $C2DA` has no title and publishes as a page headed \"Data at C2DA\". There is no record to fold it into — the entry above it is c $C2C7 — so it is an entry in its own right: write the title"
 
 [[finding]]
 check = "identity"

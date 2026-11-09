@@ -22,8 +22,8 @@ in its cells instead (#R$B27D).
 { 1 | Bright graphic or bar | No | No | No | Yes | Yes | Yes }
 { 2 | Skimmer | No | No | Yes | No | No | No }
 { 3 | Hostile object | Yes | Yes | Yes | No | Yes | No }
-{ 2 and 3 | Shot, or a struck hostile object? | Yes | Yes | Yes | No | Yes | No }
-{ 4 | Hostile object as it explodes? | Yes | Yes | Yes | No | No | No }
+{ 2 and 3 | Shot, or a hit cell | Yes | Yes | Yes | No | Yes | No }
+{ 4 | Hostile object as it explodes | Yes | Yes | Yes | No | No | No }
 { 5 | Bright graphic | Yes | No | No | Yes | No | No }
 { 7 | ? | No | No | No | Yes | No | Yes }
 TABLE#

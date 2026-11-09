@@ -5,6 +5,8 @@
 ### Added
 
 - Graphics engine documented in depth (`$B080–$B3AF`): cell addresses, the graphic directory fields, cell masks, colour patterns, the pixel, colour, mark and shadow passes, with every basic block commented.
+- Hostile objects documented in depth (`$C09B–$C962`): the four slots, launches, the 13 designs and their shifted images, steering, the four moves, cover maps, collisions, pushes, firing, explosions, and every field of the hostile object workspace.
+- Documented two more defects in the game: a hit cell's mark clear also clears the struck object's own mark, and a hostile shot that starts on the Skimmer pushes it in an unset direction.
 - The game loop `play_game` documented in depth (`$CE91–$D218`), with every play loop variable defined: controls, speeds and step rates, screen exits, hatchway steps, pushes, flips and the shot clicks.
 - Interrupts, shields, readouts and score documented in depth (`$CDE8–$CE90`, `$D219–$D2AE`, `$D2D6–$D472`): the IM 2 set-up, the Skimmer's speed rates and flip, shield loss, the rolling readout digits, the Damage Report Indicator drain and the score count.
 - Workspace page (`src/workspace.ref`): the attribute mirror and its mark bits, the IM 2 table, the Skimmer's background store and cover map, with `@equ` names for every workspace operand.

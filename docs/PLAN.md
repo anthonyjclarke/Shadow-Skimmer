@@ -8,10 +8,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Item                | State                                     |
 |:--------------------|:------------------------------------------|
-| Phase               | 3 – depth pass, G3 game loop              |
+| Phase               | 3 – depth pass, H hostile objects         |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
-| Baseline findings   | 49                                        |
-| Routines to the bar | 35 of 120 (`$B080–$B811`, `$CDE8–$D472`) |
+| Baseline findings   | 48                                        |
+| Routines to the bar | 63 of 120 (`$B080–$B811`, `$C09B–$C962`, `$CDE8–$D472`) |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
 | Catalogs            | graphics, sound, data: not started        |
@@ -78,9 +78,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B16F`       | Label the control panel patterns in `$A2B8`   |
 | `$BAA7`       | Code with no caller: unused?                  |
 | `$BC68`       | Draw-mode code templates: what copies them?   |
-| `$C2DA`       | Lone `$C9` after a RET: unused byte?          |
-| `$C4DB`       | Table addresses built from immediates: `$BBE5`, `$BF58`, `$C186`, `$C1D0`, `$C1F5`, `$C4E0`, `$C503` |
-| `$C186`       | `LD H,$BD` raw high byte of the launch cells  |
+| `$C4DB`       | Table addresses built from immediates: `$BBE5`, `$BF58`, `$C1F5` (needs `$9A88`), `$C503` (needs `$A018`) |
 | `$CB8E`       | Delay loop with no caller: unused?            |
 | `$CD9C`       | Retype the Skimmer image pointers as `W`      |
 | `$BA3B`       | Fold WALL DONE's end `$00` into `t $BA06`     |
@@ -91,7 +89,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$9520`       | Title the defence device designs (`$7CD4` split) |
 | `$D2E7`       | Label the font; its address is built from immediates |
 | `$D473`       | Split the readout block; state the digit format and drain amounts there |
-| `$BEEF`       | Say "adds 20 points" in `$BEEF` and `$C819`   |
 | `$CE26`       | Split `flag_interrupt` into its own entry     |
 | `$9A88`       | Label and render the 13 hostile object designs |
 | `$95B0`       | 32 zero bytes after the device designs        |
@@ -103,19 +100,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 |:--------------|:----------------------------------------------|
 | whole image   | Sectors 2–3 and game end coverage (FuseX)     |
 | `$BA06`       | Title and label of WALL DONE                  |
-| `$BD40`       | Is the device the only hostile object inside? |
-| `$C946`       | Limit test counts two objects per call: bug?  |
-| `$D2CC`       | Does the hold clear objects the new screen overlaps? |
+| `$C946`       | Limit per slot pair allows twice the launch cells: intended? |
 | `$BF8B`       | Does the `$21` result end the opening?        |
 | `$BF6A`       | Rows and widths of the hatch's bitmap        |
 | `$BEE0`       | Which cell pushes the Skimmer, and how?       |
-| `$C46B`       | Explosion inside the hull sets device flag?   |
-| `$C494`       | Cells skipped when they hold ink: why?        |
-| `$C955`       | Counter meaning; firing gate ≥ 2              |
-| `$C949`       | Pixel offset in 2-pixel steps?                |
-| `$C94E`       | Negative states: explosion frames, `$FE`, `$FF` |
-| `$C76A`       | What do the inked-cell marks mean?            |
-| `$CC32`       | What the NOP / DEC C patch changes            |
 | `$CD3A`       | Is AND `$0B` a cover test?                    |
 | `$B889`       | Shield count at column 5; leaflet says right  |
 | `$B850`       | Rows 0–3 cleared; panel is rows 0–5           |
@@ -126,21 +114,13 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$CD86`       | When is the Skimmer's mark `$04` toggled?     |
 | `$F30A`       | Is it the title tune's data?                  |
 | `$BC1F`       | Schema of the three control-key sets          |
-| `$BD40`       | Does `$FF` mean the device is destroyed?      |
-| `$C2DB`       | Does a pulse laser shot make it explode?      |
-| `$C802`       | Which flag bit, and does a second call restore? |
-| `$C819`       | What do the blocking marks mean?              |
-| `$C880`       | Does it fire across its line of travel?       |
-| `$C957`       | What do the per-move flags mean?              |
 | `$B812`       | Can the control panel shadow row 6?           |
-| `$C18B`       | Does steering override the start direction at once? |
 | `$B5F6`       | Column-0 vertical runs shade twice: visible?  |
 | `$B7B7`       | Bit 7: only the steering distances' sign bits? |
 | `$B3B0`       | A zero-length bar loops 256 times: document?  |
 | `$B3F0`       | Why do the two bars' shadow offsets differ?   |
 | `$C802`       | Does `$C0D4`'s reset to `$08` pair the explosion toggles? |
 | mark bit 5    | Which graphics use cell mask 7?               |
-| `$B6F8`       | `add_hostile` draws nothing: who draws the device? |
 | `$FF70`       | Cover map `$FF` is the map's page byte (relocation) |
 | `$D48D`       | Label `shield_loss_due` (split `$D473`)       |
 | `$F840`       | Label the hostile slots' state bytes (split `$F473`) |
@@ -149,6 +129,17 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$D2B5`       | Snapshot `$01` sets a blue border on the first click? |
 | `$C845`       | Push sets speed ±3 without new rates: visible? |
 | `$CF9E`       | Dead `LD A,n` loads before calls: note them?  |
+| `$C204`       | Split `add_hostile` into its own entry        |
+| `$F473`       | Split the hostile slots and table their schema |
+| `$A018`       | Label the explosion frame offsets (split)     |
+| `$C43E`       | Explosion's white paint over coloured graphics? |
+| `$C1B1`       | Blocked launch on the Skimmer pushes it: visible? |
+| `$C0AC`       | Image buffers overwrite sysvars: any ROM call reads them? |
+| `$BEE0`       | `OR D` gives Z at a shot's first cell: effect? |
+| `$C8C4`       | Hostile shot's right range stops at column 30: defect? |
+| `$C453`       | Double count of an exploding object: matters at `$C11B`? |
+| `$BEEF`       | Say "adds 20 points" in `$BEEF`               |
+| `$B6F8`       | Row says `add_hostile` draws; it does not     |
 | `$E141`       | Screen 55's last record runs into the next layout |
 | `$B4FB`       | Does anything call `$B04F` while `$B058` is a NOP? |
 | `$C955`       | Counter value `$17` for the defence device    |
@@ -244,3 +235,22 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$D2CF`  | `$D2CF` and `$D2BA` typed `W`                       |
 | `$BD44`  | Fires only half a cell off the grid on that axis   |
 | `$CE86`  | `@ssub` on `row_first_screen`                       |
+| `$C2DB`  | Yes: a shot marks the cell, the next update explodes it |
+| `$C18B`  | No: the first steer comes on the fifth whole cell  |
+| `$C186`  | `@ssub` on `launch_cells`; `$C1D0` likewise        |
+| `$C2DA`  | Unused byte, typed `u`                             |
+| `$C494`  | Skipped cells are the ones that hide the object    |
+| `$C46B`  | Yes: only the device exists inside, so its flag    |
+| `$BD40`  | `$FF` means destroyed; the device is alone inside  |
+| `$B6F8`  | `update_hostile` redraws the device after the hold |
+| `$D2CC`  | Yes: blocked kept objects vanish during the hold   |
+| `$C802`  | Toggles pair: `$08` moves, `$18`/`$10` explosions  |
+| `$C76A`  | The hostile object's cover map, not ink            |
+| `$C819`  | Shot or hit cell: 20 points; Skimmer cell: a push  |
+| `$C880`  | Yes, at right angles; the device never fires       |
+| `$C955`  | Cells left before the next steer                   |
+| `$C949`  | Pixel offset 0–3 in 2-pixel steps                  |
+| `$C94E`  | States tabled at `$C947`                           |
+| `$C957`  | 1 if the object stepped                            |
+| `$CC32`  | The NOP rewinds the cover map 3 cells per row, not 4 |
+| `$C2E0`  | No: every exploding object vanishes in the hold    |
