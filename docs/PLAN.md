@@ -8,10 +8,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Item                | State                                     |
 |:--------------------|:------------------------------------------|
-| Phase               | 3 – depth pass, H hostile objects         |
+| Phase               | 3 – depth pass, S Skimmer                 |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
-| Baseline findings   | 48                                        |
-| Routines to the bar | 63 of 120 (`$B080–$B811`, `$C09B–$C962`, `$CDE8–$D472`) |
+| Baseline findings   | 46                                        |
+| Routines to the bar | 85 of 121 (`$B080–$B811`, `$C09B–$D472` but `$CD86`) |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
 | Catalogs            | graphics, sound, data: not started        |
@@ -79,8 +79,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$BAA7`       | Code with no caller: unused?                  |
 | `$BC68`       | Draw-mode code templates: what copies them?   |
 | `$C4DB`       | Table addresses built from immediates: `$BBE5`, `$BF58`, `$C1F5` (needs `$9A88`), `$C503` (needs `$A018`) |
-| `$CB8E`       | Delay loop with no caller: unused?            |
-| `$CD9C`       | Retype the Skimmer image pointers as `W`      |
+| `$CD9C`       | Label images in `$7CD4`, then type `$CD9C–$CDE7` as `W` |
 | `$BA3B`       | Fold WALL DONE's end `$00` into `t $BA06`     |
 | `$BA45`       | Dead store to the text attribute              |
 | `$6200`       | Document the graphic directory record (also `$A818`, needs a split) |
@@ -104,14 +103,8 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$BF8B`       | Does the `$21` result end the opening?        |
 | `$BF6A`       | Rows and widths of the hatch's bitmap        |
 | `$BEE0`       | Which cell pushes the Skimmer, and how?       |
-| `$CD3A`       | Is AND `$0B` a cover test?                    |
 | `$B889`       | Shield count at column 5; leaflet says right  |
 | `$B850`       | Rows 0–3 cleared; panel is rows 0–5           |
-| `$CCB0`       | Which map does `CP H` test?                   |
-| `$CBC6`       | `DEC C` vs `DEC A`: first shield-loss frame never drawn? |
-| `$CD36`       | Fold the out-of-line tail into `$CD3A`?       |
-| `$CD3A`       | Is the fourth column marked at a cell edge?   |
-| `$CD86`       | When is the Skimmer's mark `$04` toggled?     |
 | `$F30A`       | Is it the title tune's data?                  |
 | `$BC1F`       | Schema of the three control-key sets          |
 | `$B812`       | Can the control panel shadow row 6?           |
@@ -140,6 +133,15 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$C453`       | Double count of an exploding object: matters at `$C11B`? |
 | `$BEEF`       | Say "adds 20 points" in `$BEEF`               |
 | `$B6F8`       | Row says `add_hostile` draws; it does not     |
+| `$D08A`       | An exit on both axes leaves sideways: say so? |
+| `$C963`       | Merge `$C97B`–`$C9B7` into `move_skimmer_left`? |
+| `$CD89`       | Split into its own entry for `R` rows         |
+| `$CBF3`       | Split the shared draw loop for its contract   |
+| `$CC57`       | Split for `R` rows                            |
+| `$CC3C`       | Does the click rate depend on the dummy read? |
+| site theme    | `#UDGTABLE` cells have no padding: captions touch (`$CD9C`, `$9520`) |
+| `$C28D`       | "pixel offset" → "horizontal offset" in the hostile entries |
+| `$CDC8`       | Split the unused first frame into its own `u` block? |
 | `$E141`       | Screen 55's last record runs into the next layout |
 | `$B4FB`       | Does anything call `$B04F` while `$B058` is a NOP? |
 | `$C955`       | Counter value `$17` for the defence device    |
@@ -162,6 +164,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `verify-frag`     | Renders `game.skool`; baseline keys `shadskim`   |
 | `diff_entries.py` | Skips untracked files                            |
 | `rules.md`        | No DEF-6/VIS-11 exemption for the glossary boxes |
+| `coverage`        | Counts a bare well-named CALL (ENT-7) as skeletal (`$CD86`) |
 | label-namespace   | Roots miss the game loop                         |
 
 ### Closed
@@ -254,3 +257,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$C957`  | 1 if the object stepped                            |
 | `$CC32`  | The NOP rewinds the cover map 3 cells per row, not 4 |
 | `$C2E0`  | No: every exploding object vanishes in the hold    |
+| `$CB8E`  | Unused delay loop; nothing refers to it            |
+| `$CBC6`  | Bug: `DEC C` skips the first shield-loss frame     |
+| `$CCB0`  | `CP H` tests the cover map; store and map share page `$FF` |
+| `$CD3A`  | Yes: the fourth column at a cell edge; `AND $0B` is the cover test |
+| `$CD36`  | Kept as its own entry, `cover_map_hide`            |
+| `$CD86`  | Set on a new screen, then toggled old and new each draw |
+| `$CC9B`  | No: step sizes change only at `$D219` from aligned positions |

@@ -5,6 +5,8 @@
 ### Added
 
 - Graphics engine documented in depth (`$B080–$B3AF`): cell addresses, the graphic directory fields, cell masks, colour patterns, the pixel, colour, mark and shadow passes, with every basic block commented.
+- The Skimmer documented in depth (`$C963–$CDE7`): its four moves and screen exits, the shared draw with its cover map and timing-matched skip, background saves and restores, blocking checks and pushes, and the image, flip and shield-loss frame tables with renders.
+- Documented another defect in the game: the shield-loss animation never shows its first frame (`$CBC6`).
 - Hostile objects documented in depth (`$C09B–$C962`): the four slots, launches, the 13 designs and their shifted images, steering, the four moves, cover maps, collisions, pushes, firing, explosions, and every field of the hostile object workspace.
 - Documented two more defects in the game: a hit cell's mark clear also clears the struck object's own mark, and a hostile shot that starts on the Skimmer pushes it in an unset direction.
 - The game loop `play_game` documented in depth (`$CE91–$D218`), with every play loop variable defined: controls, speeds and step rates, screen exits, hatchway steps, pushes, flips and the shot clicks.

@@ -51,4 +51,4 @@ the hatch's bitmap as a graphic of 3×3 cells instead.
 One byte for each cell under the Skimmer, from $FF70 to $FF7F: 4 rows of 4
 cells, rows from the top. A byte holds $FF for a cell where the game does not
 draw the Skimmer, and 0 for any other. Such a cell hides the Skimmer, or lies in the fourth
-column while the Skimmer sits on a cell edge? That $FF is the high byte of the map's address.
+column while the Skimmer sits on a cell edge. That $FF is the high byte of the map's address.

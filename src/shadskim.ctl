@@ -1634,166 +1634,431 @@ g $C962 Hostile objects removed
 B $C962,1 Number of hostile objects removed during one move of the hostile objects
 @ $C963 label=move_skimmer_left
 c $C963 Move the Skimmer left
-D $C963 Moves the Skimmer left by its horizontal step. A blocked move turns it back, and the left edge of the screen flags an exit.
+D $C963 Moves the Skimmer left by one horizontal step. A cell that blocks it turns it back, and at the screen's left edge it flags an exit.
+N $C963 All four moves of the Skimmer work alike. A move checks for a block only when the Skimmer reaches into a new column or row of cells. A block or an exit leaves the Skimmer where it stands. A block also reverses the Skimmer's speed on that axis.
+N $C963 A step puts back the background where the Skimmer leaves, and saves the background where it arrives. So the background store holds the screen under the Skimmer's place. Cells where the cover map hides the Skimmer keep their screen bytes.
+N $C963 Each move takes the offset to be a whole number of steps from the cell grid. So a step never crosses a cell edge partway.
+  $C963 Take one step off the offset. Does the Skimmer stay in its cell?
+  $C96A If so, move it inside the cell
+  $C96C Keep the new offset, which is below zero.
+  $C96D Is the Skimmer in the screen's first column?
+  $C972 If not, move it into the column on its left
+  $C974,6 Flag an exit across the left edge, and drop the new offset.
 @ $C97B label=move_left_blocked
 c $C97B Turn the Skimmer back after a blocked move left
-D $C97B Reverses the Skimmer's horizontal motion after a blocked move to the left.
+D $C97B Sends the Skimmer back the other way after a blocked move left, and leaves it where it stands.
+  $C97B Drop the new offset.
 @ $C97C label=turn_skimmer_x
+N $C97C This entry point reverses the horizontal speed alone.
+  $C97C,8 Reverse the horizontal speed.
 @ $C985 label=move_left_cell
 c $C985 Move the Skimmer into the cell on its left
-D $C985 Moves the Skimmer one cell left when nothing blocks that cell, and otherwise turns it back.
+D $C985 Moves the Skimmer's top-left cell one column left, unless a cell in the new column blocks it. A blocked Skimmer keeps its place and turns back.
+R $C985 I:A column of the Skimmer's top-left cell, 1–29
+  $C985 Move the Skimmer's top-left cell one column left, in its column and its attribute mirror address.
+  $C990 Is the way clear through the new column of cells?
+  $C993 If so, move the Skimmer into it
+  $C995 Blocked: put back the column and the attribute mirror address, and turn the Skimmer back.
 @ $C99E label=move_left_px
 c $C99E Move the Skimmer left inside its cell
-D $C99E Moves the Skimmer left without a change of cell, and puts back the background of the column it leaves at the cell's left edge.
+D $C99E Moves the Skimmer left inside its cell. When it comes square on the cell column, it puts back the background of the fourth column, which it no longer covers.
+R $C99E I:A new horizontal offset, 0–2
+R $C99E I:F zero flag set if the new offset is 0
+  $C99E Jump unless the Skimmer now lies square on its cell column
+  $C9A0 Put back the background of the fourth column, apart from cells where the cover map hides the Skimmer.
 @ $C9A6 ssub=LD DE,skimmer_bg_store+3
 @ $C9AA ssub=LD HL,skimmer_cover_map+3
+  $C9B3 The new offset is 0.
 @ $C9B7 label=move_left_scroll
-c $C9B7 Shift the Skimmer's background store one cell left
-D $C9B7 Moves the Skimmer's screen position one cell left and saves the background of the column it enters.
+c $C9B7 Move the Skimmer one column left
+D $C9B7 Shifts the Skimmer's place on the screen one column left, with its background store, once the new column is clear. It then stores the new offset and counts the step.
+  $C9B7 Shift the background store one column right, which drops its fourth column.
 @ $C9BA ssub=LD HL,skimmer_bg_store+$5E
 @ $C9BD ssub=LD DE,skimmer_bg_store+$5F
+  $C9C2 Move the Skimmer's screen address one column left.
+  $C9C9 Save the background of the new first column.
+  $C9CF Take back the new offset, and add 4 to measure it in the new cell.
 @ $C9D2 label=store_left_px
+  $C9D2,7 Store the new offset, and count the step.
 @ $C9DA label=exit_screen_right
 c $C9DA Flag an exit to the screen on the right
 D $C9DA Flags that the Skimmer leaves the screen across its right edge.
+  $C9DA,5 Note the right edge as the one crossed.
 @ $C9E0 label=move_skimmer_right
 c $C9E0 Move the Skimmer right
-D $C9E0 Moves the Skimmer right by its horizontal step. A blocked move turns it back, and the right edge of the screen flags an exit.
+D $C9E0 Moves the Skimmer right by one horizontal step. A cell that blocks it turns it back, and at the screen's right edge it flags an exit.
+  $C9E0 Does the Skimmer lie square on its cell column?
+  $C9E5 Jump if not: it already covers a fourth column
+N $C9E7 The Skimmer covers three columns of cells, and a step right takes it into a fourth.
+  $C9E7 Does it reach the screen's right edge?
+  $C9EC If so, flag the exit
+  $C9EE Is the way clear through the column of cells on its right?
+  $C9F7 If not, turn the Skimmer back
 @ $C9FA ssub=LD DE,skimmer_bg_store+3
+  $C9FA Save the background of that column, the fourth that the Skimmer now covers.
+  $CA06 The offset starts from 0.
 @ $CA07 label=move_right_px
+  $CA07 Add the step to the offset. Does the Skimmer stay in its cell?
+  $CA0D If so, store the new offset
+  $CA0F Keep the new offset, which runs past the cell.
+  $CA10 Move the Skimmer's top-left cell one column right, in its column and its attribute mirror address.
+  $CA18 Put back the background of the first column, which the Skimmer leaves.
+  $CA28 Shift the background store one column left, which drops its first column.
 @ $CA2B ssub=LD HL,skimmer_bg_store+1
+  $CA33 Move the Skimmer's screen address one column right.
+  $CA3A Save the background of the new fourth column.
 @ $CA3D ssub=LD DE,skimmer_bg_store+3
+  $CA43 Take back the new offset, and take 4 off to measure it in the new cell.
 @ $CA46 label=store_right_px
+  $CA46,7 Store the new offset, and count the step.
 @ $CA4E label=exit_screen_top
 c $CA4E Flag an exit to the screen above
 D $CA4E Flags that the Skimmer leaves the screen across its top edge.
+  $CA4E,5 Note the top edge as the one crossed.
 @ $CA54 label=move_skimmer_up
 c $CA54 Move the Skimmer up
-D $CA54 Moves the Skimmer up by its vertical step. A blocked move turns it back, and the top of the play area flags an exit.
+D $CA54 Moves the Skimmer up by one vertical step. A cell that blocks it turns it back, and at the top of the play area it flags an exit.
+N $CA54 A step up uncovers a strip as deep as the step along the Skimmer's bottom edge.
+  $CA54 Take the strip's cells from the cover map's fourth row.
 @ $CA55 ssub=LD HL,skimmer_cover_map+$0C
 @ $CA59 ssub=LD A,($D2B0+1)
+  $CA59 Does the Skimmer's top lie on a cell's top pixel row?
+  $CA5E Jump if not: it already covers a fourth row of cells
+N $CA60 The Skimmer covers three rows of cells, and a step up takes it into the row above.
+  $CA60 Is it at the top of the play area?
+  $CA65 If so, flag the exit
+  $CA67 Move its top-left cell up a row.
+  $CA6B Is the way clear through the row of cells above?
+  $CA77 If so, go on with the step
+  $CA79 Blocked: put the row back.
 @ $CA7D label=turn_skimmer_y
+  $CA7D,8 Reverse the vertical speed: the Skimmer turns back.
 @ $CA86 label=move_up_row_clear
+  $CA86 The way is clear. The strip lies in the Skimmer's third row of cells, so take its cells from the cover map's third row. Keep the new attribute mirror address.
 @ $CA87 ssub=LD HL,skimmer_cover_map+8
 @ $CA8E label=move_up_px
+  $CA8E Find the screen address of the Skimmer's new top, a step higher. Does the top lie below a cell's top pixel row?
+  $CA99 If so, take the step off its pixel row
+  $CA9B Move up a row of cells. Does that cross into the third of the screen above?
+  $CAA0 Jump if so: the step off the high byte reaches that third
+  $CAA2 Add a cell's depth to the high byte, so the step lands in the cell above.
 @ $CAA4 label=move_up_line
+  $CAA4 Take the step off the pixel row, and keep the new top.
+  $CAA7 Find the strip's screen address, three rows of cells below the new top. Does it stay in the same third of the screen?
+  $CAAB Jump if so
+  $CAAD Move it into the next third.
 @ $CAB1 label=move_up_source
 @ $CAB1 ssub=LD HL,skimmer_bg_store+$58
+  $CAB1 Take the strip from the store's bottom two pixel rows. Is the step the deeper one?
+  $CAB9 Jump if not
 @ $CABB ssub=LD HL,skimmer_bg_store+$50
+  $CABB Take it from the bottom four rows instead.
 @ $CABE label=move_up_draw
+  $CABE Put the strip's background back, apart from cells where the cover map hides the Skimmer.
+  $CAC1 Is the step the deeper one?
+  $CAC6 Jump if not
 @ $CAC8 ssub=LD HL,skimmer_bg_store+$4F
+  $CAC8 Shift the store down four pixel rows, which drops its bottom four.
 @ $CAD0 label=move_up_small_step
 @ $CAD0 ssub=LD HL,skimmer_bg_store+$57
+  $CAD0 Shift the store down two pixel rows, which drops its bottom two.
 @ $CAD6 label=move_up_scroll
 @ $CAD6 ssub=LD DE,skimmer_bg_store+$5F
+  $CAD6 Run the shift from the store's end backward.
+  $CADB Make the new top the Skimmer's screen address.
+  $CADF Save the background of the rows it enters into the store's top rows.
+  $CAE5,4 Count the step.
 @ $CAEA label=exit_screen_bottom
 c $CAEA Flag an exit to the screen below
 D $CAEA Flags that the Skimmer leaves the screen across its bottom edge.
+  $CAEA,5 Note the bottom edge as the one crossed.
 @ $CAF0 label=move_skimmer_down
 @ $CAF0 ssub=LD A,($D2B0+1)
 c $CAF0 Move the Skimmer down
-D $CAF0 Moves the Skimmer down by its vertical step. A blocked move turns it back, and the bottom of the play area flags an exit.
+D $CAF0 Moves the Skimmer down by one vertical step. A cell that blocks it turns it back, and at the bottom of the screen it flags an exit.
+N $CAF0 A step down uncovers a strip as deep as the step along the Skimmer's top edge.
+  $CAF0 Does the Skimmer's top lie on a cell's top pixel row?
+  $CAF5 Jump if not: it already covers a fourth row of cells
+N $CAF7 The Skimmer covers three rows of cells, and a step down takes it into the row below.
+  $CAF7 Does it reach the bottom of the screen?
+  $CAFC If so, flag the exit
+  $CAFF Is the way clear through the row of cells below?
+  $CB09 If not, turn the Skimmer back
 @ $CB0C ssub=LD A,($D2B0+1)
+  $CB0C Take the top's pixel row again.
 @ $CB11 label=move_down_px
+  $CB11 Add the step to the top's pixel row. Does the top stay in its row of cells?
+  $CB17 If so, keep the row
+  $CB19 Move the Skimmer's top-left cell down a row, in its row and its attribute mirror address.
 @ $CB27 label=move_down_source
+  $CB27 Put back the strip's background from the store's top rows, apart from cells where the cover map's first row hides the Skimmer.
+  $CB36 Is the step the deeper one?
+  $CB3B Jump if so
+  $CB3D Shift the store up two pixel rows, which drops its top two.
 @ $CB40 ssub=LD HL,skimmer_bg_store+8
 @ $CB45 label=move_down_big_step
+  $CB45 Shift the store up four pixel rows, which drops its top four.
 @ $CB48 ssub=LD HL,skimmer_bg_store+$10
 @ $CB4B label=move_down_scroll
+  $CB4B Run the shift from the store's start forward.
+  $CB50 Find the screen address of the rows the Skimmer enters, three rows of cells below its top. Do they stay in the same third of the screen?
+  $CB57 Jump if so
+  $CB59 Move into the next third.
 @ $CB5D label=move_down_draw
+  $CB5D Point at the store's bottom two pixel rows. Is the step the deeper one?
 @ $CB60 ssub=LD DE,skimmer_bg_store+$58
+  $CB65 Jump if not
 @ $CB67 ssub=LD DE,skimmer_bg_store+$50
+  $CB67 Point at its bottom four rows instead.
 @ $CB6A label=move_down_draw_at
+  $CB6A Save the background of the rows the Skimmer enters.
+  $CB6D Add the step to the top's pixel row. Does it stay inside the cell?
+  $CB79 If so, keep the new top
+  $CB7B Move down a row of cells. Does that cross into the next third of the screen?
+  $CB7F If so, the carry from the pixel row already points into that third
+  $CB81 Take back the carry from the pixel row into the third.
 @ $CB85 label=move_down_store
-b $CB8E
+  $CB85,8 Keep the new top as the Skimmer's screen address, and count the step.
+@ $CB8E label=unused_delay
+c $CB8E Unused delay loop
+D $CB8E A delay loop that no routine in the game calls.
+  $CB8E Double the count, and take one off.
+@ $CB90 label=unused_delay_pass
+  $CB90 Spend time. The five loads only read the ROM, and keep no result.
+  $CBA4,3 Loop until the count runs out.
 @ $CBA8 label=draw_skimmer
 c $CBA8 Draw the Skimmer
-D $CBA8 Draws the Skimmer through its mask over its saved background, and leaves undrawn the cells its #R$CD3A(cover map) marks.
+D $CBA8 Draws the Skimmer's flip frame or shield loss frame, or else its image for its horizontal offset, through its mask over its saved background. It leaves alone the cells where its #R$CD3A(cover map) hides it.
+  $CBA8 Put back the fourth step of the cover map's rewind, which the move of the hostile objects takes out. A row of the Skimmer's map holds four cells.
 @ $CBAA ssub=LD ($CC32),A
-@ $CBBB label=skimmer_draw_seq
+  $CBAD Does a flip run?
+  $CBB2 Jump if not
+  $CBB4 Take the flip frames, and count the flip's frame from 0.
+@ $CBBB label=skimmer_draw_loss
+  $CBBB Does a shield loss run?
+  $CBC0 Jump if not
+  $CBC2 Take the shield loss frames, with the stage of the loss as the frame.
+N $CBC6 BUG: this reduces #REGc, which nothing reads, where the flip reduces its frame in #REGa. So stage 1 draws the second frame, and the first frame never shows.
+  $CBC6 Go to find the frame's entry.
 @ $CBCA label=skimmer_draw_shift
+  $CBCA Otherwise take the Skimmer's normal or flipped images, with its horizontal offset as the image.
 @ $CBD1 label=skimmer_draw_frame
+  $CBD1 Find the frame's or image's entry, 4 bytes per entry.
+  $CBD8 Hand the draw the background store, the entry's mask and the cover map in the other register set.
+  $CBE6 Draw the entry's frame or image at the Skimmer's screen address.
 @ $CBF3 label=skimmer_draw_row
+N $CBF3 This entry point is the draw loop, for the Skimmer and the hostile objects alike. It takes #REGb pixel rows of #REGc bytes, from the frame or image in #REGhl, to the screen at #REGde.
+N $CBF3 The other register set holds the background store in #REGhl, the mask in #REGde and the cover map in #REGbc.
+  $CBF3 Start a pixel row.
 @ $CBF6 label=skimmer_draw_byte
+  $CBF6 Does the cover map hide the object in this cell? A hidden cell's byte equals the high byte of the map's address.
+  $CBF9 Jump if so
+  $CBFB Write the background through the mask, with the frame or image over it. Step on through the mask, the background store and the cover map.
 @ $CC03 label=skimmer_draw_next
+  $CC03 Step on through the frame or image and along the screen row, to the row's end.
+  $CC07 Find the pixel row's place in its cell, 0 for the top.
 @ $CC0A label=skimmer_draw_sound
+  $CC0A Is it at or below #R$D2CD(the click row)? The play loop copies the click row into this operand, and an explosion sets its own.
+  $CC0C Jump if not
+  $CC0E Click the speaker.
 @ $CC17 label=skimmer_draw_down
+  $CC17 Move the screen address down one pixel row. Does the new row lie in the same row of cells?
+  $CC1C Jump if so
+  $CC1F Move to the next row of cells. Jump if it starts a new third of the screen.
+  $CC26 Otherwise take the address back up a cell's height.
 @ $CC2A label=skimmer_draw_rows_left
+  $CC2A,3 Leave the cover map at its next row, and count the pixel row.
 @ $CC2E label=skimmer_draw_rewind
+  $CC2E The new pixel row lies in the same row of cells. Step the cover map back to the start of its row.
 @ $CC32 label=skimmer_draw_map_back
+  $CC32 The fourth step back. The Skimmer's draw makes it DEC C, for map rows of four cells. The hostile objects' move makes it a NOP, for rows of three.
+  $CC34,3 Count the pixel row.
 @ $CC38 label=skimmer_draw_covered
+  $CC38 Leave the screen byte as it is. Step on through the mask, the background store and the cover map. The dummy read gives a skipped byte the same T-states as a drawn one.
 @ $CC42 label=save_skimmer_bg
 c $CC42 Save the background behind the Skimmer
 D $CC42 Copies the screen under the Skimmer into its background store.
+  $CC42 Start at the store's first byte and the Skimmer's top-left screen byte.
+  $CC48 Copy three columns in this loop. The fourth follows as the loop runs on into the column copy.
 @ $CC4A label=skimmer_bg_col
+  $CC4A Copy one column, then move one column right on the screen and in the store.
 @ $CC57 label=save_bg_column
+N $CC57 This entry point copies one column of the screen, the Skimmer's full depth, into the background store. #REGhl holds the screen address of the column's top byte, and #REGde its place in the store.
+  $CC57 Walk the column down the Skimmer's depth, one row of the store for each pixel row.
 @ $CC5A label=bg_save_row
+  $CC5A Copy one byte. Return after the last pixel row.
+  $CC5E Move to the store's next row.
+  $CC61 Move the screen address down one pixel row. Does the new row lie in the same row of cells?
+  $CC65 Jump if so
+  $CC67 Move to the next row of cells. Jump if it starts a new third of the screen.
+  $CC6D Otherwise take the address back up a cell's height.
 @ $CC73 label=restore_bg_column
 c $CC73 Put back one column of the Skimmer's background
-D $CC73 Copies one column of the Skimmer's background store back to the screen, and leaves out the cells its cover map marks.
+D $CC73 Copies one column of the Skimmer's background store back to the screen. It leaves alone the cells where its cover map hides the Skimmer, so whatever hides it there stays whole.
+R $CC73 I:HL screen address of the column's top byte
+R $CC73 I:DE address of the column's top byte in the background store
+R $CC73 I:HL' address of the column's top cell in the cover map
+R $CC73 I:C' number of cells in a row of the cover map
+  $CC73 Walk the column down the Skimmer's depth, one row of the store for each pixel row.
 @ $CC77 label=bg_restore_row
+  $CC77 Does the cover map hide the Skimmer in this cell? A hidden cell's byte equals the high byte of the map's address.
+  $CC7B Jump if so
+  $CC7D Put the background byte back.
 @ $CC7F label=bg_restore_next
+  $CC7F Return after the last pixel row.
+  $CC81 Move to the store's next row.
+  $CC84 Move the screen address down one pixel row. Does the new row lie in the same row of cells?
+  $CC88 Jump if so
+  $CC8A Move the cover map to its next row.
+  $CC8F Move to the next row of cells. Jump if it starts a new third of the screen.
+  $CC95 Otherwise take the address back up a cell's height.
 @ $CC9B label=save_screen_block
-c $CC9B Save a block of the screen
-D $CC9B Copies a block of the screen, as many pixel rows deep as the count at #R$D2C4, into a store.
+c $CC9B Save a strip of the screen behind the Skimmer
+D $CC9B Copies a strip of the screen, the Skimmer's width across and one vertical step deep, into its background store. The strip lies in one row of cells.
+R $CC9B I:HL screen address of the strip's top-left byte
+R $CC9B I:DE address of the strip in the background store
+  $CC9B Take the Skimmer's width across, and one vertical step of pixel rows.
 @ $CCA1 label=block_save_row
+  $CCA1 Start a pixel row.
 @ $CCA4 label=block_save_byte
+  $CCA4 Copy the row, and run on through the store.
+  $CCAA,5 Move down one pixel row. The strip never leaves its row of cells, so no cell row changes.
 @ $CCB0 label=restore_screen_block
-c $CCB0 Put back a block of the screen
-D $CCB0 Copies a stored block, as many pixel rows deep as the count at #R$D2C4, back onto the screen. It leaves out the columns a cover map marks?
+c $CCB0 Put back a strip of the screen behind the Skimmer
+D $CCB0 Copies a strip of the Skimmer's background store back to the screen, the Skimmer's width across and one vertical step deep. It leaves alone the cells where its cover map hides the Skimmer.
+N $CCB0 The strip lies in one row of cells, so every pixel row reads one row of the cover map.
+R $CCB0 I:HL address of the strip in the background store
+R $CCB0 I:DE screen address of the strip's top-left byte
+R $CCB0 I:HL' address of the first cell of the strip's row in the cover map
+  $CCB0 Take the Skimmer's width across, and one vertical step of pixel rows.
 @ $CCB6 label=block_restore_row
+  $CCB6 Start a pixel row.
 @ $CCB9 label=block_restore_byte
+  $CCB9 Does the cover map hide the Skimmer in this cell? A hidden cell's byte equals the high byte of the store's address, which lies on the map's page.
+  $CCBE Jump if so
+  $CCC0 Put the background byte back.
 @ $CCC2 label=block_restore_next
+  $CCC2 Step along the row.
+  $CCC6,12 Move down one pixel row, and step the cover map back to the start of its row.
 @ $CCD3 label=check_skimmer_column
 c $CCD3 Check the cells beside the Skimmer
-D $CCD3 Checks a column of cells beside the Skimmer for anything that blocks it. The flipped Skimmer ignores one more attribute mirror mark, so cells with only that mark do not block it.
+D $CCD3 Checks the column of cells that a step left or right takes the Skimmer into, for anything that blocks it. A hostile object or shot that blocks it also starts a push on the Skimmer.
+N $CCD3 The flipped Skimmer passes under one kind of bright graphic that stops it the right way up.
+R $CCD3 I:HL attribute mirror address of the column's top cell
 R $CCD3 O:F carry set if the way is clear
+  $CCD3 Take the marks that block the Skimmer the right way up.
+  $CCD5 Is it flipped?
+  $CCDA Jump if not
+  $CCDC Drop the mark of the bright graphics that the flipped Skimmer passes under.
 @ $CCDE label=check_skimmer_col_len
+  $CCDE Does the Skimmer's top pixel row lie below a cell's top, so that it spans a fourth row of cells?
 @ $CCE0 ssub=LD A,($D2B0+1)
+  $CCE5 Jump if so
+  $CCE7 It spans three.
 @ $CCE8 label=check_skimmer_col_go
+  $CCE8 Step down one row of cells at a time.
 @ $CCEB label=check_skimmer_col_cell
+  $CCEB Does a mark in this cell block the Skimmer?
+  $CCED Jump if so
+  $CCEF Check the next cell down.
+  $CCF2,1 The way is clear.
 @ $CCF4 label=skimmer_blocked
+N $CCF4 The Skimmer's way is blocked. Both checks come here with #REGhl at the cell that blocks it.
+  $CCF4 Does the cell hold a hostile object with no hit?
+  $CCF9 Jump if so
+  $CCFB Does it hold a shot, or a hit?
+  $CCFD Jump if not: something else blocks the way
+  $CCFF,6 Start a short push on the Skimmer, and report the way blocked.
 @ $CD06 label=skimmer_blocked_mark
+  $CD06 The Skimmer rams a hostile object. Mark the cell hit, count the hit and start a long push on the Skimmer.
 @ $CD16 label=skimmer_blocked_done
+  $CD16,1 Report the way blocked.
 @ $CD18 label=check_skimmer_row
 c $CD18 Check the cells above or below the Skimmer
-D $CD18 Checks a row of cells above or below the Skimmer for anything that blocks it.
+D $CD18 Checks the row of cells that a step up or down takes the Skimmer into, for anything that blocks it. A blocked step ends at #R$CCF4(the column check's response).
+R $CD18 I:HL attribute mirror address of the row's left cell
 R $CD18 O:F carry set if the way is clear
+  $CD18 Pick the marks that block the Skimmer, as #R$CCD3(the column check) does.
+  $CD1A Is the Skimmer flipped?
+  $CD1F Jump if not
+  $CD21 Drop the mark that the flipped Skimmer passes under.
 @ $CD23 label=check_skimmer_row_len
+  $CD23 Does the Skimmer sit right of its cell's left edge, so that it spans a fourth column of cells?
+  $CD2A Jump if so
+  $CD2C It spans three.
 @ $CD2D label=check_skimmer_row_cell
-@ $CD36 label=mark_cell_covered
-c $CD36 Mark a cell in the Skimmer's cover map
+  $CD2D Does a mark in this cell block the Skimmer?
+  $CD2F Jump if so
+  $CD31 Check the next cell along.
+  $CD34,1 The way is clear.
+@ $CD36 label=cover_map_hide
+c $CD36 Hide the Skimmer in a cell of its cover map
+D $CD36 Hides the Skimmer in the current cell of #R$CD3A(its cover map), and goes back to the build of the map.
+  $CD36 A hidden cell holds the high byte of the map's address.
 @ $CD3A label=map_skimmer_cover
 c $CD3A Build the Skimmer's cover map
-D $CD3A Marks each cell under the Skimmer that the attribute mirror marks, and the fourth column when the Skimmer sits on a cell edge?
+D $CD3A Builds the Skimmer's cover map: the cells under it where a bright graphic, a bar, a hostile object or a shot hides it. At its cell's left edge the Skimmer's images leave the fourth column empty, and the map hides it there too.
+  $CD3A Keep the Skimmer's horizontal offset in the other #REGa.
+  $CD3F Start at the map's first cell and the Skimmer's top-left cell in the attribute mirror, with four rows of four cells to walk.
 @ $CD49 label=cover_map_row
+  $CD49 Start a row of cells, with the horizontal offset to hand.
 @ $CD4F label=cover_map_cell
+  $CD4F Does a bright graphic, a bar, a hostile object or a shot mark the cell?
+  $CD52 If so, hide the Skimmer there
+  $CD55 Is this the fourth column, with the Skimmer at its cell's left edge? The count of cells left plus the horizontal offset tells: only the last cell at horizontal offset 0 gives this sum.
+  $CD59 If so, hide the Skimmer there
+  $CD5B If not, show it there.
 @ $CD5D label=cover_map_store
+  $CD5D Store the cell's byte, and move to the next cell of the row.
+  $CD62 Move to the attribute mirror's next row. The count of cells is 0 here, so only the carry goes into the high byte.
+  $CD6A,3 Count the row.
 @ $CD6E label=get_skimmer_span
 c $CD6E Find the cells under the Skimmer
-D $CD6E Gives the Skimmer's top-left cell in the attribute mirror and how many rows and columns of cells lie under it. Each count is four, or three where the Skimmer sits exactly on a cell edge.
+D $CD6E Gives the block of cells under the Skimmer in the attribute mirror. On each axis it spans three cells where the Skimmer sits on a cell edge, and four otherwise.
+R $CD6E O:HL attribute mirror address of the Skimmer's top-left cell
+R $CD6E O:B number of rows of cells under the Skimmer, 3 or 4
+R $CD6E O:C number of columns of cells under the Skimmer, 3 or 4
+  $CD6E Start from four rows and four columns at the Skimmer's top-left cell.
+  $CD74 Does the Skimmer sit right of its cell's left edge?
+  $CD79 Jump if so
+  $CD7B It spans three columns.
 @ $CD7C label=get_skimmer_span_rows
 @ $CD7C ssub=LD A,($D2B0+1)
-@ $CD86 label=toggle_skimmer_flag
-c $CD86 Toggle the Skimmer's flag in the attribute mirror
-D $CD86 Flips a flag bit in each attribute mirror cell under the Skimmer?
-@ $CD89 label=toggle_cells_flag
-@ $CD8C label=toggle_cells_flag_row
-@ $CD8F label=toggle_cells_flag_cell
+  $CD7C Does its top pixel row lie below a cell's top?
+  $CD83 Return if so
+  $CD84,1 It spans three rows.
+@ $CD86 label=toggle_skimmer_mark
+c $CD86 Toggle the Skimmer's mark in the attribute mirror
+D $CD86 Toggles the Skimmer's mark in each attribute mirror cell under it.
+@ $CD89 label=toggle_cells_mark
+N $CD89 This entry point toggles the mark over a block of cells that the caller gives. #REGhl holds the top-left cell, #REGb the rows and #REGc the columns.
+  $CD89 Step down one row of cells at a time.
+@ $CD8C label=toggle_cells_mark_row
+  $CD8C Start a row.
+@ $CD8F label=toggle_cells_mark_cell
+  $CD8F Toggle the Skimmer's mark in each cell of the row.
+  $CD96,5 Move to the next row.
 @ $CD9C label=skimmer_images
 b $CD9C Skimmer images, normal and flipped
-D $CD9C Each entry is two words: the address of an image, then the address of its mask. The first four are the Skimmer's images at each pixel offset.
+D $CD9C One entry of 4 bytes for each horizontal offset of the Skimmer, from its cell's left edge in steps of 2 pixels. An entry holds the address of the image, then the address of its mask.
+N $CD9C The normal Skimmer.
+N $CD9C #UDGTABLE { #UDGARRAY4,,3,4,,,,2($8800-$8843-1-32:$8980-$89C3-1-32)(skimmer_image_1) | #UDGARRAY4,,3,4,,,,2($8860-$88A3-1-32:$89E0-$8A23-1-32)(skimmer_image_2) | #UDGARRAY4,,3,4,,,,2($88C0-$8903-1-32:$8A40-$8A83-1-32)(skimmer_image_3) | #UDGARRAY4,,3,4,,,,2($8920-$8963-1-32:$8AA0-$8AE3-1-32)(skimmer_image_4) } { 0 pixels right | 2 pixels right | 4 pixels right | 6 pixels right } TABLE#
 B $CD9C,16,4
 @ $CDAC label=skimmer_flipped_images
-N $CDAC The flipped Skimmer at each pixel offset
+N $CDAC The flipped Skimmer. Its images share the masks of the normal ones.
+N $CDAC #UDGTABLE { #UDGARRAY4,,3,4,,,,2($8D60-$8DA3-1-32:$8980-$89C3-1-32)(skimmer_flipped_1) | #UDGARRAY4,,3,4,,,,2($8DC0-$8E03-1-32:$89E0-$8A23-1-32)(skimmer_flipped_2) | #UDGARRAY4,,3,4,,,,2($8E20-$8E63-1-32:$8A40-$8A83-1-32)(skimmer_flipped_3) | #UDGARRAY4,,3,4,,,,2($8E80-$8EC3-1-32:$8AA0-$8AE3-1-32)(skimmer_flipped_4) } { 0 pixels right | 2 pixels right | 4 pixels right | 6 pixels right } TABLE#
 B $CDAC,16,4
 @ $CDBC label=skimmer_flip_frames
 b $CDBC Skimmer flip frames
-D $CDBC The three frames of the flip, each laid out as an entry of the #R$CD9C(Skimmer images).
+D $CDBC The three frames of the flip, which #R$CBA8(the Skimmer's draw) shows in turn whichever way the Skimmer turns over. Each entry is laid out as one of #R$CD9C(the Skimmer images).
+N $CDBC #UDGTABLE { #UDGARRAY4,,3,4,,,,2($8B20-$8B63-1-32:$8C40-$8C83-1-32)(skimmer_flip_1) | #UDGARRAY4,,3,4,,,,2($8B80-$8BC3-1-32:$8CA0-$8CE3-1-32)(skimmer_flip_2) | #UDGARRAY4,,3,4,,,,2($8BE0-$8C23-1-32:$8D00-$8D43-1-32)(skimmer_flip_3) } { Frame 1 | Frame 2 | Frame 3 } TABLE#
 B $CDBC,12,4
 @ $CDC8 label=shield_loss_frames
 b $CDC8 Skimmer frames for a shield loss
-D $CDC8 Eight frames, each laid out as an entry of the #R$CD9C(Skimmer images). The stage of a shield loss at #R$D2D4 picks the frame.
+D $CDC8 The eight frames of a shield loss, one entry for each stage of the loss at #R$D2D4 from stage 0. Each entry is laid out as one of #R$CD9C(the Skimmer images).
+N $CDC8 A defect in #R$CBC6(the Skimmer's draw) skips the first frame.
+N $CDC8 #UDGTABLE { #UDGARRAY4,,3,4,,,,2($8EE0-$8F23-1-32:$8F40-$8F83-1-32)(shield_loss_1) | #UDGARRAY4,,3,4,,,,2($8FA0-$8FE3-1-32:$9000-$9043-1-32)(shield_loss_2) | #UDGARRAY4,,3,4,,,,2($9060-$90A3-1-32:$90C0-$9103-1-32)(shield_loss_3) | #UDGARRAY4,,3,4,,,,2($9120-$9163-1-32:$9180-$91C3-1-32)(shield_loss_4) } { Frame 1 | Frame 2 | Frame 3 | Frame 4 } TABLE#
+N $CDC8 #UDGTABLE { #UDGARRAY4,,3,4,,,,2($91E0-$9223-1-32:$9240-$9283-1-32)(shield_loss_5) | #UDGARRAY4,,3,4,,,,2($92A0-$92E3-1-32:$9300-$9343-1-32)(shield_loss_6) | #UDGARRAY4,,3,4,,,,2($9360-$93A3-1-32:$93C0-$9403-1-32)(shield_loss_7) | #UDGARRAY4,,3,4,,,,2($9420-$9463-1-32:$9480-$94C3-1-32)(shield_loss_8) } { Frame 5 | Frame 6 | Frame 7 | Frame 8 } TABLE#
 B $CDC8,32,4
 @ $CDE8 label=init_interrupts
 c $CDE8 Set up the interrupt routine
