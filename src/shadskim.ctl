@@ -1343,28 +1343,63 @@ D $CDC8 Eight frames, each laid out as an entry of the #R$CD9C(Skimmer images). 
 B $CDC8,32,4
 @ $CDE8 label=init_interrupts
 c $CDE8 Set up the interrupt routine
-D $CDE8 Fills the interrupt vector table so that every interrupt jumps to the #R$CE26(flag routine), and switches to vectored interrupts.
+D $CDE8 Fills the interrupt vectors so that every interrupt reaches the #R$CE26(flag routine), and switches to vectored interrupts.
+  $CDE8 Hold off interrupts while the vectors change. Each vector takes the high byte of the interrupt jump, which is also its low byte.
+@ $CDEC ssub=LD BC,int_jump/$100
 @ $CDEF label=init_interrupts_fill
+  $CDEF Fill the vectors, and the byte after them that a vector read at the last one also takes. Whatever byte the data bus holds, the vector leads to the interrupt jump.
+  $CDF4 Make the interrupt jump lead to the flag routine.
+@ $CDFA ssub=LD (HL),flag_interrupt%$100
+@ $CDFD ssub=LD (HL),flag_interrupt/$100
 @ $CDFF ssub=LD A,int_vectors/256
+  $CDFF,7 Point the Z80 at the vectors, and switch to vectored interrupts.
 @ $CE07 label=readouts_interrupt
 c $CE07 Interrupt routine that updates the readouts
-D $CE07 Runs the #R$D343(readout update) on each interrupt, then sets the flag at #R$D2AF.
+D $CE07 Runs the #R$D343(readout update) on each interrupt and keeps every register, and continues into the #R$CE26(flag routine).
+  $CE07,14 Keep both register sets and the index registers.
+  $CE18 Restore them.
 @ $CE26 label=flag_interrupt
+N $CE26 This entry point is the flag routine, which marks each interrupt at #R$D2AF(the interrupt flag).
+  $CE26,7 Raise the flag.
 @ $CE30 label=skimmer_cells_changed
 c $CE30 Check whether the cells under the Skimmer changed
-D $CE30 Compares the Skimmer's attribute mirror address and span with the ones saved at #R$D2BA and #R$D2BC.
-R $CE30 O:F zero set if nothing changed
+D $CE30 Compares the Skimmer's top-left cell in the attribute mirror with #R$D2BA(the saved cell). It also compares the rows and columns of cells under it with #R$D2BC(the saved span).
+R $CE30 O:F zero set if the Skimmer covers the same cells
+  $CE30 Does the low byte of the top-left cell's mirror address match the saved one?
+  $CE37 Return if not
 @ $CE38 ssub=LD A,($D2B8+1)
+  $CE38 Does the high byte match too?
+  $CE3D Return if not
+  $CE3E Find the rows and columns of cells under the Skimmer. Does the number of columns match?
+  $CE46 Return if not
+  $CE47,3 Does the number of rows match? The zero flag gives the answer.
 @ $CE4B label=colour_play_area_split
 c $CE4B Colour the play area with a black left strip
 D $CE4B Sets the play area to black on black in its left 11 columns and to white on black in the right 21.
+R $CE4B I:HL attribute address of the play area's top-left cell
+  $CE4B Colour each character row of the play area.
 @ $CE4D label=split_colour_row
+  $CE4D Start the row with black ink on black paper.
 @ $CE51 label=split_colour_left
+  $CE51 Colour the left strip.
+  $CE55 Switch to white ink on black paper for the rest of the row.
 @ $CE59 label=split_colour_right
+  $CE59 Colour the rest of the row, which leaves the address at the next row's first cell.
+  $CE5D,3 Move to the next row, until the play area is done.
 @ $CE61 label=animate_flip
 c $CE61 Step the Skimmer's flip animation
 D $CE61 Every fourth call, advances the flip frame. After the third frame of the flip, it toggles the flipped state and switches to the Skimmer images for the new state.
+R $CE61 I:A the flip's current frame, 1–3
+R $CE61 I:HL address of #R$D2D1(the flip frame), with #R$D2D2(the flipped flag) after it
+  $CE61 Keep the frame, and count the call. Is it a fourth one?
+  $CE6B Return if not
+  $CE6C Move to the next frame. Is the third frame over?
+  $CE71 Jump if not
+  $CE73 The flip is over. Clear the frame. Toggle the flipped state: does the Skimmer now fly the right way up?
+  $CE7A Take its normal images, and keep them if so.
+  $CE7F Take its flipped images.
 @ $CE82 label=animate_flip_frames
+  $CE82,3 Switch the Skimmer's draw to them.
 @ $CE85 label=animate_flip_done
 @ $CE86 label=row_first_screen
 b $CE86 First screen number of each hull map row
@@ -1372,135 +1407,509 @@ D $CE86 One byte per row of the hull map: the number of the row's first screen. 
 B $CE86,11,1
 @ $CE91 label=play_game
 c $CE91 Play a game
-D $CE91 Runs a game until the last shield goes or the Skimmer reaches the WALL DONE screen, one pass of its loop for each interrupt.
-R $CE91 O:A $5E if the game ends on the WALL DONE screen
+D $CE91 Runs a game from a fresh score until the last shield goes or the Skimmer reaches the WALL DONE screen.
+R $CE91 O:A $5E if the game ends on the WALL DONE screen, 1 if it ends with the last shield
+  $CE91 Start with a full Damage Report Indicator, a score of zero and the Skimmer's normal images.
+  $CE9A The Skimmer starts the right way up and at rest, square on its cell, with no controls in force, no push and no shot clicks.
+  $CEB3 Set the horizontal step rates for a start at rest.
+  $CEB9 Set the vertical ones too. The second clear of the vertical speed is redundant.
+  $CEC3 Empty the four #R$F800(hostile object slots), and switch off the shot clicks of the Skimmer draw.
+  $CED4 Put the Skimmer on its first cell.
 @ $CEDB label=enter_screen
+N $CEDB A move to the next screen starts the new screen here, and so does the trip into an inner section.
+  $CEDB No hatchway animation runs on the new screen.
 @ $CEDF label=enter_screen_hatchway
+  $CEDF The trip out of an inner section starts its screen here, with the hatchway animation under way. Let each interrupt update the readouts while the screen draws.
 @ $CEE0 ssub=LD HL,$CE07
 @ $CEE3 ssub=LD (int_jump+1),HL
+  $CEE7 Find the screen address of the Skimmer's top-left cell, and the cell's attribute mirror address.
 @ $CEEF ssub=ADD A,(attr_mirror-$5800)/256
+  $CEF9 Empty the #R$C909(animation list), and take away the pulse laser shot and the hostile objects' shot.
+  $CF08 The new screen has no hatchway, launch cells or hits yet, and no shield loss is due or under way.
 @ $CF0C ssub=LD ($D2C7+1),A
+N $CF1B The sector follows from the screen's place on the hull map. Columns 0 and 1 make up sector 1. In the other columns, rows 5 to 10 make up sector 2 and rows 0 to 4 make up sector 3.
+  $CF1B Start from the first sector.
+  $CF1D Is the screen in the first sector? Jump if so.
+  $CF24 Take the second sector. Is the screen in its rows? Jump if so.
+  $CF2C Take the third sector.
+@ $CF2D label=store_sector
+  $CF2D Keep the sector and show it on the control panel. Then fill the play area with the sector's hull surface.
+  $CF3A Make the play area's colour white ink on black paper.
 @ $CF3C ssub=LD ($B87A+1),A
+  $CF3F Keep the screen's column on the hull map. Is it the left column?
+  $CF48 Jump if not
+  $CF4A Colour the play area with a black strip on its left, and skip the plain colour.
+@ $CF4F label=colour_whole_area
+  $CF4F Colour the whole play area.
+@ $CF52 label=clear_play_marks
+  $CF52 Clear the attribute mirror's marks over the play area.
 @ $CF53 ssub=LD ($B87A+1),A
 @ $CF56 ssub=LD HL,attr_mirror+$C0
+  $CF5C Look up the number of the screen at the left end of this hull map row.
+@ $CF5F ssub=ADD A,row_first_screen%$100
+@ $CF62 ssub=LD H,row_first_screen/$100
+@ $CF67 label=add_screen_column
+  $CF67 Add the screen's column to give its number, and draw the screen.
+  $CF6F Let each interrupt set the interrupt flag and do nothing more.
 @ $CF70 ssub=LD HL,$CE26
 @ $CF73 ssub=LD (int_jump+1),HL
+  $CF77 Did the screen end the game on WALL DONE?
+  $CF7C Jump if not
+  $CF7E,2 Report the end on the WALL DONE screen.
+@ $CF81 label=place_skimmer
+  $CF81 Put the Skimmer on the new screen. Save what lies behind it, map its cover and draw it, then mark its cells in the attribute mirror.
+  $CF8D Start the hostile objects' hold count.
 @ $CF92 label=play_loop
+N $CF92 The play loop. Each pass waits for an interrupt, so the game runs at most one pass for each interrupt.
+  $CF92 Turn the border black and the speaker off, and watch the interrupt flag.
+@ $CF98 label=wait_interrupt
+  $CF98 Wait for the next interrupt.
+  $CF9C Clear the flag for the next one.
+  $CF9E Handle the fire key. It ignores the value in #REGa.
+  $CFA3 Let the Skimmer draw click the speaker while a pulse laser shot's clicks run.
 @ $CFA6 ssub=LD ($CC0A+1),A
+  $CFA9 Did the Damage Report Indicator run out, so that a shield loss is due? The first load has no effect.
+  $CFB0 Jump if not
 @ $CFB2 ssub=LD A,($D2B0+1)
+  $CFB2 Does the Skimmer sit off the cell grid, by a pixel row or a horizontal offset?
+  $CFBC Jump if so, to let it move on to a cell.
+  $CFBE Run the shield loss. Did it take the last shield? Return if so.
+@ $CFC7 label=check_hatchway
+  $CFC7 Is the hatchway animation under way?
+  $CFCC Jump if not
+  $CFCE Is the Skimmer about to leave an inner section?
+  $CFD0 Jump if not
+  $CFD2 Make the hatch open over the Skimmer, and take the Skimmer out to the outer hull.
+  $CFDF Empty the four #R$F800(hostile object slots), and enter the outer hull's screen with the animation under way.
+@ $CFF0 label=test_rise_start
+  $CFF0 Does the hatch start to open over the Skimmer?
+  $CFF2 Jump if not
+  $CFF4 Point at the Skimmer's background store.
+@ $CFF9 label=clear_store_byte
+  $CFF9 Blank the store, so that the Skimmer first draws over black.
+@ $CFFE label=run_hatchway_step
+  $CFFE Run the animation, which hands back the step to run next.
+  $D001 Did the hatch close over the Skimmer on its trip in?
+  $D003 Jump if not
+  $D005 Pause, then enter the inner section's screen with the four #R$F800(hostile object slots) empty.
+@ $D01E label=keep_hatchway_step
+  $D01E Keep the next step. The Skimmer holds its place while the animation runs.
+@ $D024 label=check_flip
+  $D024 Does a flip run?
+  $D02A Jump if not
+  $D02C Run the flip animation, and redraw the Skimmer where it stands.
+@ $D032 label=step_skimmer
+N $D032 The Skimmer moves, one axis after the other. An axis whose mask is 1 flips its phase on each pass, and steps only on the passes that leave the phase at 0. An axis whose mask is 0 can step on every pass.
+  $D032 Note the cells under the Skimmer before it moves.
+  $D03F No step and no exit yet.
+  $D046 Flip the vertical phase. Does it skip the vertical step now?
+  $D050 Jump if so
+  $D052 Is the vertical speed zero?
+  $D057 Jump if so
+  $D059 Move the Skimmer down for a negative vertical speed.
+@ $D062 label=y_step_up
+  $D062 Move it up for a positive one.
+@ $D065 label=y_step_done
+  $D065 Map the Skimmer's cover again if the step changed its cells.
+  $D06B Flip the horizontal phase. Does it skip the horizontal step now?
+  $D075 Jump if so
+  $D077 Is the horizontal speed zero?
+  $D07C Jump if so
+  $D07E Move the Skimmer right for a negative horizontal speed.
+@ $D087 label=x_step_left
+  $D087 Move it left for a positive one.
+@ $D08A label=check_screen_exit
+N $D08A A step across an edge of the screen leads to the next screen on the hull map. At an edge of the hull map it leads nowhere, and the Skimmer stays at the edge of its screen.
+  $D08A Did the Skimmer cross an edge of the screen?
+  $D08F Jump if not
+  $D092 Did it leave on the left?
+  $D094 Jump if not
+  $D096 Is the screen in the hull map's left column?
+  $D09B Jump if so
+  $D09D Enter the screen on the left, with the Skimmer at its right edge.
+@ $D0A9 label=leave_right
+  $D0A9 Did it leave on the right?
+  $D0AB Jump if not
+  $D0AD Is the screen in the hull map's right column?
+  $D0B2 Jump if so
+  $D0B4 Enter the screen on the right, with the Skimmer at its left edge.
+@ $D0C0 label=leave_top
+  $D0C0 Did it leave at the top?
+  $D0C2 Jump if not
+  $D0C4 Is the screen in the hull map's top row?
+  $D0C9 Jump if so
+  $D0CB Enter the screen above, with the Skimmer at the bottom of its play area.
+@ $D0D7 label=leave_bottom
+  $D0D7 Did it leave at the bottom?
+  $D0D9 Jump if not
+  $D0DB Is the screen in the hull map's bottom row?
+  $D0E0 Jump if so
+  $D0E2 Enter the screen below, with the Skimmer at the top of its play area.
+@ $D0EE label=redraw_skimmer
+  $D0EE Did the Skimmer take a step?
+  $D0F3 Jump if not
+  $D0F5 Keep the cover map if the Skimmer still lies over the same cells.
+@ $D0FA label=remap_cover
+  $D0FA Map the cells that hide the Skimmer afresh.
+@ $D0FD label=show_skimmer
+  $D0FD Draw the Skimmer. Then toggle its mark in the attribute mirror, over the cells it stood on and then over the cells it stands on. Over cells in both sets the two toggles cancel out, so the mark moves with the Skimmer.
 @ $D10D label=play_loop_update
+  $D10D Stop the Skimmer draw's clicks.
 @ $D10F ssub=LD ($CC0A+1),A
+N $D112 Every pass runs the rest, the passes of the hatchway animation too.
+  $D112 Count down the clicks of a pulse laser shot. When they end, switch off their click row too.
+@ $D120 label=run_tasks
+  $D120 Clear the speaker byte. No routine of the pass reads #REGa, so each load into it before a call has no effect.
+  $D138 Keep the controls in force.
+  $D13B Start the Skimmer's movement flag from the direction controls held.
+  $D141 Is the Skimmer square on a cell column?
+  $D146 Jump if not
+  $D148 Is a shield loss due?
+  $D14D Jump if not
+  $D150 Slow the Skimmer as if no control were held.
+@ $D154 label=steer_x
+  $D154 Is left held?
+  $D15A Jump if not
+  $D15C Is right held too? Then the two cancel out.
+  $D15E Jump if so
+  $D160 Gain a unit of speed to the left, to at most the top speed.
+@ $D169 label=steer_x_right
+  $D169 Is right held?
+  $D16B Jump if not
+  $D16D Gain a unit of speed to the right, to at most the top speed.
+@ $D175 label=slow_x
+  $D175 Is the Skimmer at rest on this axis already?
+  $D178 Jump if so
+  $D17A Take two off a positive speed.
+@ $D17F label=slow_x_inc
+  $D17F Add one. Either way the speed ends a unit nearer zero.
+@ $D180 label=set_speed_x
+  $D180 Set the horizontal speed and its rates.
+  $D18A Halve the step: the rates give it in pixels, and the horizontal offset counts steps of 2 pixels.
+@ $D191 label=check_y_aligned
 @ $D191 ssub=LD A,($D2B0+1)
+  $D191 Is the Skimmer square on a cell row?
+  $D196 Jump if not
+  $D198 Is a shield loss due?
+  $D19D Jump if not
+  $D1A0 Slow the Skimmer as if no control were held.
+@ $D1A4 label=steer_y
+  $D1A4 Is up held?
+  $D1AA Jump if not
+  $D1AC Is down held too? Then the two cancel out.
+  $D1AE Jump if so
+  $D1B0 Gain a unit of speed upward, to at most the top speed.
+@ $D1B8 label=steer_y_down
+  $D1B8 Is down held?
+  $D1BA Jump if not
+  $D1BC Gain a unit of speed downward, to at most the top speed.
+@ $D1C4 label=slow_y
+  $D1C4 Is the Skimmer at rest on this axis already?
+  $D1C7 Jump if so
+  $D1C9 Take two off a positive speed.
+@ $D1CE label=slow_y_inc
+  $D1CE Add one. Either way the speed ends a unit nearer zero.
+@ $D1CF label=set_speed_y
+  $D1CF Set the vertical speed and its rates. The store of the speed into the step has no effect, since the rates overwrite it at once.
+@ $D1DA label=try_flip
+  $D1DA Add the Skimmer's offsets in its cell to its movement flag. Is it moving, or off the cell grid?
 @ $D1E2 ssub=LD A,($D2B0+1)
+  $D1EB Jump if so
+  $D1ED Is a flip under way already?
+  $D1F3 Jump if so
+  $D1F5 Is flip held?
+  $D1F7 Jump if not
+  $D1F9 Look through the cover map's top-left nine cells, three rows of three.
+@ $D201 label=scan_cover_row
+  $D201 Start a row.
+@ $D203 label=scan_cover_cell
+  $D203 Does the cell hide the Skimmer? Then the flip cannot start.
+  $D206 Move along the row.
+  $D209 Skip the fourth column, and move down to the next row.
+  $D20D Start the flip from its first frame.
+@ $D215 label=flip_blocked
+  $D215 A cell hides the Skimmer. Drop the saved counts.
+@ $D216 label=next_pass
+  $D216 Start the next pass.
 @ $D219 label=set_speed_rates
 c $D219 Set the step rates of a Skimmer speed
-D $D219 Sets the Skimmer's step rates on one axis from its speed on that axis and the table at #R$D2A6. While no push runs, a flipped Skimmer takes the rates of the next slower speed.
+D $D219 Sets one axis's step size and step mask from the Skimmer's speed on it, and counts a moving axis at #R$D2D3(the movement flag). While no push runs, a flipped Skimmer takes the rates of the next slower speed.
+R $D219 I:A the Skimmer's speed on the axis, −3 to 3, with its sign for the direction
+R $D219 I:HL address of the axis's step size, with its step mask and its step phase after it
+  $D219 Is the speed zero or more?
+  $D21B Jump if so
+  $D21D Take its size.
+@ $D21F label=rates_check_speed
+  $D21F Is the Skimmer at rest on this axis?
+  $D221 Jump if so
+  $D223 Keep the step address, and count this axis as moving.
+  $D228 Keep the speed. Is a push on the Skimmer under way?
+  $D22F Jump if so
+  $D231 A flipped Skimmer drops to the next slower speed. Speed 0's rates match speed 1's, so a flipped Skimmer at speed 1 keeps its pace.
+@ $D235 label=rates_restore_addr
+  $D235 Recover the step address.
+@ $D236 label=rates_lookup
+  $D236 Find the speed's record in the #R$D2A6(speed rates), 2 bytes per speed.
+@ $D239 ssub=ADD A,speed_rates%$100
+@ $D23C ssub=LD A,speed_rates/$100
+  $D241,8 Store the step size, and the step mask twice: as the mask, and as the phase that starts it.
 @ $D24A label=lose_shield
 c $D24A Lose a shield
 D $D24A Once the Damage Report Indicator runs out, advances a shield loss by one stage every fourth call, or every eighth with one shield left. Its eighth stage takes away a shield, fills the indicator again and ends the game when it takes the last shield.
+  $D24A Count the call.
+  $D24E The loss moves on every fourth call. Is this the last shield?
+  $D255 Jump if not
+  $D257 With one shield left, it moves on every eighth call.
+@ $D259 label=loss_stage_due
+  $D259 Is it time for the next stage?
+  $D25B Return if not
+  $D25C Move the loss on by one stage. Is it past its last stage?
+  $D261 Return if not
+  $D262 The loss is over. Clear its stage and #R$D48D(the shield loss flag), and refill the indicator and show it.
+  $D26D Take away a shield. Was it the last one?
+  $D271 Jump if not
+  $D273,5 End the game, and show that no shields are left.
+@ $D279 label=blink_shields
+  $D279 Draw the Skimmer whole again, and blink the shield count.
+@ $D27E label=blink_shields_loop
+  $D27E Show the count, and wait. Hide it with black ink on black paper in its cell, and wait again.
+  $D28E,3 Leave the count shown.
 @ $D292 label=fill_damage_report
 c $D292 Fill the Damage Report Indicator
 D $D292 Sets the Damage Report Indicator to 999.
+  $D292 Start at the indicator's first digit.
+@ $D297 label=fill_damage_digit
+  $D297,5 Set each digit to 9.
 @ $D29D label=pause
 c $D29D Pause
+D $D29D Waits about 0.3 s at the 3.5 MHz clock in a busy loop.
+  $D29D Count 256 rounds.
+@ $D29F label=pause_count
+  $D29F Count #REGl down to zero, from 256 in each round after the first.
+  $D2A2,3 Start the next round, until the last one ends.
 @ $D2A6 label=speed_rates
 b $D2A6 Skimmer speed rates
-D $D2A6 One record of two bytes for each Skimmer speed, from speed 0 to speed 3. The first byte is the size of one step? The second is 1 for a step on every second pass of the play loop, or 0 for a step on every pass.
+D $D2A6 One record of two bytes for each Skimmer speed, from speed 0 to speed 3. The first byte is the size of one step in pixels, on either axis. The second is 1 for a step on every second pass of the play loop, or 0 for a step on every pass.
 B $D2A6,8,2
 u $D2AE Unused bytes
 @ $D2AF label=interrupt_flag
 g $D2AF Play loop variables
-B $D2AF,1
+D $D2AF The Skimmer's place, speed and animations on the current screen, and the timers that the play loop keeps.
+B $D2AF,1 $FF from an interrupt until the play loop takes it, 0 otherwise
 @ $D2B0 label=skimmer_scr_addr
-W $D2B0,2
+W $D2B0,2 Screen address of the Skimmer's top-left byte, in its top pixel row
 @ $D2B2 label=skimmer_x_shift
-B $D2B2,1
+B $D2B2,1 Horizontal offset of the Skimmer in its cell, 0–3, in steps of 2 pixels
 @ $D2B3 label=skimmer_stepped
-B $D2B3,1
+B $D2B3,1 Number of steps the Skimmer took on the latest pass of the play loop, 0–2
 @ $D2B4 label=control_bits
-B $D2B4,1
+N $D2B4 The controls in force take one bit each, set while the control is held. #TABLE(default) { =h Bit | =h Control } { 0 | Right } { 1 | Left } { 2 | Down } { 3 | Up } { 4 | Fire } { 5 | Flip } TABLE#
+B $D2B4,1 Controls in force, one bit for each control
 @ $D2B5 label=speaker_byte
-B $D2B5,1 Byte the clicks send to the border and speaker port?
+B $D2B5,1 Byte that the speaker clicks send to the border and speaker port, with its speaker bit flipped at each click
 @ $D2B6 label=skimmer_column
-B $D2B6,1
+B $D2B6,1 Column of the Skimmer's top-left cell, 0–29
 @ $D2B7 label=skimmer_row
-B $D2B7,1
+B $D2B7,1 Character row of the Skimmer's top-left cell, 6–21
 @ $D2B8 label=skimmer_mirror_addr
-W $D2B8,2
+W $D2B8,2 Attribute mirror address of the Skimmer's top-left cell
 @ $D2BA label=old_mirror_addr
-B $D2BA,2
+W $D2BA,2 Attribute mirror address of the Skimmer's top-left cell before its latest step
 @ $D2BC label=old_skimmer_span
-B $D2BC,2
+B $D2BC,2 Columns, then rows, of the cells under the Skimmer before its latest step, 3 or 4 each
 @ $D2BE label=screen_exit
-B $D2BE,1
+B $D2BE,1 Edge that the Skimmer crossed: 0 for none, 1 for the left, 2 for the right, 3 for the top, 4 for the bottom
 @ $D2BF label=speed_x
-B $D2BF,1
+B $D2BF,1 Horizontal speed of the Skimmer, from 3 for the fastest to the left through 0 at rest to −3 for the fastest to the right
 @ $D2C0 label=speed_x_step
-B $D2C0,1 Size of one step on the X axis?
+B $D2C0,1 Size of one horizontal step, 1 or 2 steps of 2 pixels
 @ $D2C1 label=speed_x_mask
-B $D2C1,1
+B $D2C1,1 1 when the Skimmer steps horizontally on every second pass, 0 when it steps on every pass
 @ $D2C2 label=speed_x_phase
-B $D2C2,1
+B $D2C2,1 Phase of the horizontal step, 0 on a pass that steps and 1 on a pass that skips the step
 @ $D2C3 label=speed_y
-B $D2C3,1
+B $D2C3,1 Vertical speed of the Skimmer, from 3 for the fastest upward through 0 at rest to −3 for the fastest downward
 @ $D2C4 label=speed_y_step
-B $D2C4,1 Size of one step on the Y axis, in pixel rows?
+B $D2C4,1 Size of one vertical step, 2 or 4 pixel rows
 @ $D2C5 label=speed_y_mask
-B $D2C5,1
+B $D2C5,1 1 when the Skimmer steps vertically on every second pass, 0 when it steps on every pass
 @ $D2C6 label=speed_y_phase
-B $D2C6,1
+B $D2C6,1 Phase of the vertical step, 0 on a pass that steps and 1 on a pass that skips the step
 @ $D2C7 label=hatchway_cell
-W $D2C7,2 Column, then row, of the hatchway's cell on the current screen
+W $D2C7,2 Column, then row, of the top-left cell of the hatchway on the current screen, both 0 for none
 @ $D2C9 label=hatchway_step
-B $D2C9,1
+N $D2C9 A step of the hatchway animation runs from 1 to 13 in its low four bits, and its high four bits name the phase. #TABLE(default) { =h Step | =h Phase } { 0 | None } { $01–$0D | The hatch opens under the Skimmer } { $11–$1D | The hatch closes under the Skimmer } { $21–$2D | The hatch opens over the Skimmer } { $31–$3D | The hatch closes over the Skimmer } { $EE | The Skimmer starts to leave an inner section } TABLE#
+B $D2C9,1 Step of the hatchway animation, 0 when none runs
 @ $D2CA label=anim_divider
-B $D2CA,1 Count of hatchway and flip animation calls, read modulo 4
+B $D2CA,1 Pass count of the hatchway or flip animation, of which only the low two bits matter
 @ $D2CB label=push_time
-B $D2CB,1
+B $D2CB,1 Passes of the play loop left in a push on the Skimmer, 0 when no push runs
 @ $D2CC label=hostile_hold_time
-B $D2CC,1 Hold count of the hostile objects, $FE or $FF while they hold and 0 once they move?
+B $D2CC,1 Hold count of the hostile objects, $FE or $FF during a hold and 0 with none
 @ $D2CD label=shot_click_row
 B $D2CD,1 First pixel row of a cell at which the Skimmer draw clicks the speaker, 0 for every row and $FE or $FF for none
 @ $D2CE label=shot_click_time
-B $D2CE,1 Passes of the play loop left before the clicks of a pulse laser shot stop, 0 when none run?
+B $D2CE,1 Passes of the play loop left in the clicks of a pulse laser shot, 0 when none run
 @ $D2CF label=skimmer_image_set
-B $D2CF,2
+W $D2CF,2 Address of the entries of #R$CD9C(the Skimmer images) in use, normal or flipped
 @ $D2D1 label=flip_step
-B $D2D1,1
+B $D2D1,1 Frame of the flip animation, 1–3, or 0 when no flip runs
 @ $D2D2 label=flipped
-B $D2D2,1
+B $D2D2,1 1 while the Skimmer flies flipped, 0 while it flies the right way up
 @ $D2D3 label=skimmer_moving
-B $D2D3,1
+B $D2D3,1 0 while the Skimmer rests square on a cell with no speed and no direction held, any other value otherwise
 @ $D2D4 label=shield_loss_step
 B $D2D4,1 Stage of a shield loss, 0–7, with 0 when no shield loss runs
 @ $D2D5 label=shield_loss_ticks
-B $D2D5,1
+B $D2D5,1 Pass count of the shield losses, 0–255
 @ $D2D6 label=print_readout
 c $D2D6 Print a control panel number
 D $D2D6 Prints a run of digits in inverse video at a character cell of the control panel.
+R $D2D6 I:B character row of the first digit
+R $D2D6 I:C column of the first digit
+R $D2D6 I:D number of digits
+R $D2D6 I:HL address of the first digit, in the form #R$D2E6(the digit printer) takes
+  $D2D6 Find the screen address of the first digit's cell, and keep it in the other register set for the digit printer.
+  $D2DC Fetch the number of digits and the address of the first.
+@ $D2DE label=readout_digit
+  $D2DE,7 Print each digit, from left to right.
 @ $D2E6 label=print_inverse_digit
 c $D2E6 Print one control panel digit
-D $D2E6 Prints one digit in inverse video and moves to the next cell on the right.
+D $D2E6 Prints one digit in inverse video, rolled partway on toward the next digit by its eighths, and moves to the next cell on the right.
+R $D2E6 I:A the digit, as 8 times its value plus its eighths toward the next digit
+R $D2E6 I:HL' screen address of the digit's cell
+R $D2E6 O:HL' screen address of the next cell on the right
+  $D2E6 Switch to the screen address.
+N $D2E7 The font holds the digits 0 to 9 and a second 0 after the 9, 8 bytes per glyph. A digit's byte is the offset of its glyph, plus its eighths. The eighths start the draw lower in the glyph and finish it in the top rows of the next glyph. So a digit rolls up its cell as its eighths grow, and a 9 rolls on into a 0.
+  $D2E7 Point at the digit's pixel rows in the font.
+  $D2EF Keep the cell's screen address, and walk its pixel rows from the top.
+@ $D2F2 label=inverse_pixel_row
+  $D2F2 Copy each pixel row onto the screen, inverted.
+  $D2F9,3 Move one cell right, and switch the register sets back.
 @ $D2FD label=add_score_digits
 c $D2FD Add to the score digits
 D $D2FD Adds a number held as decimal digits to the score, digit by digit.
+N $D2FD Each digit counts in eighths, as #R$D2E6(the digit printer) draws them. While a digit rolls on from 9 to 0, the digit on its left rolls on with it by as many eighths. #REGc carries this into the next digit. It holds the eighths of the digit that rolls, or a whole unit when a digit reaches 10 and starts again from 0.
+R $D2FD I:B number of digits
+R $D2FD I:DE address of the score's last digit
+R $D2FD I:HL address of the last digit of the number to add
+  $D2FD The last digit keeps its own eighths.
+@ $D301 label=add_digit
+  $D301 Add the digit of the number and the carry to the whole digit.
+  $D306 Does the digit reach 10?
+  $D30A Jump if not
+  $D30C Start it again from 0, and carry a whole unit.
+@ $D310 label=add_store_digit
+  $D310 Store the digit. Is it past 9, on its way to 0?
+  $D313 Jump if not
+  $D315 Let the next digit roll with it.
+@ $D319 label=add_next_digit
+  $D319,4 Move to the next digit on the left.
 @ $D31E label=subtract_damage_digits
 c $D31E Subtract from the Damage Report Indicator
 D $D31E Takes a number held as decimal digits away from the Damage Report Indicator, digit by digit.
+N $D31E Each digit counts in eighths, as #R$D2E6(the digit printer) draws them. While a digit rolls back from 0 to 9, the digit on its left rolls back with it by as many eighths. #REGc is the borrow. It holds 7 less the eighths that the digit which rolls has still to fall, or 8 at the moment a digit drops under 0.
+N $D31E A digit that drops under 0 always lands one eighth short of 10, however far under 0 it goes. So a drain of more than one eighth takes less than its full step whenever the last digit rolls back.
+R $D31E I:B number of digits
+R $D31E I:DE address of the indicator's last digit
+R $D31E I:HL address of the last digit of the number to take away
+R $D31E O:C 8 if the indicator drops under zero
+  $D31E Set the borrow so that the last digit keeps its own eighths.
+@ $D324 label=drain_digit
+  $D324 Take the digit of the number and the borrow away from the digit.
+  $D329 Jump unless it drops under 0
+  $D32C Roll it back to one eighth short of 10.
+@ $D32E label=drain_store_digit
+  $D32E Store the digit, and start with no borrow. Is the digit under 9?
+  $D333 Jump if so
+  $D335 The digit rolls back from 0: hand its eighths on to the next digit. Is it just one eighth short of 10?
+  $D33A Jump if not
+  $D33C Start the next digit on its roll back by a whole unit.
+@ $D33E label=drain_next_digit
+  $D33E,4 Move to the next digit on the left.
 @ $D343 label=update_readouts
 c $D343 Update the Damage Report Indicator and the score
-D $D343 Runs down the Damage Report Indicator, faster while a push on the Skimmer runs, and starts a shield loss when it runs out?
-D $D343 It then prints the indicator and counts points still due into the score?
+D $D343 Runs the Damage Report Indicator down, faster while a push on the Skimmer runs, and starts a shield loss when it drops under zero. It also prints the indicator and counts the points still due into the score, one step per call.
+  $D343 Take the slow drain for the indicator. Is a push on the Skimmer under way?
+  $D34E Jump if not
+  $D350 Take the fast drain instead.
+@ $D353 label=drain_indicator
+  $D353 Run the indicator down. Does it drop under zero?
+  $D35B Jump if not
+  $D35D Hold the indicator at zero, from its first digit.
+@ $D363 label=zero_indicator_digit
+  $D363 Clear each digit.
+  $D367 Is a shield loss under way already?
+  $D36C Jump if so
+  $D36E Start one.
 @ $D372 label=show_readouts
+N $D372 This entry point prints the indicator and counts the score on, with no drain.
+  $D372 Print the indicator.
+N $D37D The points still due wait at #R$D48A(the points due), in eighths of a point. Each call moves them into #R$D488(the step count), and adds one step to the score. A step starts at one eighth. While 256 steps or more are left and their count is even, a call doubles the step and halves the count. So a big award counts in faster, at up to four points a step.
+  $D37D Is any step left?
+  $D382 Jump if so
+  $D384 None is left. Go back to a step of one eighth, and add nothing this call.
+@ $D38F label=score_steps_left
+  $D38F Are 256 steps or more left?
+  $D392 Jump if not
+  $D394 Is the count even?
+  $D396 Jump if not
+  $D398 Is the step under four points?
+  $D39E Jump if not
+  $D3A0 Halve the count, double the step, and count the times the step doubled.
+@ $D3AD label=score_one_step
+  $D3AD Spend one step, and add it to the score.
+  $D3BC Print the score.
+@ $D3C7 label=take_points_due
+  $D3C7 Fetch the points due and the times the step doubled. Is the step still one eighth?
+  $D3D0 Jump if so
+  $D3D2 Halve once for each time the step doubled.
+@ $D3D3 label=divide_points_due
+  $D3D3 Divide the points due by the step.
+@ $D3D9 label=add_whole_steps
+  $D3D9 Add the whole steps to the count. Is the step one eighth?
+  $D3E4 Jump if so
+  $D3E6 Double once for each time the step doubled.
+@ $D3E7 label=steps_to_eighths
+  $D3E7 Turn the whole steps back into eighths.
+@ $D3ED label=keep_points_left
+  $D3ED,9 Take them off the points due, which keeps what is left over.
 @ $D3F7 label=add_points
 c $D3F7 Add points to the score
-D $D3F7 Adds points to the total still to count into the score?
+D $D3F7 Adds an award to #R$D48A(the points due), which the readout update counts into the score a step at a time.
+R $D3F7 I:DE award, in eighths of a point
+R $D3F7 O:HL unchanged
+  $D3F7,9 Add the award to the points due.
 @ $D401 label=reset_score
 c $D401 Reset the score
-D $D401 Fills the Damage Report Indicator, sets the score to zero and prints it.
+D $D401 Fills the Damage Report Indicator, sets the score to zero with no points due, and prints the score.
+  $D404 Start at the score's first digit.
+@ $D409 label=clear_score_byte
+  $D409 Clear the score's digits, and the points due and the step count after them.
+  $D40E,11 Print the score.
 @ $D41A label=step_animations
 c $D41A Step the animated graphics
-D $D41A Advances the timers of the animated graphics in the #R$C909(animation list), and draws the next frame of the first one whose timer reaches its limit.
+D $D41A Advances the timers of the animated graphics in the #R$C909(animation list). It draws the next frame of the first graphic whose timer reaches its frame length.
+  $D41A Start at the first animated graphic.
+@ $D41D label=anim_entry
+  $D41D Is it the end of the list?
+  $D420 Jump if so
+  $D422 Count the call on the graphic's timer. Is the current frame's time up?
+  $D427 Jump if not
+  $D429 Move to the next frame. Is it past the last one?
+  $D431 Jump if not
+  $D433 Go back to the first frame, and fetch its address.
+@ $D43D label=anim_step_frame
+  $D43D Step on from the current frame's address to the next frame's.
+@ $D447 label=anim_store_frame
+  $D447 Store the new frame's address.
+  $D44F Fetch the graphic's size and its screen address.
+  $D45A Draw the frame with no mask, and leave the colours and marks of its cells as they are.
+  $D462,3 Restart the timer. The graphics after this one in the list wait for the next call.
+@ $D466 label=anim_wait
+  $D466 Store the timer, and move to the next graphic, 13 bytes per entry.
+  $D46E,4 Cross into the next page.
+@ $D472 label=anim_done
 b $D473
 @ $D475 label=*
 B $D475

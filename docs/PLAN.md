@@ -8,10 +8,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Item                | State                                     |
 |:--------------------|:------------------------------------------|
-| Phase               | 3 – depth pass, G2 screen layouts         |
+| Phase               | 3 – depth pass, G3 game loop              |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
 | Baseline findings   | 49                                        |
-| Routines to the bar | 17 of 120 (`$B080–$B811`)                |
+| Routines to the bar | 35 of 120 (`$B080–$B811`, `$CDE8–$D472`) |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
 | Catalogs            | graphics, sound, data: not started        |
@@ -79,7 +79,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$BAA7`       | Code with no caller: unused?                  |
 | `$BC68`       | Draw-mode code templates: what copies them?   |
 | `$C2DA`       | Lone `$C9` after a RET: unused byte?          |
-| `$C4DB`       | Table addresses built from immediates: `$BBE5`, `$BF58`, `$C186`, `$C1D0`, `$C1F5`, `$C4E0`, `$C503`, `$CF62` |
+| `$C4DB`       | Table addresses built from immediates: `$BBE5`, `$BF58`, `$C186`, `$C1D0`, `$C1F5`, `$C4E0`, `$C503` |
 | `$C186`       | `LD H,$BD` raw high byte of the launch cells  |
 | `$CB8E`       | Delay loop with no caller: unused?            |
 | `$CD9C`       | Retype the Skimmer image pointers as `W`      |
@@ -89,6 +89,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B20A`       | Split plot_graphic, plot_unmasked, cast_shadow, draw_shadow into entries |
 | `$D800`       | Split the layout tables and lists; record `#TABLE` |
 | `$9520`       | Title the defence device designs (`$7CD4` split) |
+| `$D2E7`       | Label the font; its address is built from immediates |
+| `$D473`       | Split the readout block; state the digit format and drain amounts there |
+| `$BEEF`       | Say "adds 20 points" in `$BEEF` and `$C819`   |
+| `$CE26`       | Split `flag_interrupt` into its own entry     |
 | `$9A88`       | Label and render the 13 hostile object designs |
 | `$95B0`       | 32 zero bytes after the device designs        |
 | `$99A0`       | Title the hatch bitmap (`$7CD4` split)        |
@@ -101,18 +105,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$BA06`       | Title and label of WALL DONE                  |
 | `$BD40`       | Is the device the only hostile object inside? |
 | `$C946`       | Limit test counts two objects per call: bug?  |
-| `$D2CB`       | Countdown forcing directions: which events?   |
-| `$D2CC`       | Count up from `$FE` that holds hostile objects: why? |
-| `$D2C4`       | Is the first speed-rate byte a step size?     |
-| `$D2AF`       | Define the play loop variables with no description |
-| `$D47F`       | Damage Report Indicator drain rates           |
-| `$D48A`       | Score unit: trace `$D3C7–$D3F6` and `$D2FD`   |
-| `$BD44`       | Firing alignment: `$D2B2` = 2, pixel line 4   |
+| `$D2CC`       | Does the hold clear objects the new screen overlaps? |
 | `$BF8B`       | Does the `$21` result end the opening?        |
 | `$BF6A`       | Rows and widths of the hatch's bitmap        |
 | `$BEE0`       | Which cell pushes the Skimmer, and how?       |
-| `$D2CD`       | Other `$CC0B` patches: `$C47D`, `$C48A`, `$D10F` |
-| `$D343`       | Task run by the full interrupt routine        |
 | `$C46B`       | Explosion inside the hull sets device flag?   |
 | `$C494`       | Cells skipped when they hold ink: why?        |
 | `$C955`       | Counter meaning; firing gate ≥ 2              |
@@ -126,11 +122,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$CCB0`       | Which map does `CP H` test?                   |
 | `$CBC6`       | `DEC C` vs `DEC A`: first shield-loss frame never drawn? |
 | `$CD36`       | Fold the out-of-line tail into `$CD3A`?       |
-| `$D2CF`       | Type `$D2CF` and `$D2BA` as words?            |
 | `$CD3A`       | Is the fourth column marked at a cell edge?   |
-| `$D2C0`       | Is it the X step size? Speed units of `$D2BF`? |
-| `$D2B5`       | Is the speaker bit flipped only at clicks?    |
-| `$D2CE`       | Are the clicks the pulse laser shot's sound?  |
 | `$CD86`       | When is the Skimmer's mark `$04` toggled?     |
 | `$F30A`       | Is it the title tune's data?                  |
 | `$BC1F`       | Schema of the three control-key sets          |
@@ -149,9 +141,14 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$C802`       | Does `$C0D4`'s reset to `$08` pair the explosion toggles? |
 | mark bit 5    | Which graphics use cell mask 7?               |
 | `$B6F8`       | `add_hostile` draws nothing: who draws the device? |
-| `$CDE8`       | Inline `$26`/`$CE` writes are `flag_interrupt`'s address |
-| `$CDEC`       | `LD BC,$00FD` holds the vector byte as a literal |
 | `$FF70`       | Cover map `$FF` is the map's page byte (relocation) |
+| `$D48D`       | Label `shield_loss_due` (split `$D473`)       |
+| `$F840`       | Label the hostile slots' state bytes (split `$F473`) |
+| `$BBA2`       | Give `read_controls` an `R` row               |
+| `$D219`       | Note the movement flag +1 in the `D`          |
+| `$D2B5`       | Snapshot `$01` sets a blue border on the first click? |
+| `$C845`       | Push sets speed ±3 without new rates: visible? |
+| `$CF9E`       | Dead `LD A,n` loads before calls: note them?  |
 | `$E141`       | Screen 55's last record runs into the next layout |
 | `$B4FB`       | Does anything call `$B04F` while `$B058` is a NOP? |
 | `$C955`       | Counter value `$17` for the defence device    |
@@ -232,3 +229,18 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$FF70`  | The flip check scans the cover map's top-left 3×3   |
 | `$CCD3`  | The flipped Skimmer ignores bit 5 (cell mask 7)     |
 | `$B0CC`  | Mark 1 stops hostile objects and shots; 2 and `$22` do not |
+| `$D343`  | Drains the indicator and counts in the score       |
+| `$D47F`  | Drain 1/8 unit per call, 25/8 during a push        |
+| `$D48A`  | Points due in eighths; a hit adds 20 to the score  |
+| `$D2C4`  | Speed-rate byte 0 is the step in pixels            |
+| `$D2C0`  | X step halved into 2-pixel image offsets           |
+| `$CDEC`  | `int_jump/$100` `@ssub`                             |
+| `$CDE8`  | Inline bytes are `flag_interrupt`'s address        |
+| `$D2AF`  | Every play loop variable defined                   |
+| `$D2B5`  | Its speaker bit flips only at the two click sites  |
+| `$D2CE`  | Yes: the pulse laser shot's clicks                 |
+| `$D2CD`  | `$C47D`/`$C48A` set and restore the click threshold |
+| `$D2CB`  | Pushes of 20 or 35 from four collision sites       |
+| `$D2CF`  | `$D2CF` and `$D2BA` typed `W`                       |
+| `$BD44`  | Fires only half a cell off the grid on that axis   |
+| `$CE86`  | `@ssub` on `row_first_screen`                       |
