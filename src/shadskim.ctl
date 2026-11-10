@@ -26,45 +26,414 @@ b $6B6C
 s $6B74
 b $6B75
 s $7CD2
-b $7CD4
-@ $8B00 label=*
-B $8B00
-@ $9020 label=*
-B $9020
-@ $94E0 label=*
-B $94E0
-@ $9500 label=*
-B $9500
+b $7CD4 Outer hull graphics
+D $7CD4 The end of one graphic of the #R$6200(outer hull's graphic directory), then every graphic that the directory lists after it. A graphic holds 8 bytes per cell, cell by cell along each row of cells from the top. The directory gives each graphic's address and size, and some graphics share bytes.
+N $7CD4 The renders show the pixels of each graphic at the size its directory entry gives, under its graphic number. The colours come from the screen layout and the graphic's colour pattern, so the renders use black ink on white paper.
+N $7CD4 #UDGTABLE { #UDGARRAY6,,2($7C34-$7CEC-8)(outer_graphic_109) | #UDGARRAY4,,2($7CF4-$7D4C-8)(outer_graphic_110) | #UDGARRAY3,,2($7D54-$7DAC-8)(outer_graphic_111) | #UDGARRAY4,,2($7DB4-$7E0C-8)(outer_graphic_112) | #UDGARRAY3,,2($7E14-$7E6C-8)(outer_graphic_113) | #UDGARRAY4,,2($7E74-$7ECC-8)(outer_graphic_114) | #UDGARRAY3,,2($7ED4-$7F2C-8)(outer_graphic_115) } { 109 | 110 | 111 | 112 | 113 | 114 | 115 } { #UDGARRAY4,,2($7F34-$7F8C-8)(outer_graphic_116) | #UDGARRAY3,,2($7F94-$7FEC-8)(outer_graphic_117) | #UDGARRAY5,,2($7FB0-$8020-8)(outer_graphic_118) | #UDGARRAY5,,2($7FF4-$8064-8)(outer_graphic_120) | #UDGARRAY3,,2($8028-$8098-8)(outer_graphic_121) | #UDGARRAY5,,2($80A0-$8110-8)(outer_graphic_122) | #UDGARRAY3,,2($8118-$8188-8)(outer_graphic_123) } { 116 | 117 | 118 | 120 | 121 | 122 | 123 } { #UDGARRAY6,,2($8190-$8218-8)(outer_graphic_124) | #UDGARRAY3,,2($8220-$82A8-8)(outer_graphic_125) | #UDGARRAY6,,2($82B0-$8338-8)(outer_graphic_126) | #UDGARRAY3,,2($8340-$83C8-8)(outer_graphic_127) | #UDGARRAY5,,2($83D0-$83F0-8)(outer_graphic_128) | #UDGARRAY1,,2($83F8-$8418-8)(outer_graphic_129) | #UDGARRAY5,,2($8420-$8440-8)(outer_graphic_130) } { 124 | 125 | 126 | 127 | 128 | 129 | 130 } { #UDGARRAY1,,2($8448-$8468-8)(outer_graphic_131) | #UDGARRAY3,,2($8470-$8480-8)(outer_graphic_132) | #UDGARRAY1,,2($8488-$8498-8)(outer_graphic_133) | #UDGARRAY3,,2($84A0-$84B0-8)(outer_graphic_134) | #UDGARRAY1,,2($84B8-$84C8-8)(outer_graphic_135) | #UDGARRAY1,,2($84D0-$84E0-8)(outer_graphic_136) | #UDGARRAY1,,2($84E8-$84F0-8)(outer_graphic_137) } { 131 | 132 | 133 | 134 | 135 | 136 | 137 } { #UDGARRAY1,,2($84F8-$8510-8)(outer_graphic_138) | #UDGARRAY3,,2($8518-$8540-8)(outer_graphic_139) | #UDGARRAY1,,2($8548-$8560-8)(outer_graphic_140) | #UDGARRAY1,,2($8568-$8570-8)(outer_graphic_141) | #UDGARRAY6,,2($8578-$8600-8)(outer_graphic_142) | #UDGARRAY4,,2($8608-$8660-8)(outer_graphic_143) | #UDGARRAY2,,2($8668-$8690-8)(outer_graphic_144) } { 138 | 139 | 140 | 141 | 142 | 143 | 144 } { #UDGARRAY3,,2($8698-$86C0-8)(outer_graphic_145) | #UDGARRAY3,,2($86C8-$8708-8)(outer_graphic_146) | #UDGARRAY2,,2($8710-$8738-8)(outer_graphic_147) | #UDGARRAY3,,2($8740-$8768-8)(outer_graphic_148) | #UDGARRAY3,,2($8770-$87B0-8)(outer_graphic_149) | #UDGARRAY3,,2($87B8-$87F8-8)(outer_graphic_150) } { 145 | 146 | 147 | 148 | 149 | 150 } TABLE#
+B $7CD4,32,8
+  $7CD4,32 The last four cells of graphic 109
+@ $7CF4 label=outer_graphic_110
+B $7CF4,96,8
+@ $7D54 label=outer_graphic_111
+B $7D54,96,8
+@ $7DB4 label=outer_graphic_112
+B $7DB4,96,8
+@ $7E14 label=outer_graphic_113
+B $7E14,96,8
+@ $7E74 label=outer_graphic_114
+B $7E74,96,8
+@ $7ED4 label=outer_graphic_115
+B $7ED4,96,8
+@ $7F34 label=outer_graphic_116
+B $7F34,96,8
+@ $7F94 label=outer_graphic_117
+B $7F94,28,8*3,4
+@ $7FB0 label=outer_graphic_118
+B $7FB0,68,8*8,4
+@ $7FF4 label=outer_graphic_120
+B $7FF4,52,8*6,4
+@ $8028 label=outer_graphic_121
+B $8028,120,8
+@ $80A0 label=outer_graphic_122
+B $80A0,120,8
+@ $8118 label=outer_graphic_123
+B $8118,120,8
+@ $8190 label=outer_graphic_124
+B $8190,144,8
+@ $8220 label=outer_graphic_125
+B $8220,144,8
+@ $82B0 label=outer_graphic_126
+B $82B0,144,8
+@ $8340 label=outer_graphic_127
+B $8340,144,8
+@ $83D0 label=outer_graphic_128
+B $83D0,40,8
+@ $83F8 label=outer_graphic_129
+B $83F8,40,8
+@ $8420 label=outer_graphic_130
+B $8420,40,8
+@ $8448 label=outer_graphic_131
+B $8448,40,8
+@ $8470 label=outer_graphic_132
+B $8470,24,8
+@ $8488 label=outer_graphic_133
+B $8488,24,8
+@ $84A0 label=outer_graphic_134
+B $84A0,24,8
+@ $84B8 label=outer_graphic_135
+B $84B8,24,8
+@ $84D0 label=outer_graphic_136
+B $84D0,24,8
+@ $84E8 label=outer_graphic_137
+B $84E8,16,8
+@ $84F8 label=outer_graphic_138
+B $84F8,32,8
+@ $8518 label=outer_graphic_139
+B $8518,48,8
+@ $8548 label=outer_graphic_140
+B $8548,32,8
+@ $8568 label=outer_graphic_141
+B $8568,16,8
+@ $8578 label=outer_graphic_142
+B $8578,144,8
+@ $8608 label=outer_graphic_143
+B $8608,96,8
+@ $8668 label=outer_graphic_144
+B $8668,48,8
+@ $8698 label=outer_graphic_145
+B $8698,48,8
+@ $86C8 label=outer_graphic_146
+B $86C8,72,8
+@ $8710 label=outer_graphic_147
+B $8710,48,8
+@ $8740 label=outer_graphic_148
+B $8740,48,8
+@ $8770 label=outer_graphic_149
+B $8770,72,8
+@ $87B8 label=outer_graphic_150
+B $87B8,72,8
+@ $8800 label=skimmer_image_1
+b $8800 Skimmer images
+D $8800 The Skimmer the right way up, one image for each horizontal offset from its cell's left edge in steps of 2 pixels. A mask for each image follows. An image or a mask holds 24 pixel rows of 4 bytes, rows from the top.
+N $8800 #R$CBA8(The Skimmer's draw) writes the background through the mask, with the image over it. So a mask bit of 1 lets the background show. The draw sets no colour, and the Skimmer takes the colours of the cells it crosses. The renders use the play area's white ink on black paper.
+N $8800 #UDGTABLE { #UDGARRAY4,7,3,4,,,,2($8800-$8843-1-32:$8980-$89C3-1-32)(skimmer_image_1) | #UDGARRAY4,7,3,4,,,,2($8860-$88A3-1-32:$89E0-$8A23-1-32)(skimmer_image_2) | #UDGARRAY4,7,3,4,,,,2($88C0-$8903-1-32:$8A40-$8A83-1-32)(skimmer_image_3) | #UDGARRAY4,7,3,4,,,,2($8920-$8963-1-32:$8AA0-$8AE3-1-32)(skimmer_image_4) } { At the cell edge | 2 pixels right | 4 pixels right | 6 pixels right } TABLE#
+B $8800,96,8
+@ $8860 label=skimmer_image_2
+B $8860,96,8
+@ $88C0 label=skimmer_image_3
+B $88C0,96,8
+@ $8920 label=skimmer_image_4
+B $8920,96,8
+@ $8980 label=skimmer_mask_1
+B $8980,96,8
+@ $89E0 label=skimmer_mask_2
+B $89E0,96,8
+@ $8A40 label=skimmer_mask_3
+B $8A40,96,8
+@ $8AA0 label=skimmer_mask_4
+B $8AA0,96,8
+@ $8B00 label=hull_surface_1
+b $8B00 Sector 1 hull surface
+D $8B00 The pattern of the hull surface in sector 1, which #R$B02A(the hull surface draw) tiles over the play area. It covers 16×16 pixels: 16 pixel rows of 2 bytes, rows from the top.
+N $8B00 The renders use the play area's white ink on black paper, and show the pattern alone and tiled 4×4.
+N $8B00 #UDGTABLE { #UDGARRAY2,7,4,2($8B00-$8B11-1-16)(hull_surface_1) | #UDGARRAY8,7,2,2($8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11)(hull_surface_1_tiled) } { Pattern | Tiled } TABLE#
+B $8B00,32,8
+@ $8B20 label=skimmer_flip_1
+b $8B20 Skimmer flip frames
+D $8B20 The three frames of the Skimmer's flip, then a mask for each frame, each laid out as one of #R$8800(the Skimmer images).
+N $8B20 #UDGTABLE { #UDGARRAY4,7,3,4,,,,2($8B20-$8B63-1-32:$8C40-$8C83-1-32)(skimmer_flip_1) | #UDGARRAY4,7,3,4,,,,2($8B80-$8BC3-1-32:$8CA0-$8CE3-1-32)(skimmer_flip_2) | #UDGARRAY4,7,3,4,,,,2($8BE0-$8C23-1-32:$8D00-$8D43-1-32)(skimmer_flip_3) } { Frame 1 | Frame 2 | Frame 3 } TABLE#
+B $8B20,96,8
+@ $8B80 label=skimmer_flip_2
+B $8B80,96,8
+@ $8BE0 label=skimmer_flip_3
+B $8BE0,96,8
+@ $8C40 label=skimmer_flip_mask_1
+B $8C40,96,8
+@ $8CA0 label=skimmer_flip_mask_2
+B $8CA0,96,8
+@ $8D00 label=skimmer_flip_mask_3
+B $8D00,96,8
+@ $8D60 label=skimmer_flipped_1
+b $8D60 Flipped Skimmer images
+D $8D60 The flipped Skimmer, one image for each horizontal offset from its cell's left edge in steps of 2 pixels. Each is laid out as one of #R$8800(the Skimmer images), and takes the mask of the image the right way up.
+N $8D60 #UDGTABLE { #UDGARRAY4,7,3,4,,,,2($8D60-$8DA3-1-32:$8980-$89C3-1-32)(skimmer_flipped_1) | #UDGARRAY4,7,3,4,,,,2($8DC0-$8E03-1-32:$89E0-$8A23-1-32)(skimmer_flipped_2) | #UDGARRAY4,7,3,4,,,,2($8E20-$8E63-1-32:$8A40-$8A83-1-32)(skimmer_flipped_3) | #UDGARRAY4,7,3,4,,,,2($8E80-$8EC3-1-32:$8AA0-$8AE3-1-32)(skimmer_flipped_4) } { At the cell edge | 2 pixels right | 4 pixels right | 6 pixels right } TABLE#
+B $8D60,96,8
+@ $8DC0 label=skimmer_flipped_2
+B $8DC0,96,8
+@ $8E20 label=skimmer_flipped_3
+B $8E20,96,8
+@ $8E80 label=skimmer_flipped_4
+B $8E80,96,8
+@ $8EE0 label=shield_loss_1
+b $8EE0 The Skimmer's shield loss frames
+D $8EE0 The eight frames of a shield loss. Each frame's image comes before its mask, and each is laid out as one of #R$8800(the Skimmer images).
+N $8EE0 #UDGTABLE { #UDGARRAY4,7,3,4,,,,2($8EE0-$8F23-1-32:$8F40-$8F83-1-32)(shield_loss_1) | #UDGARRAY4,7,3,4,,,,2($8FA0-$8FE3-1-32:$9000-$9043-1-32)(shield_loss_2) | #UDGARRAY4,7,3,4,,,,2($9060-$90A3-1-32:$90C0-$9103-1-32)(shield_loss_3) | #UDGARRAY4,7,3,4,,,,2($9120-$9163-1-32:$9180-$91C3-1-32)(shield_loss_4) } { Frame 1 | Frame 2 | Frame 3 | Frame 4 } { #UDGARRAY4,7,3,4,,,,2($91E0-$9223-1-32:$9240-$9283-1-32)(shield_loss_5) | #UDGARRAY4,7,3,4,,,,2($92A0-$92E3-1-32:$9300-$9343-1-32)(shield_loss_6) | #UDGARRAY4,7,3,4,,,,2($9360-$93A3-1-32:$93C0-$9403-1-32)(shield_loss_7) | #UDGARRAY4,7,3,4,,,,2($9420-$9463-1-32:$9480-$94C3-1-32)(shield_loss_8) } { Frame 5 | Frame 6 | Frame 7 | Frame 8 } TABLE#
+B $8EE0,96,8
+@ $8F40 label=shield_loss_mask_1
+B $8F40,96,8
+@ $8FA0 label=shield_loss_2
+B $8FA0,96,8
+@ $9000 label=shield_loss_mask_2
+B $9000,96,8
+@ $9060 label=shield_loss_3
+B $9060,96,8
+@ $90C0 label=shield_loss_mask_3
+B $90C0,96,8
+@ $9120 label=shield_loss_4
+B $9120,96,8
+@ $9180 label=shield_loss_mask_4
+B $9180,96,8
+@ $91E0 label=shield_loss_5
+B $91E0,96,8
+@ $9240 label=shield_loss_mask_5
+B $9240,96,8
+@ $92A0 label=shield_loss_6
+B $92A0,96,8
+@ $9300 label=shield_loss_mask_6
+B $9300,96,8
+@ $9360 label=shield_loss_7
+B $9360,96,8
+@ $93C0 label=shield_loss_mask_7
+B $93C0,96,8
+@ $9420 label=shield_loss_8
+B $9420,96,8
+@ $9480 label=shield_loss_mask_8
+B $9480,96,8
+@ $94E0 label=hull_surface_2
+b $94E0 Sector 2 hull surface
+D $94E0 The pattern of the hull surface in sector 2, laid out as #R$8B00(the pattern of sector 1).
+N $94E0 #UDGTABLE { #UDGARRAY2,7,4,2($94E0-$94F1-1-16)(hull_surface_2) | #UDGARRAY8,7,2,2($94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1)(hull_surface_2_tiled) } { Pattern | Tiled } TABLE#
+B $94E0,32,8
+@ $9500 label=hull_surface_3
+b $9500 Sector 3 hull surface
+D $9500 The pattern of the hull surface in sector 3, laid out as #R$8B00(the pattern of sector 1).
+N $9500 #UDGTABLE { #UDGARRAY2,7,4,2($9500-$9511-1-16)(hull_surface_3) | #UDGARRAY8,7,2,2($9500;$9501;$9500;$9501;$9500;$9501;$9500;$9501;$9510;$9511;$9510;$9511;$9510;$9511;$9510;$9511;$9500;$9501;$9500;$9501;$9500;$9501;$9500;$9501;$9510;$9511;$9510;$9511;$9510;$9511;$9510;$9511;$9500;$9501;$9500;$9501;$9500;$9501;$9500;$9501;$9510;$9511;$9510;$9511;$9510;$9511;$9510;$9511;$9500;$9501;$9500;$9501;$9500;$9501;$9500;$9501;$9510;$9511;$9510;$9511;$9510;$9511;$9510;$9511)(hull_surface_3_tiled) } { Pattern | Tiled } TABLE#
+B $9500,32,8
 @ $9520 label=device_designs
-N $9520 The design of each sector's defence device.
+b $9520 Defence device designs
+D $9520 The design of each sector's defence device, 48 bytes per sector in sector order: 16 pixel rows of 3 bytes, rows from the top. The third byte of every row is 0, so a design covers 16×16 pixels.
 N $9520 #UDGTABLE { #UDGARRAY2,,6,3($9520;$9521;$9538;$9539)(device_design_1) | #UDGARRAY2,,6,3($9550;$9551;$9568;$9569)(device_design_2) | #UDGARRAY2,,6,3($9580;$9581;$9598;$9599)(device_design_3) } { Sector 1 | Sector 2 | Sector 3 } TABLE#
-B $9520
+B $9520,48,8 Sector 1
+B $9550,48,8 Sector 2
+B $9580,48,8 Sector 3
+u $95B0 Unused bytes
+S $95B0,32
 @ $95D0 label=animated_frames
-B $95D0
+b $95D0 Animated graphic frames
+D $95D0 The eight frames of the animated graphic, in the order the game shows them. Each frame holds 3×3 cells in the cell order of a graphic.
+N $95D0 #R$B4A7(The animated graphic draw) draws a frame in the attribute of the graphic's layout record, so the renders use black ink on white paper.
+N $95D0 #UDGTABLE { #UDGARRAY3,,3($95D0-$9610-8)(animated_frame_1) | #UDGARRAY3,,3($9618-$9658-8)(animated_frame_2) | #UDGARRAY3,,3($9660-$96A0-8)(animated_frame_3) | #UDGARRAY3,,3($96A8-$96E8-8)(animated_frame_4) | #UDGARRAY3,,3($96F0-$9730-8)(animated_frame_5) | #UDGARRAY3,,3($9738-$9778-8)(animated_frame_6) | #UDGARRAY3,,3($9780-$97C0-8)(animated_frame_7) | #UDGARRAY3,,3($97C8-$9808-8)(animated_frame_8) } { Frame 1 | Frame 2 | Frame 3 | Frame 4 | Frame 5 | Frame 6 | Frame 7 | Frame 8 } TABLE#
+B $95D0,72,8
+B $9618,72,8
+B $9660,72,8
+B $96A8,72,8
+B $96F0,72,8
+B $9738,72,8
+B $9780,72,8
+B $97C8,72,8
+@ $9810 label=unused_graphic_1
+b $9810 Unused graphics
+D $9810 Graphics that nothing in the game draws. In the cell order of a graphic, they make three graphics of 3×2 cells, then eight of 2×2 cells?
+N $9810 #UDGTABLE { #UDGARRAY3,,3($9810-$9838-8)(unused_graphic_1) | #UDGARRAY3,,3($9840-$9868-8)(unused_graphic_2) | #UDGARRAY3,,3($9870-$9898-8)(unused_graphic_3) | #UDGARRAY2,,3($98A0-$98B8-8)(unused_graphic_4) | #UDGARRAY2,,3($98C0-$98D8-8)(unused_graphic_5) | #UDGARRAY2,,3($98E0-$98F8-8)(unused_graphic_6) | #UDGARRAY2,,3($9900-$9918-8)(unused_graphic_7) | #UDGARRAY2,,3($9920-$9938-8)(unused_graphic_8) | #UDGARRAY2,,3($9940-$9958-8)(unused_graphic_9) | #UDGARRAY2,,3($9960-$9978-8)(unused_graphic_10) | #UDGARRAY2,,3($9980-$9998-8)(unused_graphic_11) } TABLE#
+B $9810,48,8
+@ $9840 label=unused_graphic_2
+B $9840,48,8
+@ $9870 label=unused_graphic_3
+B $9870,48,8
+@ $98A0 label=unused_graphic_4
+B $98A0,32,8
+@ $98C0 label=unused_graphic_5
+B $98C0,32,8
+@ $98E0 label=unused_graphic_6
+B $98E0,32,8
+@ $9900 label=unused_graphic_7
+B $9900,32,8
+@ $9920 label=unused_graphic_8
+B $9920,32,8
+@ $9940 label=unused_graphic_9
+B $9940,32,8
+@ $9960 label=unused_graphic_10
+B $9960,32,8
+@ $9980 label=unused_graphic_11
+B $9980,32,8
 @ $99A0 label=hatch_bitmap
-B $99A0
+g $99A0 Hatch bitmap
+D $99A0 The bitmap of the hatch at the centre of a hatchway, 3×3 cells: 24 pixel rows of 3 bytes, rows from the top. #R$B449(The hatchway draw) stamps two #R$99E8(hatch patterns) into it for each screen. The upper patch takes the first 2 bytes of pixel rows 3–10, and the lower patch those of rows 13–20.
+N $99A0 The render shows the bitmap as screen 91 stamps it, in black ink on white paper. Screen 91 lies in sector 1, at row 9 and column 1 of the hull map. ROM byte $045B holds $CD there, which picks pattern 6 for the upper patch and pattern 5 for the lower. A hatchway draws its hatch in the hatchway's own attribute.
+N $99A0 #UDGTABLE { #PUSHShatch91 #POKES($99A9,#PEEK($9A38))#POKES($99AA,#PEEK($9A39))#POKES($99AC,#PEEK($9A3A))#POKES($99AD,#PEEK($9A3B))#POKES($99AF,#PEEK($9A3C))#POKES($99B0,#PEEK($9A3D))#POKES($99B2,#PEEK($9A3E))#POKES($99B3,#PEEK($9A3F))#POKES($99B5,#PEEK($9A40))#POKES($99B6,#PEEK($9A41))#POKES($99B8,#PEEK($9A42))#POKES($99B9,#PEEK($9A43))#POKES($99BB,#PEEK($9A44))#POKES($99BC,#PEEK($9A45))#POKES($99BE,#PEEK($9A46))#POKES($99BF,#PEEK($9A47))#POKES($99C7,#PEEK($9A28))#POKES($99C8,#PEEK($9A29))#POKES($99CA,#PEEK($9A2A))#POKES($99CB,#PEEK($9A2B))#POKES($99CD,#PEEK($9A2C))#POKES($99CE,#PEEK($9A2D))#POKES($99D0,#PEEK($9A2E))#POKES($99D1,#PEEK($9A2F))#POKES($99D3,#PEEK($9A30))#POKES($99D4,#PEEK($9A31))#POKES($99D6,#PEEK($9A32))#POKES($99D7,#PEEK($9A33))#POKES($99D9,#PEEK($9A34))#POKES($99DA,#PEEK($9A35))#POKES($99DC,#PEEK($9A36))#POKES($99DD,#PEEK($9A37))#UDGARRAY3,,4,3($99A0-$99D2-1-24)(hatch_screen_91)#POPS } { On screen 91 } TABLE#
+B $99A0,9,3
 @ $99A9 label=hatch_upper_patch
-B $99A9
+B $99A9,30,3
 @ $99C7 label=hatch_lower_patch
-B $99C7
+B $99C7,33,3
 @ $99E8 label=hatch_patterns
-B $99E8
-@ $9A68 label=*
-B $9A68
-@ $9E08 label=*
-B $9E08
-@ $9F58 label=*
-B $9F58
-s $A0D7
-b $A0D9
-s $A12F
-b $A131
-@ $A158 label=*
-B $A158
-s $A2B7
-b $A2B8
-@ $A458 label=*
-@ $A818 label=*
+b $99E8 Hatch patterns
+D $99E8 The eight patterns that #R$B449(the hatchway draw) stamps into #R$99A0(the hatch bitmap), 16 bytes each: 8 pixel rows of 2 bytes, rows from the top. Each covers 16×8 pixels.
+N $99E8 #UDGTABLE { #UDGARRAY2,,4,2($99E8-$99E9-1-16)(hatch_pattern_1) | #UDGARRAY2,,4,2($99F8-$99F9-1-16)(hatch_pattern_2) | #UDGARRAY2,,4,2($9A08-$9A09-1-16)(hatch_pattern_3) | #UDGARRAY2,,4,2($9A18-$9A19-1-16)(hatch_pattern_4) | #UDGARRAY2,,4,2($9A28-$9A29-1-16)(hatch_pattern_5) | #UDGARRAY2,,4,2($9A38-$9A39-1-16)(hatch_pattern_6) | #UDGARRAY2,,4,2($9A48-$9A49-1-16)(hatch_pattern_7) | #UDGARRAY2,,4,2($9A58-$9A59-1-16)(hatch_pattern_8) } { Pattern 1 | Pattern 2 | Pattern 3 | Pattern 4 | Pattern 5 | Pattern 6 | Pattern 7 | Pattern 8 } TABLE#
+B $99E8,16,8
+B $99F8,16,8
+B $9A08,16,8
+B $9A18,16,8
+B $9A28,16,8
+B $9A38,16,8
+B $9A48,16,8
+B $9A58,16,8
+@ $9A68 label=unused_hatch_pattern_1
+b $9A68 Unused hatch patterns
+D $9A68 Two patterns in the format of #R$99E8(the hatch patterns) that nothing in the game draws.
+N $9A68 #UDGTABLE { #UDGARRAY2,,4,2($9A68-$9A69-1-16)(unused_hatch_pattern_1) | #UDGARRAY2,,4,2($9A78-$9A79-1-16)(unused_hatch_pattern_2) } TABLE#
+B $9A68,16,8
+@ $9A78 label=unused_hatch_pattern_2
+B $9A78,16,8
+@ $9A88 label=hostile_designs
+b $9A88 Hostile object designs
+D $9A88 Thirteen designs of 64 bytes, one of which a new hostile object takes at random from #R$C09B(the refresh register). A design holds 16 pixel rows of 2 bytes for its image, then 16 rows of 2 bytes for its mask, rows from the top.
+N $9A88 #R$C227(The image build) makes the shifted images of a design. A mask bit of 1 lets the background show. A hostile object takes the colours of the cells it crosses, so the renders use the play area's white ink on black paper.
+N $9A88 #UDGTABLE { #UDGARRAY2,7,4,2,,,,2($9A88-$9A99-1-16:$9AA8-$9AB9-1-16)(hostile_design_1) | #UDGARRAY2,7,4,2,,,,2($9AC8-$9AD9-1-16:$9AE8-$9AF9-1-16)(hostile_design_2) | #UDGARRAY2,7,4,2,,,,2($9B08-$9B19-1-16:$9B28-$9B39-1-16)(hostile_design_3) | #UDGARRAY2,7,4,2,,,,2($9B48-$9B59-1-16:$9B68-$9B79-1-16)(hostile_design_4) | #UDGARRAY2,7,4,2,,,,2($9B88-$9B99-1-16:$9BA8-$9BB9-1-16)(hostile_design_5) | #UDGARRAY2,7,4,2,,,,2($9BC8-$9BD9-1-16:$9BE8-$9BF9-1-16)(hostile_design_6) | #UDGARRAY2,7,4,2,,,,2($9C08-$9C19-1-16:$9C28-$9C39-1-16)(hostile_design_7) } { #UDGARRAY2,7,4,2,,,,2($9C48-$9C59-1-16:$9C68-$9C79-1-16)(hostile_design_8) | #UDGARRAY2,7,4,2,,,,2($9C88-$9C99-1-16:$9CA8-$9CB9-1-16)(hostile_design_9) | #UDGARRAY2,7,4,2,,,,2($9CC8-$9CD9-1-16:$9CE8-$9CF9-1-16)(hostile_design_10) | #UDGARRAY2,7,4,2,,,,2($9D08-$9D19-1-16:$9D28-$9D39-1-16)(hostile_design_11) | #UDGARRAY2,7,4,2,,,,2($9D48-$9D59-1-16:$9D68-$9D79-1-16)(hostile_design_12) | #UDGARRAY2,7,4,2,,,,2($9D88-$9D99-1-16:$9DA8-$9DB9-1-16)(hostile_design_13) } TABLE#
+B $9A88,64,8
+B $9AC8,64,8
+B $9B08,64,8
+B $9B48,64,8
+B $9B88,64,8
+B $9BC8,64,8
+B $9C08,64,8
+B $9C48,64,8
+B $9C88,64,8
+B $9CC8,64,8
+B $9D08,64,8
+B $9D48,64,8
+B $9D88,64,8
+@ $9DC8 label=shot_graphics
+b $9DC8 Shot graphics
+D $9DC8 The graphic of each shot for each direction, 8 bytes each, one per pixel row from the top. The four of the pulse laser shot come first, then the four of the hostile objects' shot. Each set of four runs in the order left, right, up, down.
+N $9DC8 The renders use the colours that #R$BF19(the shot draw) gives each shot. The pulse laser shot takes bright red ink on black paper, and the hostile objects' shot bright yellow ink.
+N $9DC8 #UDGTABLE { =h,c4 Pulse laser shot | =h,c4 Hostile objects' shot } { #UDG$9DC8,66,4(shot_graphic_1) | #UDG$9DD0,66,4(shot_graphic_2) | #UDG$9DD8,66,4(shot_graphic_3) | #UDG$9DE0,66,4(shot_graphic_4) | #UDG$9DE8,70,4(shot_graphic_5) | #UDG$9DF0,70,4(shot_graphic_6) | #UDG$9DF8,70,4(shot_graphic_7) | #UDG$9E00,70,4(shot_graphic_8) } { Left | Right | Up | Down | Left | Right | Up | Down } TABLE#
+B $9DC8,64,8
+@ $9E08 label=explosion_frames
+g $9E08 Explosion frames
+D $9E08 The seven frames of a hostile object's explosion, 48 bytes each: 16 pixel rows of 3 bytes, rows from the top. A frame sits at the horizontal offset that #R$A018(the frame offsets) record for it, and #R$C526(the frame shift) rewrites it in place for another offset.
+N $9E08 The renders show the frames as the game loads them, at the cell edge, through #R$9F58(the first explosion mask). They use the bright yellow ink on black paper that #R$C44B(the explosion step) paints over an explosion.
+N $9E08 #UDGTABLE { #UDGARRAY3,70,4,3,,,,2($9E08-$9E22-1-24:$9F58-$9F72-1-24)(explosion_frame_1) | #UDGARRAY3,70,4,3,,,,2($9E38-$9E52-1-24:$9F58-$9F72-1-24)(explosion_frame_2) | #UDGARRAY3,70,4,3,,,,2($9E68-$9E82-1-24:$9F58-$9F72-1-24)(explosion_frame_3) | #UDGARRAY3,70,4,3,,,,2($9E98-$9EB2-1-24:$9F58-$9F72-1-24)(explosion_frame_4) | #UDGARRAY3,70,4,3,,,,2($9EC8-$9EE2-1-24:$9F58-$9F72-1-24)(explosion_frame_5) | #UDGARRAY3,70,4,3,,,,2($9EF8-$9F12-1-24:$9F58-$9F72-1-24)(explosion_frame_6) | #UDGARRAY3,70,4,3,,,,2($9F28-$9F42-1-24:$9F58-$9F72-1-24)(explosion_frame_7) } { Frame 1 | Frame 2 | Frame 3 | Frame 4 | Frame 5 | Frame 6 | Frame 7 } TABLE#
+B $9E08,48,8
+B $9E38,48,8
+B $9E68,48,8
+B $9E98,48,8
+B $9EC8,48,8
+B $9EF8,48,8
+B $9F28,48,8
+@ $9F58 label=explosion_masks
+b $9F58 Explosion masks
+D $9F58 The mask of an explosion frame for each horizontal offset from the cell's left edge, in steps of 2 pixels. Each is laid out as one of #R$9E08(the explosion frames), and a mask bit of 1 lets the background show. The #R$C2A9(defence device) draws through the first of them too.
+N $9F58 The renders draw each mask bit of 1 in black ink on white paper.
+N $9F58 #UDGTABLE { #UDGARRAY3,,4,3($9F58-$9F72-1-24)(explosion_mask_1) | #UDGARRAY3,,4,3($9F88-$9FA2-1-24)(explosion_mask_2) | #UDGARRAY3,,4,3($9FB8-$9FD2-1-24)(explosion_mask_3) | #UDGARRAY3,,4,3($9FE8-$A002-1-24)(explosion_mask_4) } { At the cell edge | 2 pixels right | 4 pixels right | 6 pixels right } TABLE#
+B $9F58,48,8
+B $9F88,48,8
+B $9FB8,48,8
+B $9FE8,48,8
+@ $A018 label=explosion_offsets
+g $A018 Explosion frame offsets
+D $A018 The horizontal offset of each #R$9E08(explosion frame), one byte per frame in frame order. It runs from 0 at the cell edge to 3 for 6 pixels right.
+B $A018,7,1
+B $A01F,1 Unused
+@ $A020 label=font
+b $A020 Font
+D $A020 The game's font, 39 glyphs of 8 bytes, one byte per pixel row from the top. The table gives the character that each glyph prints, in glyph order.
+N $A020 #UDGTABLE { #FONT$A020,39,56,2(font) } TABLE#
+N $A020 #UDGTABLE { =h Glyphs | =h Characters } { #UDGARRAY10,,2($A020-$A068-8)(font_digits) | 0–9 } { #UDG$A070,,2(font_second_zero) | A second 0, which a #R$D2E6(control panel digit) rolls into after 9 } { #UDG$A078,,2(font_space) | Space } { #UDGARRAY13,,2($A080-$A0E0-8)(font_letters_1) | A–M } { #UDGARRAY13,,2($A0E8-$A148-8)(font_letters_2) | N–Z } { #UDG$A150,,2(font_slash) | [, which the font draws as a slash } TABLE#
+B $A020,312,8
+@ $A158 label=control_panel
+b $A158 Control panel
+D $A158 The graphic of the control panel. Its left half and then its right half hold 16×6 cells each, in the cell order of a graphic. The colour pattern of each half follows, one attribute per cell, row by row from the top.
+N $A158 #R$B812(The panel draw) draws the panel. The render takes each cell's colour from its half's pattern, as the game does. It leaves out the readouts that the game prints over the panel.
+N $A158 #UDGTABLE { #UDGARRAY32,,2($A158-$A1D0-8;$A458-$A4D0-8;$A1D8-$A250-8;$A4D8-$A550-8;$A258-$A2D0-8;$A558-$A5D0-8;$A2D8-$A350-8;$A5D8-$A650-8;$A358-$A3D0-8;$A658-$A6D0-8;$A3D8-$A450-8;$A6D8-$A750-8)[$A758-$A767;$A7B8-$A7C7;$A768-$A777;$A7C8-$A7D7;$A778-$A787;$A7D8-$A7E7;$A788-$A797;$A7E8-$A7F7;$A798-$A7A7;$A7F8-$A807;$A7A8-$A7B7;$A808-$A817](control_panel) } TABLE#
+B $A158,768,8 Left half
+@ $A458 label=control_panel_right
+B $A458,768,8 Right half
+@ $A758 label=colour_pat_33
+B $A758,96,16 Colour pattern of the left half
+@ $A7B8 label=colour_pat_34
+B $A7B8,96,16 Colour pattern of the right half
+@ $A818 label=inner_graphic_dir
+b $A818 Inner section graphic directory
+D $A818 The address and the size of each of the 18 graphics of the inner sections, 4 bytes per graphic in graphic number order. A record holds the address of the graphic's pixels, then its width in cells and its height in cells.
+W $A818,2 Pixels
+B $A81A,2 Width and height in cells
+W $A81C,2 Pixels
+B $A81E,2 Width and height in cells
+W $A820,2 Pixels
+B $A822,2 Width and height in cells
+W $A824,2 Pixels
+B $A826,2 Width and height in cells
+W $A828,2 Pixels
+B $A82A,2 Width and height in cells
+W $A82C,2 Pixels
+B $A82E,2 Width and height in cells
+W $A830,2 Pixels
+B $A832,2 Width and height in cells
+W $A834,2 Pixels
+B $A836,2 Width and height in cells
+W $A838,2 Pixels
+B $A83A,2 Width and height in cells
+W $A83C,2 Pixels
+B $A83E,2 Width and height in cells
+W $A840,2 Pixels
+B $A842,2 Width and height in cells
+W $A844,2 Pixels
+B $A846,2 Width and height in cells
+W $A848,2 Pixels
+B $A84A,2 Width and height in cells
+W $A84C,2 Pixels
+B $A84E,2 Width and height in cells
+W $A850,2 Pixels
+B $A852,2 Width and height in cells
+W $A854,2 Pixels
+B $A856,2 Width and height in cells
+W $A858,2 Pixels
+B $A85A,2 Width and height in cells
+W $A85C,2 Pixels
+B $A85E,2 Width and height in cells
+@ $A860 label=inner_graphic_0
+b $A860 Inner section graphics
+D $A860 The 18 graphics that #R$A818(the inner section graphic directory) lists, each 8 bytes per cell in the cell order of a graphic.
+N $A860 The renders show each graphic under its graphic number. The colours come from the screen layout, so the renders use black ink on white paper.
+N $A860 #UDGTABLE { #UDGARRAY1,,2($A860-$A860-8)(inner_graphic_0) | #UDGARRAY1,,2($A868-$A868-8)(inner_graphic_1) | #UDGARRAY1,,2($A870-$A870-8)(inner_graphic_2) | #UDGARRAY1,,2($A878-$A878-8)(inner_graphic_3) | #UDGARRAY6,,2($A880-$A908-8)(inner_graphic_4) | #UDGARRAY6,,2($A910-$A998-8)(inner_graphic_5) } { 0 | 1 | 2 | 3 | 4 | 5 } { #UDGARRAY5,,2($A9A0-$AA10-8)(inner_graphic_6) | #UDGARRAY4,,2($AA18-$AA70-8)(inner_graphic_7) | #UDGARRAY4,,2($AA78-$AAD0-8)(inner_graphic_8) | #UDGARRAY4,,2($AAD8-$AB30-8)(inner_graphic_9) | #UDGARRAY3,,2($AB38-$ABC0-8)(inner_graphic_10) | #UDGARRAY3,,2($ABC8-$AC38-8)(inner_graphic_11) } { 6 | 7 | 8 | 9 | 10 | 11 } { #UDGARRAY3,,2($AC40-$ACB0-8)(inner_graphic_12) | #UDGARRAY3,,2($ACB8-$AD10-8)(inner_graphic_13) | #UDGARRAY3,,2($AD18-$AD70-8)(inner_graphic_14) | #UDGARRAY3,,2($AD78-$ADD0-8)(inner_graphic_15) | #UDGARRAY5,,2($ADD8-$AE98-8)(inner_graphic_16) | #UDGARRAY2,,2($AEA0-$AEB8-8)(inner_graphic_17) } { 12 | 13 | 14 | 15 | 16 | 17 } TABLE#
+B $A860,8,8
+@ $A868 label=inner_graphic_1
+B $A868,8,8
+@ $A870 label=inner_graphic_2
+B $A870,8,8
+@ $A878 label=inner_graphic_3
+B $A878,8,8
+@ $A880 label=inner_graphic_4
+B $A880,144,8
+@ $A910 label=inner_graphic_5
+B $A910,144,8
+@ $A9A0 label=inner_graphic_6
+B $A9A0,120,8
+@ $AA18 label=inner_graphic_7
+B $AA18,96,8
+@ $AA78 label=inner_graphic_8
+B $AA78,96,8
+@ $AAD8 label=inner_graphic_9
+B $AAD8,96,8
+@ $AB38 label=inner_graphic_10
+B $AB38,144,8
+@ $ABC8 label=inner_graphic_11
+B $ABC8,120,8
+@ $AC40 label=inner_graphic_12
+B $AC40,120,8
+@ $ACB8 label=inner_graphic_13
+B $ACB8,96,8
+@ $AD18 label=inner_graphic_14
+B $AD18,96,8
+@ $AD78 label=inner_graphic_15
+B $AD78,96,8
+@ $ADD8 label=inner_graphic_16
+B $ADD8,200,8
+@ $AEA0 label=inner_graphic_17
+B $AEA0,32,8
+u $AEC0 Unused bytes
+S $AEC0,320
 @ $B000 label=boot
 c $B000 Jump to the main loop
 @ $B003 label=clear_screen
@@ -720,6 +1089,7 @@ N $B812 While #R$BD34(the shadow switch) holds 0, #R$B27D(the unmasked graphic d
   $B833 Colour the right half from its own colour pattern.
   $B838,18 Draw the right half from #R$A458(its graphic), beside the left half.
 @ $B84B label=clear_play_area
+@ $B84B keep
 c $B84B Clear the play area
 D $B84B Blanks every pixel of the play area, across the whole width of the screen.
 R $B84B I:HL screen address of the top pixel row of the play area's first cell
@@ -904,7 +1274,7 @@ R $BB4A O:BC address of the message's end byte
 @ $BB6D label=print_char
 c $BB6D Print a character
 D $BB6D Draws one character of #R$A020(the game's font) in a cell, and colours the cell with #R$BD15(the draw attribute).
-N $BB6D The font holds 8 bytes per glyph, one for each pixel row from the top. A space takes glyph 11. A code below the colon takes its value less the code of 0, and any other code its value less $35. So the digits take glyphs 0–9, the capitals take glyphs 12–37, and [ takes glyph 38, the font's slash.
+N $BB6D The font holds 8 bytes per glyph, one for each pixel row from the top. A space takes glyph 11. A code below the colon takes its value less the code of 0, and any other code its value less $35. So the digits take glyphs 0–9, the capitals take glyphs 12–37, and [ takes glyph 38. #R$A020(The font) shows the character that each glyph prints.
 R $BB6D I:A character code: a space, a digit, a capital or [
 R $BB6D I:DE attribute address of the cell
 R $BB6D I:HL screen address of the cell's top pixel row
@@ -921,6 +1291,8 @@ R $BB6D O:HL screen address of the next cell's top pixel row
   $BB7F Take the capital's glyph, or the slash for [.
 @ $BB81 label=glyph_addr
   $BB81 Point at the glyph in the font, 8 bytes per glyph. Each path leaves the carry clear, so the three rotations multiply the glyph number by 8.
+@ $BB89 ssub=ADD A,font%$100
+@ $BB8C ssub=LD A,font/$100
   $BB90 Walk the glyph's pixel rows from the top.
 @ $BB93 label=glyph_row
   $BB93 Copy each pixel row of the glyph down the cell.
@@ -1352,7 +1724,9 @@ R $BF19 O:A $FF if the cell stops the shot, 0 if not
   $BF3D Find the cell's top pixel row, keep it, and count its pixel rows.
 @ $BF49 label=draw_shot_save
   $BF49 Save the pixel rows, from the top.
-  $BF4F Point at the graphic for the shot's direction, 8 bytes each. The four of the pulse laser shot come first, then the four of the hostile objects' shot.
+  $BF4F Point at #R$9DC8(the shot's graphic) for its direction, 8 bytes each.
+@ $BF55 ssub=ADD A,shot_graphics%$100
+@ $BF58 ssub=LD D,shot_graphics/$100
   $BF5C Carry into the high byte.
 @ $BF5D label=draw_shot_graphic
   $BF5D Go back to the cell's top pixel row, and count its pixel rows.
@@ -1555,6 +1929,8 @@ N $C16C No slot is free.
   $C1D5 Keep the buffer's address.
   $C1DC Pick a hostile object design at random.
   $C1E1,23 Find the design, 64 bytes per design: a 16×16 image, then its mask.
+@ $C1F1 ssub=ADD A,hostile_designs%$100
+@ $C1F5 ssub=ADC A,hostile_designs/$100
   $C1FB It first steers toward the Skimmer on its fifth whole cell on the play area.
   $C200 Point at the new object's slot.
 @ $C204 label=add_hostile
@@ -1781,7 +2157,9 @@ c $C4F2 Draw a hostile object's explosion frame
 D $C4F2 Draws the current explosion frame at the hostile object's position, after it shifts the frame to the hostile object's pixel offset when they differ.
   $C4F2 Take the explosion frame from the object's state, 0 for the first.
   $C4F8 Find the frame's image among the explosion frames.
+@ $C500 ssub=ADD A,explosion_offsets%$100
   $C500 Point at the pixel offset that the frame's image sits at, one byte per frame after the explosion masks.
+@ $C503 ssub=LD H,explosion_offsets/$100
   $C507 Never runs: those bytes do not cross a page.
 @ $C508 label=draw_explosion_shift
   $C508 Does the frame sit at another pixel offset than the object's? If so, shift it to the object's.
@@ -2614,28 +2992,22 @@ N $CD89 This entry point toggles the mark over a block of cells that the caller 
 @ $CD8F label=toggle_cells_mark_cell
   $CD8F Toggle the Skimmer's mark in each cell of the row.
   $CD96,5 Move to the next row.
-@ $CD9C label=skimmer_images
-b $CD9C Skimmer images, normal and flipped
-D $CD9C One entry of 4 bytes for each horizontal offset of the Skimmer, from its cell's left edge in steps of 2 pixels. An entry holds the address of the image, then the address of its mask.
-N $CD9C The normal Skimmer.
-N $CD9C #UDGTABLE { #UDGARRAY4,,3,4,,,,2($8800-$8843-1-32:$8980-$89C3-1-32)(skimmer_image_1) | #UDGARRAY4,,3,4,,,,2($8860-$88A3-1-32:$89E0-$8A23-1-32)(skimmer_image_2) | #UDGARRAY4,,3,4,,,,2($88C0-$8903-1-32:$8A40-$8A83-1-32)(skimmer_image_3) | #UDGARRAY4,,3,4,,,,2($8920-$8963-1-32:$8AA0-$8AE3-1-32)(skimmer_image_4) } { 0 pixels right | 2 pixels right | 4 pixels right | 6 pixels right } TABLE#
-B $CD9C,16,4
-@ $CDAC label=skimmer_flipped_images
-N $CDAC The flipped Skimmer. Its images share the masks of the normal ones.
-N $CDAC #UDGTABLE { #UDGARRAY4,,3,4,,,,2($8D60-$8DA3-1-32:$8980-$89C3-1-32)(skimmer_flipped_1) | #UDGARRAY4,,3,4,,,,2($8DC0-$8E03-1-32:$89E0-$8A23-1-32)(skimmer_flipped_2) | #UDGARRAY4,,3,4,,,,2($8E20-$8E63-1-32:$8A40-$8A83-1-32)(skimmer_flipped_3) | #UDGARRAY4,,3,4,,,,2($8E80-$8EC3-1-32:$8AA0-$8AE3-1-32)(skimmer_flipped_4) } { 0 pixels right | 2 pixels right | 4 pixels right | 6 pixels right } TABLE#
-B $CDAC,16,4
-@ $CDBC label=skimmer_flip_frames
-b $CDBC Skimmer flip frames
-D $CDBC The three frames of the flip, which #R$CBA8(the Skimmer's draw) shows in turn whichever way the Skimmer turns over. Each entry is laid out as one of #R$CD9C(the Skimmer images).
-N $CDBC #UDGTABLE { #UDGARRAY4,,3,4,,,,2($8B20-$8B63-1-32:$8C40-$8C83-1-32)(skimmer_flip_1) | #UDGARRAY4,,3,4,,,,2($8B80-$8BC3-1-32:$8CA0-$8CE3-1-32)(skimmer_flip_2) | #UDGARRAY4,,3,4,,,,2($8BE0-$8C23-1-32:$8D00-$8D43-1-32)(skimmer_flip_3) } { Frame 1 | Frame 2 | Frame 3 } TABLE#
-B $CDBC,12,4
-@ $CDC8 label=shield_loss_frames
-b $CDC8 Skimmer frames for a shield loss
-D $CDC8 The eight frames of a shield loss, one entry for each stage of the loss at #R$D2D4 from stage 0. Each entry is laid out as one of #R$CD9C(the Skimmer images).
+@ $CD9C label=skimmer_image_addrs
+b $CD9C Skimmer image addresses
+D $CD9C The addresses of #R$8800(the Skimmer images) and their masks, by the Skimmer's horizontal offset from its cell's left edge in steps of 2 pixels. Each entry holds the address of an image, then the address of its mask.
+W $CD9C,16,4
+@ $CDAC label=skimmer_flipped_addrs
+N $CDAC The entries of the #R$8D60(flipped Skimmer images). They take the masks of the images the right way up.
+W $CDAC,16,4
+@ $CDBC label=flip_frame_addrs
+b $CDBC Addresses of the Skimmer's flip frames
+D $CDBC The addresses of #R$8B20(the flip frames) and their masks, which #R$CBA8(the Skimmer's draw) shows in turn whichever way the Skimmer turns over. Each entry is laid out as one of #R$CD9C(the Skimmer image addresses).
+W $CDBC,12,4
+@ $CDC8 label=shield_loss_addrs
+b $CDC8 Addresses of the Skimmer's shield loss frames
+D $CDC8 The addresses of #R$8EE0(the shield loss frames) and their masks, one entry for each #R$D2D4(the loss's stage), from 0. Each entry is laid out as one of #R$CD9C(the Skimmer image addresses).
 N $CDC8 A defect in #R$CBC6(the Skimmer's draw) skips the first frame.
-N $CDC8 #UDGTABLE { #UDGARRAY4,,3,4,,,,2($8EE0-$8F23-1-32:$8F40-$8F83-1-32)(shield_loss_1) | #UDGARRAY4,,3,4,,,,2($8FA0-$8FE3-1-32:$9000-$9043-1-32)(shield_loss_2) | #UDGARRAY4,,3,4,,,,2($9060-$90A3-1-32:$90C0-$9103-1-32)(shield_loss_3) | #UDGARRAY4,,3,4,,,,2($9120-$9163-1-32:$9180-$91C3-1-32)(shield_loss_4) } { Frame 1 | Frame 2 | Frame 3 | Frame 4 } TABLE#
-N $CDC8 #UDGTABLE { #UDGARRAY4,,3,4,,,,2($91E0-$9223-1-32:$9240-$9283-1-32)(shield_loss_5) | #UDGARRAY4,,3,4,,,,2($92A0-$92E3-1-32:$9300-$9343-1-32)(shield_loss_6) | #UDGARRAY4,,3,4,,,,2($9360-$93A3-1-32:$93C0-$9403-1-32)(shield_loss_7) | #UDGARRAY4,,3,4,,,,2($9420-$9463-1-32:$9480-$94C3-1-32)(shield_loss_8) } { Frame 5 | Frame 6 | Frame 7 | Frame 8 } TABLE#
-B $CDC8,32,4
+W $CDC8,32,4
 @ $CDE8 label=init_interrupts
 c $CDE8 Set up the interrupt routine
 D $CDE8 Fills the interrupt vectors so that every interrupt reaches the #R$CE26(flag routine), and switches to vectored interrupts.
@@ -3046,7 +3418,7 @@ B $D2CD,1 First pixel row of a cell at which the Skimmer draw clicks the speaker
 @ $D2CE label=shot_click_time
 B $D2CE,1 Passes of the play loop left in the clicks of a pulse laser shot, 0 when none run
 @ $D2CF label=skimmer_image_set
-W $D2CF,2 Address of the entries of #R$CD9C(the Skimmer images) in use, normal or flipped
+W $D2CF,2 Address of the entries of #R$CD9C(the Skimmer image addresses) in use, normal or flipped
 @ $D2D1 label=flip_step
 B $D2D1,1 Frame of the flip animation, 1–3, or 0 when no flip runs
 @ $D2D2 label=flipped
@@ -3075,8 +3447,10 @@ R $D2E6 I:A the digit, as 8 times its value plus its eighths toward the next dig
 R $D2E6 I:HL' screen address of the digit's cell
 R $D2E6 O:HL' screen address of the next cell on the right
   $D2E6 Switch to the screen address.
+@ $D2E7 ssub=ADD A,font%$100
 N $D2E7 The font holds the digits 0 to 9 and a second 0 after the 9, 8 bytes per glyph. A digit's byte is the offset of its glyph, plus its eighths. The eighths start the draw lower in the glyph and finish it in the top rows of the next glyph. So a digit rolls up its cell as its eighths grow, and a 9 rolls on into a 0.
   $D2E7 Point at the digit's pixel rows in the font.
+@ $D2EA ssub=LD A,font/$100
   $D2EF Keep the cell's screen address, and walk its pixel rows from the top.
 @ $D2F2 label=inverse_pixel_row
   $D2F2 Copy each pixel row onto the screen, inverted.

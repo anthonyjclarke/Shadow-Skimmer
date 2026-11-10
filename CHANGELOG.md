@@ -5,6 +5,7 @@
 ### Added
 
 - Graphics engine documented in depth (`$B080–$B3AF`): cell addresses, the graphic directory fields, cell masks, colour patterns, the pixel, colour, mark and shadow passes, with every basic block commented.
+- Graphics gallery (`src/graphics.ref`) and the sprite block `$7CD4–$A817` split into labelled, rendered entries: the Skimmer's images, flip and shield-loss frames (animated), hull surfaces, defence devices, the animated graphic, the hatch, the 13 hostile object designs, the shots, the explosion (animated), the font and the control panel in its own colours.
 - The title tune player, decrypted by `tools/tune_player.py` and published as its own listing (`src/tune.ctl`, `src/tune.ref`): the introduction's slides, the two-tone and three-tone players with their timing and pitch formulas, the noise run and the key-press exit. The tune listing plays the start of the first part as an `#AUDIO` clip, captured by running the game's own player in SkoolKit's simulator.
 - Control panel, menus, keys, the main loop, printing and the title tune wrapper documented in depth (`$B812–$BD43`, `$F000–$F472`), with every game variable defined and the title tune's note data identified. Every routine outside the encrypted title tune player is now documented.
 - Start-up, firing and hatchways documented in depth (`$61A8–$B07F`, `$BD44–$C09A`): the entry, screen clear and hull surface, the fire key, both shots' launch, flight, colours and marks, hits and pushes, and the hatchway animation's halves and phases.

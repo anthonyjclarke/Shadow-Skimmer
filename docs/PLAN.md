@@ -8,13 +8,13 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Item                | State                                     |
 |:--------------------|:------------------------------------------|
-| Phase               | 3 – depth pass, code and tune player      |
+| Phase               | 4 – catalogs: graphics (sprite block)     |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
-| Baseline findings   | 40                                        |
+| Baseline findings   | 26                                        |
 | Routines to the bar | 118 of 121 (3 flagged only for a bare well-named JP or CALL) |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
-| Catalogs            | graphics, sound, data: not started        |
+| Catalogs            | graphics: sprite block; sound, data: not started |
 | Behaviour spec      | not started                               |
 | Relocatability      | label-clean; unproven                     |
 
@@ -24,7 +24,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Target              | Lane | State                                |
 |:--------------------|:-----|:-------------------------------------|
-| Title tune player `$F009` (`src/tune.ctl`) | code | review |
+| Graphics GX2 `$7CD4–$A817` | catalog | review |
 
 ---
 
@@ -71,20 +71,12 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | Address       | Open question                                 |
 |:--------------|:----------------------------------------------|
 | `$F480`       | Split the key copy out of `b $F473` as code (moves `$F473` baseline keys) |
-| `$A020`       | One font entry (39 glyphs) and a render; `@ssub` at `$BB89` |
-| `$B16F`       | Label the panel patterns `$A758`/`$A7B8` in `$A2B8` |
-| `$C4DB`       | Table addresses built from immediates: `$BF58`, `$C1F5` (needs `$9A88`), `$C503` (needs `$A018`) |
-| `$CD9C`       | Label images in `$7CD4`, then type `$CD9C–$CDE7` as `W` |
 | `$6200`       | Document the graphic directory record (also `$A818`, needs a split) |
 | `$B20A`       | Split plot_graphic, plot_unmasked, cast_shadow, draw_shadow into entries |
 | `$D800`       | Split the layout tables and lists; record `#TABLE` |
-| `$9520`       | Title the defence device designs (`$7CD4` split) |
 | `$D2E7`       | Label the font; its address is built from immediates |
 | `$D473`       | Split the readout block; state the digit format and drain amounts there |
 | `$CE26`       | Split `flag_interrupt` into its own entry     |
-| `$9A88`       | Label and render the 13 hostile object designs |
-| `$95B0`       | 32 zero bytes after the device designs        |
-| `$99A0`       | Title the hatch bitmap (`$7CD4` split)        |
 
 ### Game behaviour
 
@@ -108,7 +100,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$CF9E`       | Dead `LD A,n` loads before calls: note them?  |
 | `$C204`       | Split `add_hostile` into its own entry        |
 | `$F473`       | Split the hostile slots and table their schema |
-| `$A018`       | Label the explosion frame offsets (split)     |
 | `$C43E`       | Explosion's white paint over coloured graphics? |
 | `$C1B1`       | Blocked launch on the Skimmer pushes it: visible? |
 | `$C0AC`       | Image buffers overwrite sysvars: any ROM call reads them? |
@@ -126,8 +117,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$CDC8`       | Split the unused first frame into its own `u` block? |
 | `$BE3F`       | Is the range `$FF` write reachable? Only via `$C8FE` (C AND 3 = 2) |
 | `$C8FE`       | Can C AND 3 be 2 after `update_hostile`? Shot with range 255 |
-| `$9DC8`       | Label and render the eight shot graphics (`$7CD4` split) |
-| `$8B00`       | Label and render the three hull patterns (`$7CD4` split) |
 | `$B04F`       | Split `$B04F`, `$BE1E`, `$BE4D` into entries for `R` rows |
 | `$BD13`       | Merge `$BD13/$BD14`, `$BD21/$BD22` into words (`@ssub` at `$B5BD`, `$B60D`, `$B4C5`) |
 | `$BAC6`       | What is at `$F7F8–$F7FF`, above the stack's start? |
@@ -141,6 +130,14 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `tune`        | Raw operands in the tune listing (`operand_subs` reads only the main skool) |
 | `tune`        | Tune links use the prose face; try `tune-CodePath=tune/asm` |
 | lint-prose    | Vale is not installed, so the prose lint never runs |
+| `$9810`       | Unused graphics: confirm the 3×2 / 2×2 grouping |
+| `$6200`       | Entries 117/120 overlap 118/121; 119 points at ROM `$145C` |
+| `$7CD4`       | Starts inside graphic 109; merge with `$645C–$7CD3` (GX1) |
+| `$99A0`       | Render the hatch at opening steps with the GX1 decoder |
+| `$C500`       | Link `#R$A018` instead of "after the explosion masks" |
+| `$A818`       | Review the minimal inner directory entries (GX1) |
+| glyph 10      | `?` reaches the second 0; no message prints `?` |
+| `g` pages     | `g` entries get SkoolKit's "Game status buffer" header |
 | `$E141`       | Screen 55's last record runs into the next layout |
 | `$C955`       | Counter value `$17` for the defence device    |
 | `$B363`       | Shadow edge tests use the layout cell, not the drawn one |
@@ -281,3 +278,12 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$BBA2`  | `R` row O:A gives the control bits                 |
 | `$F009`  | Decrypted listing published as `tune` (`src/tune.ctl`, `tools/tune_player.py`) |
 | `$F1BF`  | `#AUDIO` render from the game's own code (simulator) |
+| `$CD9C`  | Pointer tables typed `W` with image labels         |
+| `$9A88`  | 13 hostile designs labelled and rendered with masks |
+| `$9DC8`  | 8 shot graphics rendered in their traced colours   |
+| `$8B00`  | Three hull surface patterns labelled and rendered  |
+| `$A018`  | `explosion_offsets`, with `@ssub` at `$C503`       |
+| `$A020`  | One font entry with a character table              |
+| `$B16F`  | Targets labelled `colour_pat_33/34`                |
+| `$95B0`  | Unused bytes past the third device design          |
+| `$C4DB`  | Table addresses from immediates now `@ssub`        |

@@ -1,0 +1,103 @@
+; The graphics catalog: one section for each kind of graphic the game draws,
+; in the order the game first shows them. Each section names the graphic, links
+; to the listing entry that holds its bytes and renders it. The entry states the
+; format and the colours, and the renders here repeat the entry's own.
+
+; Masked images float on the page: a pixel that the mask lets the background
+; through renders transparent.
+[ImageWriter]
+PNGAlpha=0
+
+[Page:Graphics]
+SectionPrefix=Graphic
+
+[Graphic:font:Font]
+The game prints its messages and the control panel's numbers in its own #R$A020(font).
+
+#UDGTABLE { #FONT$A020,39,56,2(font) } TABLE#
+
+#UDGTABLE { =h Glyphs | =h Characters } { #UDGARRAY10,,2($A020-$A068-8)(font_digits) | 0–9 } { #UDG$A070,,2(font_second_zero) | A second 0, which a #R$D2E6(control panel digit) rolls into after 9 } { #UDG$A078,,2(font_space) | Space } { #UDGARRAY13,,2($A080-$A0E0-8)(font_letters_1) | A–M } { #UDGARRAY13,,2($A0E8-$A148-8)(font_letters_2) | N–Z } { #UDG$A150,,2(font_slash) | [, which the font draws as a slash } TABLE#
+
+[Graphic:control-panel:Control panel]
+The #R$A158(control panel) across the top six rows of the screen, in its own colours.
+
+#UDGTABLE { #UDGARRAY32,,2($A158-$A1D0-8;$A458-$A4D0-8;$A1D8-$A250-8;$A4D8-$A550-8;$A258-$A2D0-8;$A558-$A5D0-8;$A2D8-$A350-8;$A5D8-$A650-8;$A358-$A3D0-8;$A658-$A6D0-8;$A3D8-$A450-8;$A6D8-$A750-8)[$A758-$A767;$A7B8-$A7C7;$A768-$A777;$A7C8-$A7D7;$A778-$A787;$A7D8-$A7E7;$A788-$A797;$A7E8-$A7F7;$A798-$A7A7;$A7F8-$A807;$A7A8-$A7B7;$A808-$A817](control_panel) } TABLE#
+
+[Graphic:defence-devices:Defence devices]
+The #R$9520(design) of the defence device in each sector.
+
+#UDGTABLE { #UDGARRAY2,,6,3($9520;$9521;$9538;$9539)(device_design_1) | #UDGARRAY2,,6,3($9550;$9551;$9568;$9569)(device_design_2) | #UDGARRAY2,,6,3($9580;$9581;$9598;$9599)(device_design_3) } { Sector 1 | Sector 2 | Sector 3 } TABLE#
+
+[Graphic:hull-surface:Hull surface]
+The pattern that covers the play area in each sector: #R$8B00(sector 1), #R$94E0(sector 2) and #R$9500(sector 3).
+
+#UDGTABLE { #UDGARRAY8,7,2,2($8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B00;$8B01;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11;$8B10;$8B11)(hull_surface_1_tiled) | #UDGARRAY8,7,2,2($94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1)(hull_surface_2_tiled) | #UDGARRAY8,7,2,2($9500;$9501;$9500;$9501;$9500;$9501;$9500;$9501;$9510;$9511;$9510;$9511;$9510;$9511;$9510;$9511;$9500;$9501;$9500;$9501;$9500;$9501;$9500;$9501;$9510;$9511;$9510;$9511;$9510;$9511;$9510;$9511;$9500;$9501;$9500;$9501;$9500;$9501;$9500;$9501;$9510;$9511;$9510;$9511;$9510;$9511;$9510;$9511;$9500;$9501;$9500;$9501;$9500;$9501;$9500;$9501;$9510;$9511;$9510;$9511;$9510;$9511;$9510;$9511)(hull_surface_3_tiled) } { Sector 1 | Sector 2 | Sector 3 } TABLE#
+
+[Graphic:outer-hull-graphics:Outer hull graphics]
+The #R$7CD4(last graphics of the outer hull), under their graphic numbers.
+
+#UDGTABLE { #UDGARRAY6,,2($7C34-$7CEC-8)(outer_graphic_109) | #UDGARRAY4,,2($7CF4-$7D4C-8)(outer_graphic_110) | #UDGARRAY3,,2($7D54-$7DAC-8)(outer_graphic_111) | #UDGARRAY4,,2($7DB4-$7E0C-8)(outer_graphic_112) | #UDGARRAY3,,2($7E14-$7E6C-8)(outer_graphic_113) | #UDGARRAY4,,2($7E74-$7ECC-8)(outer_graphic_114) | #UDGARRAY3,,2($7ED4-$7F2C-8)(outer_graphic_115) } { 109 | 110 | 111 | 112 | 113 | 114 | 115 } { #UDGARRAY4,,2($7F34-$7F8C-8)(outer_graphic_116) | #UDGARRAY3,,2($7F94-$7FEC-8)(outer_graphic_117) | #UDGARRAY5,,2($7FB0-$8020-8)(outer_graphic_118) | #UDGARRAY5,,2($7FF4-$8064-8)(outer_graphic_120) | #UDGARRAY3,,2($8028-$8098-8)(outer_graphic_121) | #UDGARRAY5,,2($80A0-$8110-8)(outer_graphic_122) | #UDGARRAY3,,2($8118-$8188-8)(outer_graphic_123) } { 116 | 117 | 118 | 120 | 121 | 122 | 123 } { #UDGARRAY6,,2($8190-$8218-8)(outer_graphic_124) | #UDGARRAY3,,2($8220-$82A8-8)(outer_graphic_125) | #UDGARRAY6,,2($82B0-$8338-8)(outer_graphic_126) | #UDGARRAY3,,2($8340-$83C8-8)(outer_graphic_127) | #UDGARRAY5,,2($83D0-$83F0-8)(outer_graphic_128) | #UDGARRAY1,,2($83F8-$8418-8)(outer_graphic_129) | #UDGARRAY5,,2($8420-$8440-8)(outer_graphic_130) } { 124 | 125 | 126 | 127 | 128 | 129 | 130 } { #UDGARRAY1,,2($8448-$8468-8)(outer_graphic_131) | #UDGARRAY3,,2($8470-$8480-8)(outer_graphic_132) | #UDGARRAY1,,2($8488-$8498-8)(outer_graphic_133) | #UDGARRAY3,,2($84A0-$84B0-8)(outer_graphic_134) | #UDGARRAY1,,2($84B8-$84C8-8)(outer_graphic_135) | #UDGARRAY1,,2($84D0-$84E0-8)(outer_graphic_136) | #UDGARRAY1,,2($84E8-$84F0-8)(outer_graphic_137) } { 131 | 132 | 133 | 134 | 135 | 136 | 137 } { #UDGARRAY1,,2($84F8-$8510-8)(outer_graphic_138) | #UDGARRAY3,,2($8518-$8540-8)(outer_graphic_139) | #UDGARRAY1,,2($8548-$8560-8)(outer_graphic_140) | #UDGARRAY1,,2($8568-$8570-8)(outer_graphic_141) | #UDGARRAY6,,2($8578-$8600-8)(outer_graphic_142) | #UDGARRAY4,,2($8608-$8660-8)(outer_graphic_143) | #UDGARRAY2,,2($8668-$8690-8)(outer_graphic_144) } { 138 | 139 | 140 | 141 | 142 | 143 | 144 } { #UDGARRAY3,,2($8698-$86C0-8)(outer_graphic_145) | #UDGARRAY3,,2($86C8-$8708-8)(outer_graphic_146) | #UDGARRAY2,,2($8710-$8738-8)(outer_graphic_147) | #UDGARRAY3,,2($8740-$8768-8)(outer_graphic_148) | #UDGARRAY3,,2($8770-$87B0-8)(outer_graphic_149) | #UDGARRAY3,,2($87B8-$87F8-8)(outer_graphic_150) } { 145 | 146 | 147 | 148 | 149 | 150 } TABLE#
+
+[Graphic:hatch:Hatch]
+The #R$99A0(hatch bitmap) at the centre of a hatchway, and the #R$99E8(hatch patterns), two of which #R$B449(the hatchway draw) stamps into it for each screen. The render shows the hatch of screen 91.
+
+#UDGTABLE { #PUSHShatch91 #POKES($99A9,#PEEK($9A38))#POKES($99AA,#PEEK($9A39))#POKES($99AC,#PEEK($9A3A))#POKES($99AD,#PEEK($9A3B))#POKES($99AF,#PEEK($9A3C))#POKES($99B0,#PEEK($9A3D))#POKES($99B2,#PEEK($9A3E))#POKES($99B3,#PEEK($9A3F))#POKES($99B5,#PEEK($9A40))#POKES($99B6,#PEEK($9A41))#POKES($99B8,#PEEK($9A42))#POKES($99B9,#PEEK($9A43))#POKES($99BB,#PEEK($9A44))#POKES($99BC,#PEEK($9A45))#POKES($99BE,#PEEK($9A46))#POKES($99BF,#PEEK($9A47))#POKES($99C7,#PEEK($9A28))#POKES($99C8,#PEEK($9A29))#POKES($99CA,#PEEK($9A2A))#POKES($99CB,#PEEK($9A2B))#POKES($99CD,#PEEK($9A2C))#POKES($99CE,#PEEK($9A2D))#POKES($99D0,#PEEK($9A2E))#POKES($99D1,#PEEK($9A2F))#POKES($99D3,#PEEK($9A30))#POKES($99D4,#PEEK($9A31))#POKES($99D6,#PEEK($9A32))#POKES($99D7,#PEEK($9A33))#POKES($99D9,#PEEK($9A34))#POKES($99DA,#PEEK($9A35))#POKES($99DC,#PEEK($9A36))#POKES($99DD,#PEEK($9A37))#UDGARRAY3,,4,3($99A0-$99D2-1-24)(hatch_screen_91)#POPS } { On screen 91 } TABLE#
+
+#UDGTABLE { #UDGARRAY2,,4,2($99E8-$99E9-1-16)(hatch_pattern_1) | #UDGARRAY2,,4,2($99F8-$99F9-1-16)(hatch_pattern_2) | #UDGARRAY2,,4,2($9A08-$9A09-1-16)(hatch_pattern_3) | #UDGARRAY2,,4,2($9A18-$9A19-1-16)(hatch_pattern_4) | #UDGARRAY2,,4,2($9A28-$9A29-1-16)(hatch_pattern_5) | #UDGARRAY2,,4,2($9A38-$9A39-1-16)(hatch_pattern_6) | #UDGARRAY2,,4,2($9A48-$9A49-1-16)(hatch_pattern_7) | #UDGARRAY2,,4,2($9A58-$9A59-1-16)(hatch_pattern_8) } { Pattern 1 | Pattern 2 | Pattern 3 | Pattern 4 | Pattern 5 | Pattern 6 | Pattern 7 | Pattern 8 } TABLE#
+
+[Graphic:animated-graphic:Animated graphic]
+The #R$95D0(frames of the animated graphic) in the order the game shows them.
+
+#UDGARRAY3,,3($95D0-$9610-8)(*g_animated_1) #UDGARRAY3,,3($9618-$9658-8)(*g_animated_2) #UDGARRAY3,,3($9660-$96A0-8)(*g_animated_3) #UDGARRAY3,,3($96A8-$96E8-8)(*g_animated_4) #UDGARRAY3,,3($96F0-$9730-8)(*g_animated_5) #UDGARRAY3,,3($9738-$9778-8)(*g_animated_6) #UDGARRAY3,,3($9780-$97C0-8)(*g_animated_7) #UDGARRAY3,,3($97C8-$9808-8)(*g_animated_8)
+
+#UDGTABLE { #FRAMES(g_animated_1,10;g_animated_2;g_animated_3;g_animated_4;g_animated_5;g_animated_6;g_animated_7;g_animated_8)(animated_graphic) } TABLE#
+
+[Graphic:skimmer:The Skimmer]
+The Skimmer #R$8800(the right way up) and #R$8D60(flipped), at each horizontal offset from its cell's left edge.
+
+#UDGTABLE { #UDGARRAY4,7,3,4,,,,2($8800-$8843-1-32:$8980-$89C3-1-32)(skimmer_image_1) | #UDGARRAY4,7,3,4,,,,2($8860-$88A3-1-32:$89E0-$8A23-1-32)(skimmer_image_2) | #UDGARRAY4,7,3,4,,,,2($88C0-$8903-1-32:$8A40-$8A83-1-32)(skimmer_image_3) | #UDGARRAY4,7,3,4,,,,2($8920-$8963-1-32:$8AA0-$8AE3-1-32)(skimmer_image_4) } { At the cell edge | 2 pixels right | 4 pixels right | 6 pixels right } TABLE#
+
+#UDGTABLE { #UDGARRAY4,7,3,4,,,,2($8D60-$8DA3-1-32:$8980-$89C3-1-32)(skimmer_flipped_1) | #UDGARRAY4,7,3,4,,,,2($8DC0-$8E03-1-32:$89E0-$8A23-1-32)(skimmer_flipped_2) | #UDGARRAY4,7,3,4,,,,2($8E20-$8E63-1-32:$8A40-$8A83-1-32)(skimmer_flipped_3) | #UDGARRAY4,7,3,4,,,,2($8E80-$8EC3-1-32:$8AA0-$8AE3-1-32)(skimmer_flipped_4) } { At the cell edge | 2 pixels right | 4 pixels right | 6 pixels right } TABLE#
+
+[Graphic:flip:The Skimmer's flip]
+The #R$8B20(flip frames), between the Skimmer the right way up and flipped. The game shows them in the same order for a flip either way.
+
+#UDGARRAY4,7,3,4,,,,2($8800-$8843-1-32:$8980-$89C3-1-32)(*g_skimmer) #UDGARRAY4,7,3,4,,,,2($8B20-$8B63-1-32:$8C40-$8C83-1-32)(*g_flip_1) #UDGARRAY4,7,3,4,,,,2($8B80-$8BC3-1-32:$8CA0-$8CE3-1-32)(*g_flip_2) #UDGARRAY4,7,3,4,,,,2($8BE0-$8C23-1-32:$8D00-$8D43-1-32)(*g_flip_3) #UDGARRAY4,7,3,4,,,,2($8D60-$8DA3-1-32:$8980-$89C3-1-32)(*g_flipped)
+
+#UDGTABLE { #FRAMES(g_skimmer,60;g_flip_1,8;g_flip_2;g_flip_3;g_flipped,60;g_flip_1,8;g_flip_2;g_flip_3)(skimmer_flip) } TABLE#
+
+[Graphic:shots:Shots]
+The #R$9DC8(graphics) of the pulse laser shot and the hostile objects' shot, in each direction.
+
+#UDGTABLE { =h,c4 Pulse laser shot | =h,c4 Hostile objects' shot } { #UDG$9DC8,66,4(shot_graphic_1) | #UDG$9DD0,66,4(shot_graphic_2) | #UDG$9DD8,66,4(shot_graphic_3) | #UDG$9DE0,66,4(shot_graphic_4) | #UDG$9DE8,70,4(shot_graphic_5) | #UDG$9DF0,70,4(shot_graphic_6) | #UDG$9DF8,70,4(shot_graphic_7) | #UDG$9E00,70,4(shot_graphic_8) } { Left | Right | Up | Down | Left | Right | Up | Down } TABLE#
+
+[Graphic:hostile-objects:Hostile objects]
+The #R$9A88(designs) that the hostile objects take, drawn through their masks.
+
+#UDGTABLE { #UDGARRAY2,7,4,2,,,,2($9A88-$9A99-1-16:$9AA8-$9AB9-1-16)(hostile_design_1) | #UDGARRAY2,7,4,2,,,,2($9AC8-$9AD9-1-16:$9AE8-$9AF9-1-16)(hostile_design_2) | #UDGARRAY2,7,4,2,,,,2($9B08-$9B19-1-16:$9B28-$9B39-1-16)(hostile_design_3) | #UDGARRAY2,7,4,2,,,,2($9B48-$9B59-1-16:$9B68-$9B79-1-16)(hostile_design_4) | #UDGARRAY2,7,4,2,,,,2($9B88-$9B99-1-16:$9BA8-$9BB9-1-16)(hostile_design_5) | #UDGARRAY2,7,4,2,,,,2($9BC8-$9BD9-1-16:$9BE8-$9BF9-1-16)(hostile_design_6) | #UDGARRAY2,7,4,2,,,,2($9C08-$9C19-1-16:$9C28-$9C39-1-16)(hostile_design_7) } { #UDGARRAY2,7,4,2,,,,2($9C48-$9C59-1-16:$9C68-$9C79-1-16)(hostile_design_8) | #UDGARRAY2,7,4,2,,,,2($9C88-$9C99-1-16:$9CA8-$9CB9-1-16)(hostile_design_9) | #UDGARRAY2,7,4,2,,,,2($9CC8-$9CD9-1-16:$9CE8-$9CF9-1-16)(hostile_design_10) | #UDGARRAY2,7,4,2,,,,2($9D08-$9D19-1-16:$9D28-$9D39-1-16)(hostile_design_11) | #UDGARRAY2,7,4,2,,,,2($9D48-$9D59-1-16:$9D68-$9D79-1-16)(hostile_design_12) | #UDGARRAY2,7,4,2,,,,2($9D88-$9D99-1-16:$9DA8-$9DB9-1-16)(hostile_design_13) } TABLE#
+
+[Graphic:explosion:Explosion]
+A hostile object's explosion at the cell edge, in the order of its #R$9E08(frames), through #R$9F58(the explosion mask) for that offset.
+
+#UDGARRAY3,70,4,3,,,,2($9E08-$9E22-1-24:$9F58-$9F72-1-24)(*g_explosion_1) #UDGARRAY3,70,4,3,,,,2($9E38-$9E52-1-24:$9F58-$9F72-1-24)(*g_explosion_2) #UDGARRAY3,70,4,3,,,,2($9E68-$9E82-1-24:$9F58-$9F72-1-24)(*g_explosion_3) #UDGARRAY3,70,4,3,,,,2($9E98-$9EB2-1-24:$9F58-$9F72-1-24)(*g_explosion_4) #UDGARRAY3,70,4,3,,,,2($9EC8-$9EE2-1-24:$9F58-$9F72-1-24)(*g_explosion_5) #UDGARRAY3,70,4,3,,,,2($9EF8-$9F12-1-24:$9F58-$9F72-1-24)(*g_explosion_6) #UDGARRAY3,70,4,3,,,,2($9F28-$9F42-1-24:$9F58-$9F72-1-24)(*g_explosion_7)
+
+#UDGTABLE { #FRAMES(g_explosion_1,8;g_explosion_2;g_explosion_3;g_explosion_4;g_explosion_5;g_explosion_6;g_explosion_7)(explosion) } TABLE#
+
+[Graphic:shield-loss:Shield loss]
+The #R$8EE0(shield loss frames) as the game shows them: frames 2–8, since a defect in #R$CBC6(the Skimmer's draw) skips the first.
+
+#UDGARRAY4,7,3,4,,,,2($8FA0-$8FE3-1-32:$9000-$9043-1-32)(*g_loss_2) #UDGARRAY4,7,3,4,,,,2($9060-$90A3-1-32:$90C0-$9103-1-32)(*g_loss_3) #UDGARRAY4,7,3,4,,,,2($9120-$9163-1-32:$9180-$91C3-1-32)(*g_loss_4) #UDGARRAY4,7,3,4,,,,2($91E0-$9223-1-32:$9240-$9283-1-32)(*g_loss_5) #UDGARRAY4,7,3,4,,,,2($92A0-$92E3-1-32:$9300-$9343-1-32)(*g_loss_6) #UDGARRAY4,7,3,4,,,,2($9360-$93A3-1-32:$93C0-$9403-1-32)(*g_loss_7) #UDGARRAY4,7,3,4,,,,2($9420-$9463-1-32:$9480-$94C3-1-32)(*g_loss_8)
+
+#UDGTABLE { #FRAMES(g_loss_2;g_loss_3;g_loss_4;g_loss_5;g_loss_6;g_loss_7;g_loss_8,8;g_skimmer,60)(shield_loss) } TABLE#
+
+[Graphic:inner-section-graphics:Inner section graphics]
+The #R$A860(graphics of the inner sections), under their graphic numbers.
+
+#UDGTABLE { #UDGARRAY1,,2($A860-$A860-8)(inner_graphic_0) | #UDGARRAY1,,2($A868-$A868-8)(inner_graphic_1) | #UDGARRAY1,,2($A870-$A870-8)(inner_graphic_2) | #UDGARRAY1,,2($A878-$A878-8)(inner_graphic_3) | #UDGARRAY6,,2($A880-$A908-8)(inner_graphic_4) | #UDGARRAY6,,2($A910-$A998-8)(inner_graphic_5) } { 0 | 1 | 2 | 3 | 4 | 5 } { #UDGARRAY5,,2($A9A0-$AA10-8)(inner_graphic_6) | #UDGARRAY4,,2($AA18-$AA70-8)(inner_graphic_7) | #UDGARRAY4,,2($AA78-$AAD0-8)(inner_graphic_8) | #UDGARRAY4,,2($AAD8-$AB30-8)(inner_graphic_9) | #UDGARRAY3,,2($AB38-$ABC0-8)(inner_graphic_10) | #UDGARRAY3,,2($ABC8-$AC38-8)(inner_graphic_11) } { 6 | 7 | 8 | 9 | 10 | 11 } { #UDGARRAY3,,2($AC40-$ACB0-8)(inner_graphic_12) | #UDGARRAY3,,2($ACB8-$AD10-8)(inner_graphic_13) | #UDGARRAY3,,2($AD18-$AD70-8)(inner_graphic_14) | #UDGARRAY3,,2($AD78-$ADD0-8)(inner_graphic_15) | #UDGARRAY5,,2($ADD8-$AE98-8)(inner_graphic_16) | #UDGARRAY2,,2($AEA0-$AEB8-8)(inner_graphic_17) } { 12 | 13 | 14 | 15 | 16 | 17 } TABLE#
+
+[Graphic:unused-graphics:Unused graphics]
+Graphics that nothing in the game draws: #R$9810(graphics in cell order) and #R$9A68(unused hatch patterns).
+
+#UDGTABLE { #UDGARRAY3,,3($9810-$9838-8)(unused_graphic_1) | #UDGARRAY3,,3($9840-$9868-8)(unused_graphic_2) | #UDGARRAY3,,3($9870-$9898-8)(unused_graphic_3) | #UDGARRAY2,,3($98A0-$98B8-8)(unused_graphic_4) | #UDGARRAY2,,3($98C0-$98D8-8)(unused_graphic_5) | #UDGARRAY2,,3($98E0-$98F8-8)(unused_graphic_6) | #UDGARRAY2,,3($9900-$9918-8)(unused_graphic_7) | #UDGARRAY2,,3($9920-$9938-8)(unused_graphic_8) | #UDGARRAY2,,3($9940-$9958-8)(unused_graphic_9) | #UDGARRAY2,,3($9960-$9978-8)(unused_graphic_10) | #UDGARRAY2,,3($9980-$9998-8)(unused_graphic_11) } TABLE#
+
+#UDGTABLE { #UDGARRAY2,,4,2($9A68-$9A69-1-16)(unused_hatch_pattern_1) | #UDGARRAY2,,4,2($9A78-$9A79-1-16)(unused_hatch_pattern_2) } TABLE#

@@ -43,18 +43,6 @@ message = "4445 bytes with no sub-directive - the record size is stated in prose
 [[finding]]
 check = "array-elements"
 kind = "UNDECLARED"
-at = "$A0D9"
-message = "86 bytes with no sub-directive - the record size is stated in prose only, so no element is annotated"
-
-[[finding]]
-check = "array-elements"
-kind = "UNDECLARED"
-at = "$A2B8"
-message = "3400 bytes with no sub-directive - the record size is stated in prose only, so no element is annotated"
-
-[[finding]]
-check = "array-elements"
-kind = "UNDECLARED"
 at = "$F009"
 message = "769 bytes with no sub-directive - the record size is stated in prose only, so no element is annotated"
 
@@ -87,30 +75,6 @@ check = "data-structure"
 kind = "UNTYPED"
 at = "$6B75"
 message = "4445 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
-
-[[finding]]
-check = "data-structure"
-kind = "UNTYPED"
-at = "$7CD4"
-message = "9123 of 9219 bytes fall outside every render's extent, the first at $7CD4. The macros draw 96 bytes and declare nothing about the rest. Fix it in this order: widen the render; state the record length the code walks; never a width chosen to clear this check"
-
-[[finding]]
-check = "data-structure"
-kind = "UNTYPED"
-at = "$A0D9"
-message = "86 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
-
-[[finding]]
-check = "data-structure"
-kind = "UNTYPED"
-at = "$A131"
-message = "390 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
-
-[[finding]]
-check = "data-structure"
-kind = "UNTYPED"
-at = "$A2B8"
-message = "3400 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
 
 [[finding]]
 check = "data-structure"
@@ -177,48 +141,6 @@ check = "identity"
 kind = "UNTITLED"
 at = "$7CD2"
 message = "`s $7CD2` has no title and publishes as a page headed \"Unused RAM at 7CD2\". Either it is one field split out of the record above it (b $6B75), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED"
-at = "$7CD4"
-message = "`b $7CD4` has no title and publishes as a page headed \"Data at 7CD4\". Either it is one field split out of the record above it (s $7CD2), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED"
-at = "$A0D7"
-message = "`s $A0D7` has no title and publishes as a page headed \"Unused RAM at A0D7\". Either it is one field split out of the record above it (b $7CD4), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED"
-at = "$A0D9"
-message = "`b $A0D9` has no title and publishes as a page headed \"Data at A0D9\". Either it is one field split out of the record above it (s $A0D7), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED"
-at = "$A12F"
-message = "`s $A12F` has no title and publishes as a page headed \"Unused RAM at A12F\". Either it is one field split out of the record above it (b $A0D9), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED"
-at = "$A131"
-message = "`b $A131` has no title and publishes as a page headed \"Data at A131\". Either it is one field split out of the record above it (s $A12F), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED"
-at = "$A2B7"
-message = "`s $A2B7` has no title and publishes as a page headed \"Unused RAM at A2B7\". Either it is one field split out of the record above it (b $A131), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED"
-at = "$A2B8"
-message = "`b $A2B8` has no title and publishes as a page headed \"Data at A2B8\". Either it is one field split out of the record above it (s $A2B7), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
 
 [[finding]]
 check = "identity"
