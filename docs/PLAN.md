@@ -76,23 +76,14 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | Address       | Open question                                 |
 |:--------------|:----------------------------------------------|
 | whole image   | Sectors 2–3 and game end coverage (FuseX)     |
-| screens       | Renders show every defence device standing (graphic 150) |
-| inline audio  | Tune part clips need `$F30A` in the tune snapshot (the `$F009` rows hold the introduction, bridge and noise run clips) |
-| `$F493`       | How deep does the stack grow from `$F7F8`? |
 | `$F30A`       | Render both tune parts here (blocked by SYNTH_ECHO on the schema) |
-| glossary      | Add "slide" and "noise run" (DEF-6)           |
 | gate          | The gate's linters skip `src/tune.ctl`; wire them in |
-| `tune`        | Raw operands in the tune listing (`operand_subs` reads only the main skool) |
 | lint-prose    | Vale is not installed, so the prose lint never runs |
-| `$99A0`       | Render the hatch at opening steps with the GX1 decoder |
-| graphic 35    | Names for graphics 77–79 and 86–87, cells of hatchway graphic 35 |
-| decoder       | Render graphic 24 with its dropped cell, and 104–109 in their colour patterns |
 
 ### Names
 
 | Subject        | Open question                                 |
 |:---------------|:----------------------------------------------|
-| hostile object | Register the name rulings in the glossary     |
 | `$95D0`        | Game name for the animated 3×3 graphic        |
 
 ### Skill (upstream)
@@ -108,6 +99,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | SYNTH_ECHO        | Fires on a data entry's field schema beside a clip (`$F30A`) |
 | `coverage`        | Counts a bare well-named JP or CALL (ENT-7) as skeletal (`$61FD`, `$B000`, `$CD86`) |
 | label-namespace   | Roots miss the game loop                         |
+| `operand_subs`    | Wraps only the main skool's parser: the tune listing keeps raw operands; `LinkOperands` skips `LD` |
 | theme.css         | `*{padding:0}` leaves `#UDGTABLE`/`#TABLE` cells unpadded: captions touch |
 | theme.css         | Code-face rule `a[href*="asm/"]` misses same-listing links |
 | theme.css         | Catalog section cards alternate background by position (VIS-2) |
@@ -251,6 +243,14 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B5F6`  | No: shading twice changes nothing (24 screens simulated) |
 | layouts  | Every screen and the hull map rendered by the game's own code |
 | `#AUDIO`  | Sound page: every effect and the whole tune, from the game's own code |
+| glossary | "slide" and "noise run" defined (DEF-6)             |
+| hostile object | Name rulings in the Write/Not registry; frame, structure, hatch, cover, picture kept out (NAME-2) |
+| `$99A0`  | Opening steps run by the game's code, on the Graphics page |
+| decoder  | Graphic 24 and 104–109 rendered from screens 64, 0, 10 at `$645C` |
+| graphic 35 | No code-backed name: drawn as plain 1×1 graphics   |
+| screens  | Render is right: `start_game` zeroes the device flags |
+| inline audio | `$F30A–$F45E` in the tune snapshot; part clips at `$F021`, `$F030` |
+| `$F493`  | Stack reaches no lower than `$F7BC` (60 bytes); `$F493–$F7BB` unused |
 | `$BE3F`  | Unreachable: C is always 3, so the push is down and no shot launches (`$C8FE`) |
 | `$C8C4`  | BUG note: a hostile shot fired right stops at column 30 |
 | `$D08A`  | A pass crossing two edges leaves by the side one, or by neither when that side edge is the map's |

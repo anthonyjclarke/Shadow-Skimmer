@@ -32,15 +32,30 @@ on the right never name that thing, in a label, a title or a sentence.
 
 #TABLE(default)
 { =h Write | =h Not }
+{ attribute mirror | cell map }
+{ background store | backdrop }
 { control panel | status bar, status panel, scoreboard, dashboard, HUD }
 { Damage Report Indicator | damage meter, damage bar, health bar, energy bar }
 { defence device | defense device, defense, boss }
 { flip, flipped | barrel roll, inverted flight, upside-down mode }
 { hatchway | hatch-way, trapdoor, trap door, airlock }
+{ hostile object | drone, drones, enemy, enemies, robot, robots }
+{ image | sprite, sprites }
 { mothership | mother ship, mother-ship, liner, liners, starship }
+{ play area | playfield, play field }
 { pulse laser | laser cannon, laser gun, blaster }
+{ pulse laser shot | pulse-laser shot }
 { sector | hull-sector }
 { shield | energy shield }
 { Skimmer | craft, spaceship, spacecraft }
 { structure | obstacle, obstacles }
 TABLE#
+
+[Term:noise-run:Noise run]
+The stage that closes each round of the title tune, after its second part.
+#R$F0E2@tune(The play of the noise run) times its pulses from bytes of the
+ROM.
+
+[Term:slide:Slide]
+A sound of two or three tones in the title tune's introduction or bridge. It
+plays from one record of #R$F043@tune(the title tune slides), which says how.

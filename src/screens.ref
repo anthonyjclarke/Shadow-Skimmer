@@ -8,7 +8,9 @@ SectionPrefix=Screen
 
 [Screen:hull-map:Hull map]
 Every screen of the outer hull, drawn as at #R$D8DC(the outer hull layouts). The
-screens sit where #R$CE86(the hull map) puts them, from screen 0 at the top left.
+screens sit where #R$CE86(the hull map) puts them, from screen 0 at the top left. The
+renders draw each screen as a new game finds it, when every #R$BD40(defence
+device) stands.
 
 #HTML(<div style="overflow-x: auto">)#UDGTABLE { #CALL(hull_map(hull_map)) } TABLE##HTML(</div>)
 

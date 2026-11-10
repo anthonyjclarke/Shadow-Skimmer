@@ -4,6 +4,7 @@
 
 ### Added
 
+- The hatch of screen 91 opening step by step, graphic 24 with its dropped cell and graphics 104–109 in their colour patterns, each drawn by the game's own code; the tune parts as clips in the tune listing; "slide" and "noise run" in the glossary, and the project's name rulings in its Write/Not registry.
 - Sound clips inline at the code that makes each sound: the shot (`$BE1E`), the explosion (`$C44B`), the title tune (`$F000`) and the introduction, bridge and noise run in the tune listing.
 - Graphics engine documented in depth (`$B080–$B3AF`): cell addresses, the graphic directory fields, cell masks, colour patterns, the pixel, colour, mark and shadow passes, with every basic block commented.
 - Behaviour specification (`spec/*.md`, published on the site by `tools/spec_pages.py`, kept in this repo by owner ruling until the skill takes a generic converter): architecture, game flow, the hull, graphics, the control panel, the Skimmer, controls, hostile objects, shots, collisions, the economy, the score, effects and sound, and the state, actions, dynamics and rewards for an agent.
@@ -31,6 +32,7 @@
 
 ### Changed
 
+- The stack is bounded at 60 bytes from the code (`$F7BC–$F7F7`); `$F493–$F7BB` is typed unused.
 - Entry structure: the graphic plotters, shadow casters, shot routines, Skimmer draw loops, `flag_interrupt` and `add_hostile` are their own entries with register rows; `move_skimmer_left` is one entry; `$F473` is split into unused bytes, `copy_new_keys`, the stack and the hostile object slots with their layout; `$BD13` and `$BD21` are words; `hostile_pixel_offset` is now `hostile_x_shift`.
 - Site pass: the Screens page shows two screens across and fits an 800 px window; `g` pages are headed "Variables"; links into the tune listing use the code face.
 

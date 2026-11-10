@@ -3,22 +3,31 @@
 ; to build/tune_player.bin, and the Makefile disassembles that file with this
 ; control file into build/tune.skool, the "tune" code of the site (src/tune.ref).
 ; Addresses are the game's own, so they match the main listing.
+;
+; The file ends with the title tune notes from $F30A to $F45E, as the snapshot
+; holds them. They are an `i` block: the main listing documents them, and here
+; they only put the second part's notes, and the end of the first part's, into
+; the listing's memory, so its clips play each part to its end.
 @ $F009 rom
 @ $F009 label=perform_title_tune
 c $F009 Title tune player
 D $F009 Plays the title tune: its introduction once, then its two parts over and over until the player presses a key. It encrypts itself again before it returns.
 N $F009 #TABLE(default) { =h Stage | =h Played by | =h Data } { Introduction | #R$F0A2, #R$F06C | #R$F043 to #R$F05C } { First part | #R$F104 | #R$F1BF } { Bridge | #R$F06C | #R$F065 } { Second part | #R$F104 | #R$F30A@main(the title tune notes) } { Noise run | #R$F0E2 | ROM bytes } TABLE#
 N $F009 After the noise run the tune starts again at its first part. A key stops it at the end of any note of the two parts.
-N $F009 The T-state counts of the tone and noise players leave out the ULA's waits. Each OUT to port $FE waits up to 6 T-states more while the ULA reads the display. The ULA does so for 128 T-states of each of the 192 display lines of a frame.
+N $F009 The T-state counts of the tone and noise players leave out the ULA's waits. Each OUT to port $FE waits up to 6 T-states more while the ULA reads the display. The ULA does so for 128 T-states of each of the screen's 192 display lines.
 N $F009 The clip plays the introduction.
 N $F009 #HTML(#PUSHS #AUDIO1,$F009,$F021(title-tune-introduction.wav)#POPS)
   $F009 Play the introduction: a three-tone slide, a two-tone slide, then two more three-tone slides.
+N $F021 The clip plays the first part.
+N $F021 #HTML(#PUSHS #AUDIO1,$F021,$F027(title-tune-first-part.wav)#POPS)
 @ $F021 label=tune_repeat
   $F021 Play the first part. Did the player press a key?
   $F028 If so, stop.
 N $F02A The clip plays the bridge.
 N $F02A #HTML(#PUSHS #AUDIO1,$F02A,$F030(title-tune-bridge.wav)#POPS)
   $F02A Play the bridge, a two-tone slide.
+N $F030 The clip plays the second part.
+N $F030 #HTML(#PUSHS #AUDIO1,$F030,$F037(title-tune-second-part.wav)#POPS)
   $F030 Play the second part, whose notes follow the first part's in #R$F30A@main(the title tune notes). Did the player press a key?
   $F037 If so, stop.
 N $F039 The clip plays the noise run.
@@ -192,6 +201,7 @@ R $F154 I:L length in units of 256 passes
 @ $F1BF label=tune_part_1
 b $F1BF Title tune notes, start of the first part
 D $F1BF The first notes of the title tune's first part. The part runs on into #R$F30A@main(the title tune notes), where the note format is.
-N $F1BF #HTML(#AUDIO1,$F021,$F027(title-tune-part-1-start.wav))
 B $F1BF,330,3 Notes
 B $F309,1 Period of the first tone of the note that ends in #R$F30A@main(the title tune notes)
+i $F30A
+B $F30A,341
