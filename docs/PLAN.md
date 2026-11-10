@@ -8,13 +8,13 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Item                | State                                     |
 |:--------------------|:------------------------------------------|
-| Phase               | 4 – catalogs: graphics (sprite block)     |
+| Phase               | 4 – catalogs: sound                       |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
 | Baseline findings   | 9                                         |
 | Routines to the bar | 118 of 121 (3 flagged only for a bare well-named JP or CALL) |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
-| Catalogs            | graphics: sprite block; sound, data: not started |
+| Catalogs            | graphics, screens, sound                  |
 | Behaviour spec      | not started                               |
 | Relocatability      | label-clean; unproven                     |
 
@@ -24,7 +24,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Target              | Lane | State                                |
 |:--------------------|:-----|:-------------------------------------|
-| Graphics GX1b layouts, screens, hull map | catalog | review |
+| Sound catalog `src/sound.ref` | audio | review |
 
 ---
 
@@ -89,7 +89,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$FF70`       | Cover map `$FF` is the map's page byte (relocation) |
 | `$F840`       | Label the hostile slots' state bytes (split `$F473`) |
 | `$D219`       | Note the movement flag +1 in the `D`          |
-| `$D2B5`       | Snapshot `$01` sets a blue border on the first click? |
 | `$C845`       | Push sets speed ±3 without new rates: visible? |
 | `$CF9E`       | Dead `LD A,n` loads before calls: note them?  |
 | `$C204`       | Split `add_hostile` into its own entry        |
@@ -105,13 +104,15 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$CD89`       | Split into its own entry for `R` rows         |
 | `$CBF3`       | Split the shared draw loop for its contract   |
 | `$CC57`       | Split for `R` rows                            |
-| `$CC3C`       | Does the click rate depend on the dummy read? |
 | site theme    | `#UDGTABLE` cells have no padding: captions touch (`$CD9C`, `$9520`) |
 | `$C28D`       | "pixel offset" → "horizontal offset" in the hostile entries |
 | `$CDC8`       | Split the unused first frame into its own `u` block? |
 | `$BE3F`       | Is the range `$FF` write reachable? Only via `$C8FE` (C AND 3 = 2) |
 | screens       | Renders show every defence device standing (graphic 150) |
 | graphics      | List the graphics no layout places on the Graphics page? |
+| inline audio  | Add `#AUDIO` at the owning blocks (`$BE1E`/`$CBA8`, `$C44B`, tune routines) |
+| `$D10D`       | A shot launched during the hatchway animation clicks silently |
+| Screens page  | 833 px wide at an 800 px window (3-across grid) |
 | `$C8FE`       | Can C AND 3 be 2 after `update_hostile`? Shot with range 255 |
 | `$B04F`       | Split `$B04F`, `$BE1E`, `$BE4D` into entries for `R` rows |
 | `$BD13`       | Merge `$BD13/$BD14`, `$BD21/$BD22` into words (`@ssub` at `$B5BD`, `$B60D`, `$B4C5`) |
@@ -120,7 +121,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$F154`       | Crosswise counter reloads in the three-tone player: quirk? |
 | `$F11E`       | Tone formulas assume no contended port wait states |
 | `$F30A`       | Render both tune parts here (blocked by SYNTH_ECHO on the schema); link `#R$F1BF@tune` |
-| `#AUDIO`      | Render the intro slides, the bridge, the noise run and the in-game clicks |
 | glossary      | Add "slide" and "noise run" (DEF-6)           |
 | gate          | The gate's linters skip `src/tune.ctl`; wire them in |
 | `tune`        | Raw operands in the tune listing (`operand_subs` reads only the main skool) |
@@ -292,3 +292,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$E141`  | Bug: the stray run flag leaves the shadow switch set, so screen 55's last graphic casts no shadow |
 | `$B5F6`  | No: shading twice changes nothing (24 screens simulated) |
 | layouts  | Every screen and the hull map rendered by the game's own code |
+| `#AUDIO`  | Sound page: every effect and the whole tune, from the game's own code |
+| `$D2CE`  | Clicks follow either side's shot; comments say "a shot" |
+| `$CC3C`  | The dummy read keeps the click rate independent of cover |
+| `$D2B5`  | No: the snapshot's `$01` never reaches the port     |

@@ -4,7 +4,7 @@
 ; [Index:...], [Paths], [Links] and [Titles] lines, as it is written.
 
 [Config]
-RefFiles=glossary.ref;workspace.ref;graphics.ref;screens.ref;tune.ref
+RefFiles=glossary.ref;workspace.ref;graphics.ref;screens.ref;sound.ref;tune.ref
 GameDir=shadskim
 ; #DRAWSCREEN(column,row,inside) draws one screen with the game's own code in
 ; SkoolKit's simulator: the screen clear, then the screen entry of the play
@@ -34,6 +34,7 @@ Copyright=Game &copy; 1987 The Edge / Softek. Disassembly for preservation and s
 Glossary
 Graphics
 Screens
+Sound
 Workspace
 tune-Index
 
@@ -42,6 +43,7 @@ CodeFiles={address:04X}.html
 Glossary=reference/glossary.html
 Graphics=reference/graphics.html
 Screens=reference/screens.html
+Sound=reference/sound.html
 Workspace=reference/workspace.html
 tune-Index=tune/index.html
 
@@ -49,6 +51,7 @@ tune-Index=tune/index.html
 Glossary=Glossary
 Graphics=Graphics
 Screens=Screens
+Sound=Sound
 Workspace=Workspace
 tune-Index=Title tune player
 
@@ -56,5 +59,6 @@ tune-Index=Title tune player
 Glossary=Glossary
 Graphics=Graphics
 Screens=Screens
+Sound=Sound
 Workspace=Workspace
 tune-Index=Title tune player

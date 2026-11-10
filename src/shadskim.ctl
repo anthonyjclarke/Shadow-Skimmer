@@ -3649,7 +3649,7 @@ N $CF92 The play loop. Each pass waits for an interrupt, so the game runs at mos
   $CF98 Wait for the next interrupt.
   $CF9C Clear the flag for the next one.
   $CF9E Handle the fire key. It ignores the value in #REGa.
-  $CFA3 Let the Skimmer draw click the speaker while a pulse laser shot's clicks run.
+  $CFA3 Let the Skimmer draw click the speaker while a shot's clicks run.
 @ $CFA6 ssub=LD ($CC0A+1),A
   $CFA9 Did the Damage Report Indicator run out, so that a shield loss is due? The first load has no effect.
   $CFB0 Jump if not
@@ -3740,7 +3740,7 @@ N $D08A A step across an edge of the screen leads to the next screen on the hull
   $D10D Stop the Skimmer draw's clicks.
 @ $D10F ssub=LD ($CC0A+1),A
 N $D112 Every pass runs the rest, the passes of the hatchway animation too.
-  $D112 Count down the clicks of a pulse laser shot. When they end, switch off their click row too.
+  $D112 Count down the clicks of a shot. When they end, switch off their click row too.
 @ $D120 label=run_tasks
   $D120 Clear the speaker byte. No routine of the pass reads #REGa, so each load into it before a call has no effect.
   $D138 Keep the controls in force.
@@ -3932,7 +3932,7 @@ B $D2CC,1 Hold count of the hostile objects, $FE or $FF during a hold and 0 with
 @ $D2CD label=shot_click_row
 B $D2CD,1 First pixel row of a cell at which the Skimmer draw clicks the speaker, 0 for every row and $FE or $FF for none
 @ $D2CE label=shot_click_time
-B $D2CE,1 Passes of the play loop left in the clicks of a pulse laser shot, 0 when none run
+B $D2CE,1 Passes of the play loop left in the clicks of a shot, from either side, 0 when none run
 @ $D2CF label=skimmer_image_set
 W $D2CF,2 Address of the entries of #R$CD9C(the Skimmer image addresses) in use, normal or flipped
 @ $D2D1 label=flip_step

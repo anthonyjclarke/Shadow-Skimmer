@@ -1,0 +1,70 @@
+; The sound catalog: one section for each sound the game makes, in the order
+; the game first plays them, the title tune and its stages kept together. Each
+; clip runs the game's own code in SkoolKit's simulator (#AUDIO sim mode), so it
+; plays what that code sends to the speaker. #SIM and #POKES set up the state,
+; and #PUSHS/#POPS keep each section's set-up out of the next one.
+;
+; The title tune player is encrypted in the program image, so each tune clip
+; first runs the game's own decrypt ($F45F) as a #SIM. Its clip then runs a
+; stretch of the decrypted player ($F009 on) with its own start and stop.
+;
+; The in-game clips start a game as the main loop does: its set-up from $BAC6
+; to the title tune, then the start of a game from $BB17 to the play loop
+; ($CF92). They run on through the play loop with interrupts (execint), so the
+; gaps between passes are the game's own.
+;   Shot: play runs on to the first launch of a hostile objects' shot ($C906),
+;     then to the next pass, and the clip runs until the clicks end ($D11D).
+;   Explosion: play runs on to the first redraw of a hostile object ($C437),
+;     then to the next pass. Its state in slot 2 becomes $FF, as a hit sets it
+;     at $C328, and the clip runs until the explosion's last clicks ($C448).
+
+[Page:Sound]
+SectionPrefix=Audio
+
+[Audio:title-tune:Title tune]
+The title screen plays #R$F000(the title tune) until the player presses a key.
+The clip holds the tune's introduction and its first round.
+
+#PUSHS #SIM($F472,$F45F,1,sp=$F7F8)#AUDIO1,$F009,$F03E(title-tune.wav)#POPS
+
+[Audio:title-tune-introduction:Title tune introduction]
+Each play of the title tune starts with its introduction.
+#R$F009@tune(The title tune player) plays it from #R$F043@tune(its slides).
+
+#PUSHS #SIM($F472,$F45F,1,sp=$F7F8)#AUDIO1,$F009,$F021(title-tune-introduction.wav)#POPS
+
+[Audio:title-tune-first-part:Title tune first part]
+The first part of each round of the title tune. #R$F104@tune(The play of a
+part) takes its notes from #R$F1BF@tune(the first notes) on.
+
+#PUSHS #SIM($F472,$F45F,1,sp=$F7F8)#AUDIO1,$F021,$F027(title-tune-first-part.wav)#POPS
+
+[Audio:title-tune-bridge:Title tune bridge]
+The bridge between the two parts of each round of the title tune.
+#R$F06C@tune(The play of two-tone slides) plays #R$F065@tune(its slide).
+
+#PUSHS #SIM($F472,$F45F,1,sp=$F7F8)#AUDIO1,$F02A,$F030(title-tune-bridge.wav)#POPS
+
+[Audio:title-tune-second-part:Title tune second part]
+The second part of each round of the title tune. #R$F104@tune(The play of a
+part) takes its notes from #R$F30A(the title tune notes).
+
+#PUSHS #SIM($F472,$F45F,1,sp=$F7F8)#AUDIO1,$F030,$F037(title-tune-second-part.wav)#POPS
+
+[Audio:title-tune-noise-run:Title tune noise run]
+#R$F0E2@tune(The noise run) closes each round of the title tune.
+
+#PUSHS #SIM($F472,$F45F,1,sp=$F7F8)#AUDIO1,$F039,$F03E(title-tune-noise-run.wav)#POPS
+
+[Audio:shot:Shot]
+The launch of a shot, the Skimmer's pulse laser shot or the hostile objects'
+shot. #R$BE1E(The launch) sets it off, and #R$CBA8(the Skimmer's draw) plays it.
+The clip holds the launch of a hostile objects' shot.
+
+#PUSHS #SIM($BAEB,$BAC6,1)#SIM($CF92,$BB17)#SIM($C906,execint=1)#SIM($CF95,execint=1)#AUDIO1,$CF95,$D11D,1(shot.wav)#POPS
+
+[Audio:explosion:Explosion]
+The explosion of a hostile object. #R$C44B(Each step of the explosion) plays
+its part, and #R$C43E(the end of the explosion) closes it.
+
+#PUSHS #SIM($BAEB,$BAC6,1)#SIM($CF92,$BB17)#SIM($C437,execint=1)#SIM($CF95,execint=1)#POKES$F940,$FF#AUDIO1,$CF95,$C448,1(explosion.wav)#POPS
