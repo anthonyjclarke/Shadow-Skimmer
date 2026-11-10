@@ -100,3 +100,20 @@ restore: $(RESTORED)
 FUSE_APP ?= Fuse
 fuse: restore
 	open -a "$(FUSE_APP)" $(RESTORED)
+
+# --- The title tune player ($F009-$F309) -------------------------------------
+#
+# Those bytes are encrypted in the snapshot, so the main listing holds them as
+# data. tools/tune_player.py decrypts them, and src/tune.ctl disassembles the
+# result as a second code of the site, "tune" (src/tune.ref names its source).
+TUNE_BIN   = $(BUILD)/tune_player.bin
+TUNE_SKOOL = $(BUILD)/tune.skool
+
+$(TUNE_BIN): $(ORIGINAL) tools/tune_player.py tools/z80snap.py
+	@mkdir -p $(dir $@)
+	python3 tools/tune_player.py $< $@
+
+$(TUNE_SKOOL): $(TUNE_BIN) src/tune.ctl
+	sna2skool.py --hex -o 0xF009 --ctl src/tune.ctl $< > $@
+
+$(HTML_DIR)/.stamp: $(TUNE_SKOOL)

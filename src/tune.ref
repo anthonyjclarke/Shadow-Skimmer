@@ -1,0 +1,11 @@
+; The title tune player as the game runs it. Its bytes are encrypted in the
+; snapshot, so the main listing holds them as data; the Makefile decrypts them
+; (tools/tune_player.py) and disassembles them with src/tune.ctl into
+; build/tune.skool. This file makes that listing the "tune" code of the site.
+
+[OtherCode:tune]
+Source=tune.skool
+
+[MemoryMap:tune-Index]
+EntryTypes=bcgw
+Intro=The title tune player as the game runs it. #R$F009@main(Its bytes) are encrypted in the program image, and #R$F006@main(the routine that runs it) decrypts them before each play. The listing shows them decrypted, at the addresses they occupy.

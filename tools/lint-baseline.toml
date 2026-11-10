@@ -65,12 +65,6 @@ at = "$F30A"
 message = "341 bytes with no sub-directive - the record size is stated in prose only, so no element is annotated"
 
 [[finding]]
-check = "comments"
-kind = "STE_LENGTH"
-at = "shadskim.skool:these-bytes-are-code-xor-encrypted-in-…"
-message = "These bytes are code XOR-encrypted in place: #R$F45F decrypts them (key $41"
-
-[[finding]]
 check = "data-structure"
 kind = "UNTYPED"
 at = "$61A8"

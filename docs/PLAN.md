@@ -8,7 +8,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Item                | State                                     |
 |:--------------------|:------------------------------------------|
-| Phase               | 3 – depth pass, code complete             |
+| Phase               | 3 – depth pass, code and tune player      |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
 | Baseline findings   | 40                                        |
 | Routines to the bar | 118 of 121 (3 flagged only for a bare well-named JP or CALL) |
@@ -24,7 +24,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Target              | Lane | State                                |
 |:--------------------|:-----|:-------------------------------------|
-| Depth L `$B812–$BD43`, `$F000–$F472` | code | fixes; re-review |
+| Title tune player `$F009` (`src/tune.ctl`) | code | review |
 
 ---
 
@@ -70,7 +70,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Address       | Open question                                 |
 |:--------------|:----------------------------------------------|
-| `$F009`       | Decrypted listing of the title tune player (see `docs/RESEARCH.md`) |
 | `$F480`       | Split the key copy out of `b $F473` as code (moves `$F473` baseline keys) |
 | `$A020`       | One font entry (39 glyphs) and a render; `@ssub` at `$BB89` |
 | `$B16F`       | Label the panel patterns `$A758`/`$A7B8` in `$A2B8` |
@@ -133,7 +132,15 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$BD13`       | Merge `$BD13/$BD14`, `$BD21/$BD22` into words (`@ssub` at `$B5BD`, `$B60D`, `$B4C5`) |
 | `$BAC6`       | What is at `$F7F8–$F7FF`, above the stack's start? |
 | `$BB6D`       | Does any message wrap past column 31 within a third? |
-| `$F30A`       | Lay out the 3-byte note records with the title tune's `#AUDIO` render (stride rows need it) |
+| `$F154`       | Crosswise counter reloads in the three-tone player: quirk? |
+| `$F11E`       | Tone formulas assume no contended port wait states |
+| `$F30A`       | Render both tune parts here (blocked by SYNTH_ECHO on the schema); link `#R$F1BF@tune` |
+| `#AUDIO`      | Render the intro slides, the bridge, the noise run and the in-game clicks |
+| glossary      | Add "slide" and "noise run" (DEF-6)           |
+| gate          | The gate's linters skip `src/tune.ctl`; wire them in |
+| `tune`        | Raw operands in the tune listing (`operand_subs` reads only the main skool) |
+| `tune`        | Tune links use the prose face; try `tune-CodePath=tune/asm` |
+| lint-prose    | Vale is not installed, so the prose lint never runs |
 | `$E141`       | Screen 55's last record runs into the next layout |
 | `$C955`       | Counter value `$17` for the defence device    |
 | `$B363`       | Shadow edge tests use the layout cell, not the drawn one |
@@ -155,6 +162,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `verify-frag`     | Renders `game.skool`; baseline keys `shadskim`   |
 | `diff_entries.py` | Skips untracked files                            |
 | `rules.md`        | No DEF-6/VIS-11 exemption for the glossary boxes |
+| SYNTH_ECHO        | Fires on a data entry's field schema beside a clip (`$F30A`) |
 | `coverage`        | Counts a bare well-named JP or CALL (ENT-7) as skeletal (`$61FD`, `$B000`, `$CD86`) |
 | label-namespace   | Roots miss the game loop                         |
 
@@ -271,3 +279,5 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$BC1F`  | Three 8-byte sets: flip, fire, up, down, left, right |
 | `$B812`  | No: every cell it tests holds mark 1               |
 | `$BBA2`  | `R` row O:A gives the control bits                 |
+| `$F009`  | Decrypted listing published as `tune` (`src/tune.ctl`, `tools/tune_player.py`) |
+| `$F1BF`  | `#AUDIO` render from the game's own code (simulator) |

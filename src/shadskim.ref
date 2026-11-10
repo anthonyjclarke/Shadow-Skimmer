@@ -4,7 +4,7 @@
 ; [Index:...], [Paths], [Links] and [Titles] lines, as it is written.
 
 [Config]
-RefFiles=glossary.ref;workspace.ref
+RefFiles=glossary.ref;workspace.ref;tune.ref
 GameDir=shadskim
 
 ; Parsed first, before every other project ref and the skill's theme.ref.
@@ -26,16 +26,20 @@ Copyright=Game &copy; 1987 The Edge / Softek. Disassembly for preservation and s
 [Index:Reference:Reference]
 Glossary
 Workspace
+tune-Index
 
 [Paths]
 CodeFiles={address:04X}.html
 Glossary=reference/glossary.html
 Workspace=reference/workspace.html
+tune-Index=tune/index.html
 
 [Links]
 Glossary=Glossary
 Workspace=Workspace
+tune-Index=Title tune player
 
 [Titles]
 Glossary=Glossary
 Workspace=Workspace
+tune-Index=Title tune player

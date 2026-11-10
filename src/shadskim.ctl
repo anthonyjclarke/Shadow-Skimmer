@@ -3240,8 +3240,9 @@ D $F000 Plays the title tune with interrupts off, over and over until the player
 c $F006 Decrypt and run the title tune player
 D $F006 Decrypts #R$F009(the tune player) and runs straight into it. The player encrypts itself again before it returns.
   $F006 Decrypt the player, then run on into it.
-b $F009 Encrypted routine
-D $F009 These bytes are code XOR-encrypted in place: #R$F45F decrypts them (key $41 for the first byte, one more for each byte after it) and the routine at #R$F006 runs straight into the result.
+b $F009 Title tune player, encrypted
+D $F009 The title tune player, XOR-encrypted in place. #R$F45F decrypts these bytes with key $41 for the first byte and one more for each byte after it.
+N $F009 #R$F009@tune(The decrypted listing) shows these bytes as the game runs them.
 @ $F30A label=title_tune_notes
 b $F30A Title tune notes
 D $F30A The notes of the title tune that lie outside #R$F009(the encrypted player): the end of the tune's first part, then its second part.

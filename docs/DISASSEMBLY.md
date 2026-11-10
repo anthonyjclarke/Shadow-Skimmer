@@ -52,7 +52,7 @@ The RLE detail matters. A run of 5 or more identical bytes, or 2 or more `$ED` b
 | `$B000–$D472` | Main game code                                            |
 | `$D473–$EFFF` | Data (unmapped)                                           |
 | `$F000–$F008` | Wrapper: `DI`, decrypt, run, `EI`                         |
-| `$F009–$F309` | Encrypted routine (see below)                             |
+| `$F009–$F309` | Title tune player, encrypted (see below)                  |
 | `$F30A–$F45E` | Undetermined bytes                                        |
 | `$F45F–$F472` | XOR decrypt/re-encrypt routine                            |
 | `$FA00–$FFFF` | Outside the block: runtime workspace, IM 2 vector, stack  |
@@ -63,7 +63,7 @@ The code at `$B003` clears the screen and fills `$FA00–$FCFF` with `$01`. The 
 
 ## Findings worth knowing before editing the map
 
-The routine at `$F009–$F309` is **encrypted in place**. `$F45F` XORs 769 bytes from `$F009` with a key that starts at `$41` and goes up by one per byte (wrapping at `$FF`). Because XOR is its own inverse, a second call restores the ciphertext. In the snapshot those bytes are ciphertext, so they are a `b` block. Executing the snapshot bytes as code is meaningless; the coverage trace hit addresses there only because it ran the decrypted copy. Documenting that routine needs a second, decrypted image (the skill's "packed and multi-stage loaders" recipe).
+The routine at `$F009–$F309` is **encrypted in place**. `$F45F` XORs 769 bytes from `$F009` with a key that starts at `$41` and goes up by one per byte (wrapping at `$FF`). Because XOR is its own inverse, a second call restores the ciphertext. In the snapshot those bytes are ciphertext, so they are a `b` block. Executing the snapshot bytes as code is meaningless; the coverage trace hit addresses there only because it ran the decrypted copy. Its decrypted listing is a second code of the site, "tune": `tools/tune_player.py` writes the decrypted bytes to `build/tune_player.bin`, and `src/tune.ctl` disassembles them (wired up by `src/tune.ref` and the Makefile).
 
 The game also **modifies its own code** in four places. Each is written as `label+1` with an `@ssub` so the source stays relocatable:
 
@@ -108,7 +108,7 @@ The gate is green against a recorded starting point: `CHECKS PASS [SkoolKit 10.1
 2. Make the first commit on `main` (then branch `dev` for the work), once you have decided whether `SHADSKIM.Z80` and the original zip belong in a repository that may be pushed.
 3. Dig-tasks:
    - the stub at `$61A8` (it looks like a relocator)
-   - the decrypted listing of `$F009`
+   - the title tune's `#AUDIO` render, which lays out the note records of `$F1BF` (tune listing) and `$F30A`
    - `$F30A–$F45E`
    - the text block at `$B89F` (menu, keys, end-of-game messages: x, y, colour, text, `$FF`/`$00` terminators)
 4. Run the skill's Manager/Worker/Challenger loop (`references/roles/`) routine by routine: contracts, line comments, `@equ` for `$FA00+`, `#UDG` sprites, `#AUDIO`, the behaviour spec, and the HTML site.
