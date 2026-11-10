@@ -8,14 +8,14 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Item                | State                                     |
 |:--------------------|:------------------------------------------|
-| Phase               | 4 – catalogs: sound                       |
+| Phase               | 5 – behaviour spec                        |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
 | Baseline findings   | 9                                         |
 | Routines to the bar | 118 of 121 (3 flagged only for a bare well-named JP or CALL) |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
 | Catalogs            | graphics, screens, sound                  |
-| Behaviour spec      | not started                               |
+| Behaviour spec      | 15 pages under `spec/`, published on the site |
 | Relocatability      | label-clean; unproven                     |
 
 ---
@@ -24,7 +24,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Target              | Lane | State                                |
 |:--------------------|:-----|:-------------------------------------|
-| Sound catalog `src/sound.ref` | audio | review |
+| Site pass (theme, page widths, inline audio, reader pass) | site | next |
 
 ---
 
@@ -97,7 +97,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$C1B1`       | Blocked launch on the Skimmer pushes it: visible? |
 | `$C0AC`       | Image buffers overwrite sysvars: any ROM call reads them? |
 | `$C8C4`       | Hostile shot's right range stops at column 30: defect? |
-| `$C453`       | Double count of an exploding object: matters at `$C11B`? |
 | `$B6F8`       | Row says `add_hostile` draws; it does not     |
 | `$D08A`       | An exit on both axes leaves sideways: say so? |
 | `$C963`       | Merge `$C97B`–`$C9B7` into `move_skimmer_left`? |
@@ -111,8 +110,9 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | screens       | Renders show every defence device standing (graphic 150) |
 | graphics      | List the graphics no layout places on the Graphics page? |
 | inline audio  | Add `#AUDIO` at the owning blocks (`$BE1E`/`$CBA8`, `$C44B`, tune routines) |
-| `$D10D`       | A shot launched during the hatchway animation clicks silently |
 | Screens page  | 833 px wide at an 800 px window (3-across grid) |
+| `$B850`       | `D` says rows 0–3; the code clears rows 1–4 |
+| `$CEDB`       | Screen entry cancels a due shield loss; the indicator stays at 0 |
 | `$C8FE`       | Can C AND 3 be 2 after `update_hostile`? Shot with range 255 |
 | `$B04F`       | Split `$B04F`, `$BE1E`, `$BE4D` into entries for `R` rows |
 | `$BD13`       | Merge `$BD13/$BD14`, `$BD21/$BD22` into words (`@ssub` at `$B5BD`, `$B60D`, `$B4C5`) |
@@ -154,6 +154,8 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `verify-frag`     | Renders `game.skool`; baseline keys `shadskim`   |
 | `diff_entries.py` | Skips untracked files                            |
 | `rules.md`        | No DEF-6/VIS-11 exemption for the glossary boxes |
+| `prose_units`     | Reads a Markdown pipe table as one sentence |
+| `spec_pages.py`   | Generic spec converter: move into the skill's `site/` (WORK-15). Kept in `tools/` by owner ruling 11-11-2026 until upstream takes it, since a vendored copy fails `vendor-check` on a fresh clone |
 | SYNTH_ECHO        | Fires on a data entry's field schema beside a clip (`$F30A`) |
 | `coverage`        | Counts a bare well-named JP or CALL (ENT-7) as skeletal (`$61FD`, `$B000`, `$CD86`) |
 | label-namespace   | Roots miss the game loop                         |
@@ -296,3 +298,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$D2CE`  | Clicks follow either side's shot; comments say "a shot" |
 | `$CC3C`  | The dummy read keeps the click rate independent of cover |
 | `$D2B5`  | No: the snapshot's `$01` never reaches the port     |
+| `$D10D`  | Clicks sound only on hatch-step passes during the animation |
+| `$C453`  | The double count delays a launch in that pair only  |
+| hatch timing | 101 passes for a trip's 26 steps; home in `game-flow.md` |

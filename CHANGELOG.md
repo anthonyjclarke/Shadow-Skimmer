@@ -5,6 +5,7 @@
 ### Added
 
 - Graphics engine documented in depth (`$B080–$B3AF`): cell addresses, the graphic directory fields, cell masks, colour patterns, the pixel, colour, mark and shadow passes, with every basic block commented.
+- Behaviour specification (`spec/*.md`, published on the site by `tools/spec_pages.py`, kept in this repo by owner ruling until the skill takes a generic converter): architecture, game flow, the hull, graphics, the control panel, the Skimmer, controls, hostile objects, shots, collisions, the economy, the score, effects and sound, and the state, actions, dynamics and rewards for an agent.
 - Sound page (`src/sound.ref`): the title tune whole and in its parts, the shot's clicks and the explosion, each captured by running the game's own code in SkoolKit's simulator.
 - Documented a defect in the game's data: screen 55's last layout record carries a stray run flag, so that graphic casts no shadow.
 - Screens page (`src/screens.ref`, `src/screens.py`): every outer hull screen, every inner section screen and the whole 10 × 11 hull map, each drawn by the game's own screen code in SkoolKit's simulator; the layout tables split into one labelled list per screen with the record format, and the readout variables at `$D473` split and defined.

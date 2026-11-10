@@ -4,7 +4,7 @@
 ; [Index:...], [Paths], [Links] and [Titles] lines, as it is written.
 
 [Config]
-RefFiles=glossary.ref;workspace.ref;graphics.ref;screens.ref;sound.ref;tune.ref
+RefFiles=glossary.ref;workspace.ref;graphics.ref;screens.ref;sound.ref;tune.ref;../build/spec.ref
 GameDir=shadskim
 ; #DRAWSCREEN(column,row,inside) draws one screen with the game's own code in
 ; SkoolKit's simulator: the screen clear, then the screen entry of the play
