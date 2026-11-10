@@ -110,6 +110,7 @@ The flipped Skimmer differs in three things: its images, the marks that stop it,
 A push throws the Skimmer about for a set number of passes. The passes left sit in `push_time`, and a new push starts the count again. #TABLE(default)
 { =h What starts the push           | =h Passes | =h Direction                     }
 { A shot enters a Skimmer cell      | 20        | The way the shot travels         }
+{ A shot fired into the Skimmer's cells | 20        | Down, from a defect              }
 { The Skimmer steps into a shot     | 20        | Back the way it came             }
 { The Skimmer steps into a hit      | 20        | Back the way it came             }
 { A hostile object rams the Skimmer | 35        | The way the object travels       }

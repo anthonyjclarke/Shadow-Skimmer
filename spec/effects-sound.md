@@ -10,6 +10,8 @@ A hostile object explodes in 7 frames, one per move of its pair. So each frame s
 
 Each frame paints the object's cells on the play area bright yellow ink on black paper. It then draws the frame through an explosion mask. The end paints the cells white ink on black paper, and puts back the background behind the object. Cells that hide the object keep their colours and pixels throughout. The [Graphics page](../reference/graphics.html#explosion) shows the frames.
 
+The end's paint also reaches the black strip of a screen in the hull map's column 0. On the outer hull it shows the hull surface there until the next screen draw.
+
 ---
 
 ## Flip

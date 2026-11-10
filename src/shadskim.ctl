@@ -749,7 +749,7 @@ B $9780,72,8
 B $97C8,72,8
 @ $9810 label=unused_graphic_1
 b $9810 Unused graphics
-D $9810 Graphics that nothing in the game draws. In the cell order of a graphic, they make three graphics of 3×2 cells, then eight of 2×2 cells?
+D $9810 Nothing in the game draws these graphics. The renders take them in a graphic's cell order, as three graphics of 3×2 cells and then eight of 2×2 cells.
 N $9810 #UDGTABLE { #UDGARRAY3,,3($9810-$9838-8)(unused_graphic_1) | #UDGARRAY3,,3($9840-$9868-8)(unused_graphic_2) | #UDGARRAY3,,3($9870-$9898-8)(unused_graphic_3) | #UDGARRAY2,,3($98A0-$98B8-8)(unused_graphic_4) | #UDGARRAY2,,3($98C0-$98D8-8)(unused_graphic_5) | #UDGARRAY2,,3($98E0-$98F8-8)(unused_graphic_6) | #UDGARRAY2,,3($9900-$9918-8)(unused_graphic_7) | #UDGARRAY2,,3($9920-$9938-8)(unused_graphic_8) | #UDGARRAY2,,3($9940-$9958-8)(unused_graphic_9) | #UDGARRAY2,,3($9960-$9978-8)(unused_graphic_10) | #UDGARRAY2,,3($9980-$9998-8)(unused_graphic_11) } TABLE#
 B $9810,48,8
 @ $9840 label=unused_graphic_2
@@ -1234,12 +1234,13 @@ R $B34A I:HL attribute mirror address of the cell below the block's bottom-left 
 @ $B35A label=shade_bottom_cell
   $B35A Shade the rest of the bottom edge in full, one cell per column of the block.
 @ $B363 label=shade_right_side
+N $B363 The tests of the right edge and the top cell read the layout graphic's column and row. They differ from the block's own only for the graphics of a run down column 0, below the first, and for graphic 79's second shadow.
   $B363 Step past the block's right side. Does that column, counted from the current layout graphic, lie off the screen?
   $B36B Jump if so: no right edge
   $B36D The right edge rises one cell per row of the block.
 @ $B36E label=shade_right_cell
   $B36E Shade the right edge in full, from the bottom row up.
-  $B37B Is the layout graphic on the top row of the play area? If so, its top cell is in full.
+  $B37B Is the layout graphic on the top row of the play area? If so, its top cell is in full. If its block carries on into the screen above, the full cell lets its shadow run on across the join with no notch.
   $B383 Jump if so
   $B385 Otherwise cut the top corner.
 @ $B388 label=shade_top_cell
@@ -1543,7 +1544,7 @@ D $B71E Makes the current hostile object the current sector's defence device, at
 R $B71E I:B character row of the device's top-left cell
 R $B71E I:C column of the device's top-left cell
   $B71E Place it at the cell. Its marks and its background store sit in the device's own slot.
-  $B72D Mark it as the defence device, with the same value in its counter.
+  $B72D Mark it as the defence device. Its steer count takes the same value, which no code reads for the device.
   $B735 Find the sector's design from the start of the designs, 48 bytes per sector.
   $B745 Never runs: no sector's design lies a page or more in.
 @ $B746 label=device_design_addr
@@ -1590,7 +1591,7 @@ c $B7B7 Shade one cell
 D $B7B7 Shades one cell of a shadow through one of the #R$B7DA(shadow masks). A cell below the screen's bottom row, or one whose marks in the attribute mirror keep shadows off, stays as it is.
 R $B7B7 I:DE address of the shadow mask
 R $B7B7 I:HL attribute mirror address of the cell, kept on return
-  $B7B7 Does the cell carry a mark that keeps shadows off, such as a bright graphic's or a bar's? Return if so.
+  $B7B7 Does the cell carry a mark that keeps shadows off, a bright graphic's or a bar's? Return if so. The test takes bit 7 too, which no cell of the play area holds.
   $B7BB Is the cell below the screen's bottom row? Return if so.
 @ $B7BC ssub=CP (attr_mirror+$300)/256
   $B7BF Find the cell's top pixel row.
@@ -2155,7 +2156,7 @@ R $BE1E I:HL attribute mirror address of the shot's first cell
   $BE2C Store the range and the first cell, and point at the store for the saved colour.
   $BE38 Draw the shot in its first cell. Does the cell stop it?
   $BE3E Return if not
-N $BE3F BUG: the stop lands on the shot's range, one byte after its direction. So a shot that the draw stops stays in flight, with a range of 255. Only the hostile objects' shot can meet this, when the check at its launch pushes the Skimmer up and so moves #REGhl?
+N $BE3F BUG: the stop lands on the shot's range, one byte after its direction. So a shot that the draw stops would stay in flight, with a range of 255. The defect has no effect. Each launch checks the cell just before. It goes on to a cell that stops a shot only after an upward push, which neither launch gives.
   $BE3F,4 Store the stop in the shot's record.
 @ $BE44 label=move_shots
 c $BE44 Move the shots
@@ -2417,6 +2418,7 @@ R $C09B O:A number from 0 to one less than the limit
 b $C0AC Image buffers of the hostile objects
 D $C0AC The address of each hostile object's image buffer, one for each slot at #R$F800(the hostile object slots). The two slots that move on even counts of #R$C958(the tick) come first.
 N $C0AC A buffer holds the four images of the object's design, then the four masks, 48 bytes each. Each copy sits 2 pixels further right than the one before it. #R$C227 fills them.
+N $C0AC The buffers lie over the printer buffer and the system variables, which the game never needs. Its interrupts run through its own vectors. Its one ROM call, KEY-SCAN in the title tune, reads only the keyboard.
 W $C0AC,8,2
 @ $C0B4 label=move_hostile_objects
 c $C0B4 Move the hostile objects
@@ -2469,7 +2471,7 @@ N $C16C No slot is free.
   $C196 Take the start direction from the column byte. See #R$B67C(the store of a launch cell) for why it comes out up or left.
   $C19F Find the cell's screen address and its attribute mirror address. The object starts at the left edge of its column.
 @ $C1A6 ssub=ADD A,(attr_mirror-$5800)/256
-  $C1B1 Does something block a cell under it? Return if so, and launch nothing on this call.
+  $C1B1 Does something block a cell under it? Return if so, and launch nothing on this call. The blocked cell still takes its #R$C819(collision), so the Skimmer there gets a push, and a shot or a hit there scores 20 points.
   $C1B5 Its cover map starts the slot, and its background store follows it.
   $C1C2 Pick the slot's image buffer, by the page and the slot within it.
 @ $C1CD ssub=ADD A,hostile_image_bufs%$100
@@ -2639,6 +2641,7 @@ D $C3F5 Moves the current hostile object 2 pixels in its direction, and draws it
 @ $C43E label=finish_explosion
 c $C43E End a hostile object's explosion
 D $C43E Paints the current hostile object's cells white on black and removes the hostile object.
+N $C43E The paint also reaches #R$CE4B(the black strip) of a screen in the hull map's left column. On the outer hull it shows the hull surface there until the next screen draw.
   $C43E Paint its cells white ink on black paper.
   $C443 Take the explosion mark off its cells as the object goes.
 @ $C445 ssub=LD ($C80D+1),A
@@ -2961,7 +2964,7 @@ R $C819 O:F carry set
   $C819 Does the cell hold a shot or a hit?
   $C81E Jump if not
   $C820 Add 20 points.
-N $C826 BUG: in a hit cell this also clears the mark of the hostile object that the hit belongs to. #R$C95B(The hit count) keeps the hit. So the struck object does not explode from it.
+N $C826 BUG: in a hit cell this also clears the mark of the hostile object that the hit belongs to. #R$C95B(The hit count) keeps the hit. So the struck object does not explode from it. Each move of that object then toggles its mark in the cell the wrong way round. Once the object moves off the cell, its mark stays behind there until the next screen draw.
   $C826 Take the shot or the hit out of the cell, and make the object explode.
 @ $C82D label=hostile_hit_skimmer
   $C82D Does the cell hold the Skimmer?
@@ -2973,7 +2976,7 @@ N $C826 BUG: in a hit cell this also clears the mark of the hostile object that 
   $C841,3 Drop the row and the count that the block check saved, and return to its caller with the cell blocked.
 @ $C845 label=push_skimmer
 c $C845 Start a push on the Skimmer
-D $C845 Gives the Skimmer its top speed in a direction, the start of a push.
+D $C845 Gives the Skimmer its top speed in a direction, the start of a push. It leaves the step rates alone, so the Skimmer keeps its old pace on that axis until it next lies square on a cell.
 R $C845 I:A direction of the push, 0–3 for up, down, left or right
   $C845 Is the push up?
   $C84A Jump if not
@@ -3033,6 +3036,7 @@ N $C8AA The object moves up or down, so it fires left or right.
 @ $C8C1 label=hostile_fire_right
   $C8C1 Is the object too near the right edge for a shot?
   $C8C3 Return if so
+N $C8C4 BUG: the range stops a shot fired right one column short of the screen's right edge. The shots fired the other three ways, and the pulse laser shot in all four, reach the edge they travel toward.
   $C8C4 Set the range to reach the column before the right edge.
   $C8C8 Fire right from beside the object's middle cell row.
 @ $C8D0 label=hostile_fire_vert
@@ -3052,7 +3056,7 @@ N $C8AA The object moves up or down, so it fires left or right.
   $C8F2 Fire down from beside the object's middle cell column.
 @ $C8F7 label=hostile_fire_launch
   $C8F7 Find the attribute mirror address of the shot's first cell, and set the shot's range.
-N $C8FE BUG: a first cell that holds the Skimmer pushes it in a direction from #REGc, which this routine never sets.
+N $C8FE BUG: a first cell that holds the Skimmer pushes it in the direction in #REGc, which this routine never sets. #REGc holds 3 from the object's draw, so the push is always down, whichever way the object fires. The push reports the cell as a stop, so no shot launches.
   $C8FE Does the first cell stop the shot?
   $C901 Return if so
   $C902 Launch the hostile objects' shot in its direction.
@@ -3651,7 +3655,7 @@ N $CEDB A move to the next screen starts the new screen here, and so does the tr
   $CEE7 Find the screen address of the Skimmer's top-left cell, and the cell's attribute mirror address.
 @ $CEEF ssub=ADD A,(attr_mirror-$5800)/256
   $CEF9 Empty the #R$C909(animation list), and take away the pulse laser shot and the hostile objects' shot.
-  $CF08 The new screen has no hatchway, launch cells or hits yet, and no shield loss is due or under way.
+  $CF08 The new screen has no hatchway, launch cells or hits yet, and no shield loss is due or under way. A due loss leaves the indicator at 0, so the next readout update makes the loss due again, from its first stage.
 @ $CF0C ssub=LD ($D2C7+1),A
 N $CF1B The sector follows from the screen's place on the hull map. Columns 0 and 1 make up sector 1. In the other columns, rows 5 to 10 make up sector 2 and rows 0 to 4 make up sector 3.
   $CF1B Start from the first sector.
@@ -3745,7 +3749,7 @@ N $D032 The Skimmer moves, one axis after the other. An axis whose mask is 1 fli
 @ $D087 label=x_step_left
   $D087 Move it left for a positive one.
 @ $D08A label=check_screen_exit
-N $D08A A step across an edge of the screen leads to the next screen on the hull map. At an edge of the hull map it leads nowhere, and the Skimmer stays at the edge of its screen.
+N $D08A A step across an edge of the screen leads to the next screen on the hull map. At an edge of the hull map it leads nowhere, and the Skimmer stays at the edge of its screen. The vertical step runs first, and each step notes only an edge it crosses. So a pass that crosses two edges leaves by the side one. When that side edge is an edge of the hull map, such a pass leaves by neither.
   $D08A Did the Skimmer cross an edge of the screen?
   $D08F Jump if not
   $D092 Did it leave on the left?

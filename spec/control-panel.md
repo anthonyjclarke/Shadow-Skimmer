@@ -17,7 +17,7 @@ TABLE#
 
 The shield count and the sector digit print in bright white ink on black paper. The indicator and the score print in inverse video, in the colours that the panel's pattern gives their cells. The device picture is 16×16 pixels, and it starts half a cell down from the top of row 1.
 
-The leaflet puts the shield count on the far right of the panel. The code prints it in the left half.
+The instruction leaflet puts the shield count on the far right of the control panel. The code prints it in the left half, and the digit on the right is the sector.
 
 ---
 

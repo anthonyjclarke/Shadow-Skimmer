@@ -36,6 +36,7 @@
 
 ### Fixed
 
+- Behaviour questions settled from the code: a BUG note for the hostile shot fired right (`$C8C4`); the `$BE3F` and `$C8FE` notes rewritten (the push is always down and no shot launches); the `$C826` stray mark, double-edge exits (`$D08A`), the restarted shield loss (`$CF08`), blocked launches (`$C1B1`), the explosion's paint in the black strip (`$C43E`), mirror bit 7 and the cover map's page byte; the shield count's position against the leaflet.
 - `$B850` blanks rows 1–4 of the screen, not rows 0–3.
 
 ## [0.2.0] 08-11-2026

@@ -31,7 +31,7 @@ The sector picks the hull surface pattern and the digit on the control panel. It
 
 Each screen entry prepares the play area, rows 6–23, before the layout draws. On the outer hull, `draw_hull_surface` tiles it with the sector's pattern, in bands of 16 pixel rows. Inside the hull, the same routine blanks the play area.
 
-The play area then takes white ink on black paper. A screen in the map's column 0 colours its left 11 columns black ink on black paper (`colour_play_area_split`). So nothing drawn there shows. The marks of every play area cell in the attribute mirror clear.
+The play area then takes white ink on black paper. A screen in the map's column 0 colours its left 11 columns black ink on black paper (`colour_play_area_split`). So nothing drawn there shows, until an explosion paints its cells, as the [Effects and sound](effects-sound.md#explosion) page gives. The marks of every play area cell in the attribute mirror clear.
 
 ### Layouts
 

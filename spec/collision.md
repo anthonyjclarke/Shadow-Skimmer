@@ -63,6 +63,8 @@ An explosion inside the hull destroys the sector's defence device, as the [Hosti
 
 A hit waits in its cell for the move of its own object. If another hostile object runs into the cell first, that object explodes and scores 20 points. Its collision also clears the struck object's mark from the cell. So the struck object finds no hit at its move, and flies on. The routine at fault is `hostile_collision`.
 
+Each move of the struck object then toggles its mark in the cell the wrong way round. Once it moves off the cell, its mark stays behind there until the next screen draw.
+
 ### A shot launched onto the Skimmer pushes it the wrong way
 
-The hostile objects' shot can launch with the Skimmer in its first cell. The Skimmer then gets a push in a direction that `hostile_fire` never sets. The direction comes from whatever an earlier routine left behind. If that push goes up, the launch goes on from a wrong cell. The shot then stays in flight with a range of 255.
+The hostile objects' shot can launch with the Skimmer in its first cell. The Skimmer then gets a push in a direction that `hostile_fire` never sets. The direction comes from the object's draw, and is always down, whichever way the object fires. The push reports a stop, so no shot launches.

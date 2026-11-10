@@ -76,44 +76,17 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | Address       | Open question                                 |
 |:--------------|:----------------------------------------------|
 | whole image   | Sectors 2–3 and game end coverage (FuseX)     |
-| `$C946`       | Limit per slot pair allows twice the launch cells: intended? |
-| `$B889`       | Shield count at row 3 col 5, not far right as the leaflet says |
-| `$B7B7`       | Bit 7: only the steering distances' sign bits? |
-| `$B3B0`       | A zero-length bar loops 256 times: document?  |
-| `$B3F0`       | Why do the two bars' shadow offsets differ?   |
-| `$C802`       | Does `$C0D4`'s reset to `$08` pair the explosion toggles? |
-| `$FF70`       | Cover map `$FF` is the map's page byte (relocation) |
-| `$C845`       | Push sets speed ±3 without new rates: visible? |
-| `$CF9E`       | Dead `LD A,n` loads before calls: note them?  |
-| `$C43E`       | Explosion's white paint over coloured graphics? |
-| `$C1B1`       | Blocked launch on the Skimmer pushes it: visible? |
-| `$C0AC`       | Image buffers overwrite sysvars: any ROM call reads them? |
-| `$C8C4`       | Hostile shot's right range stops at column 30: defect? |
-| `$D08A`       | An exit on both axes leaves sideways: say so? |
-| `$BE3F`       | Is the range `$FF` write reachable? Only via `$C8FE` (C AND 3 = 2) |
 | screens       | Renders show every defence device standing (graphic 150) |
-| graphics      | List the graphics no layout places on the Graphics page? |
 | inline audio  | Tune part clips need `$F30A` in the tune snapshot (the `$F009` rows hold the introduction, bridge and noise run clips) |
-| `$CEDB`       | Screen entry cancels a due shield loss; the indicator stays at 0 |
-| `$C8FE`       | Can C AND 3 be 2 after `update_hostile`? Shot with range 255 |
 | `$F493`       | How deep does the stack grow from `$F7F8`? |
-| `$BB6D`       | Does any message wrap past column 31 within a third? |
-| `$F154`       | Crosswise counter reloads in the three-tone player: quirk? |
-| `$F11E`       | Tone formulas assume no contended port wait states |
 | `$F30A`       | Render both tune parts here (blocked by SYNTH_ECHO on the schema) |
 | glossary      | Add "slide" and "noise run" (DEF-6)           |
 | gate          | The gate's linters skip `src/tune.ctl`; wire them in |
 | `tune`        | Raw operands in the tune listing (`operand_subs` reads only the main skool) |
 | lint-prose    | Vale is not installed, so the prose lint never runs |
-| `$9810`       | Unused graphics: confirm the 3×2 / 2×2 grouping |
-| `$6200`       | Entries 117/120 overlap 118/121; 119 points at ROM `$145C` |
 | `$99A0`       | Render the hatch at opening steps with the GX1 decoder |
-| glyph 10      | `?` reaches the second 0; no message prints `?` |
 | graphic 35    | Names for graphics 77–79 and 86–87, cells of hatchway graphic 35 |
 | decoder       | Render graphic 24 with its dropped cell, and 104–109 in their colour patterns |
-| `$C955`       | Counter value `$17` for the defence device    |
-| `$B363`       | Shadow edge tests use the layout cell, not the drawn one |
-| `$B37B`       | Full top shadow cell on row 6: why?           |
 
 ### Names
 
@@ -121,7 +94,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 |:---------------|:----------------------------------------------|
 | hostile object | Register the name rulings in the glossary     |
 | `$95D0`        | Game name for the animated 3×3 graphic        |
-| final goal     | Is the mothership entry-way its own entity?   |
 
 ### Skill (upstream)
 
@@ -279,6 +251,25 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B5F6`  | No: shading twice changes nothing (24 screens simulated) |
 | layouts  | Every screen and the hull map rendered by the game's own code |
 | `#AUDIO`  | Sound page: every effect and the whole tune, from the game's own code |
+| `$BE3F`  | Unreachable: C is always 3, so the push is down and no shot launches (`$C8FE`) |
+| `$C8C4`  | BUG note: a hostile shot fired right stops at column 30 |
+| `$D08A`  | A pass crossing two edges leaves by the side one, or by neither when that side edge is the map's |
+| `$C826`  | BUG note extended: the stray mark stays until the next draw (`$C802`) |
+| `$CEDB`  | The shield loss restarts from its first stage, not cancelled |
+| `$C1B1`  | A blocked launch runs the full collision |
+| `$C0AC`  | Nothing reads the overwritten system variables |
+| `$C43E`  | The white paint shows the hull surface in the black strip |
+| `$C845`  | The old pace lasts until the next square cell on that axis |
+| `$B7B7`  | Bit 7 only from the steering distances; no play area cell holds it |
+| `$FF70`  | `$FF` is the map's page byte, shared by the background store |
+| `$B889`  | Code prints at row 3, column 5; leaflet says far right (spec says both) |
+| `$C955`  | The device's 23 is never read (`$B72D`)              |
+| `$F11E`  | Wait states stated once at `$F009`; `$F154` behaviour noted |
+| `$B363`  | No visible effect: the run's own shadow covers the cells where they differ |
+| `$B37B`  | Phrased as a condition                               |
+| `$9810`  | Grouping stated as the renders' choice (EVID-9)      |
+| `$C946`, `$B3B0`, `$B3F0`, `$CF9E`, `$BB6D`, `$6200`, glyph 10, graphics | Answered; no text (covered already, or HOME-3) |
+| final goal | The entry-way is an ordinary hatchway; inner screen 5 ends the game |
 | `$BAC6`  | Nothing found reads or writes `$F7F8–$F7FF`; the stack starts below them |
 | `$B20A`  | Plotters and shadow casters are their own entries   |
 | `$B04F`  | `$B04F`, `$BE1E`, `$BE4D` split, with `R` rows       |

@@ -25,12 +25,13 @@ in its cells instead (#R$B27D).
 { 2 and 3 | Shot, or a hit cell | Yes | Yes | Yes | No | Yes | No }
 { 4 | Hostile object as it explodes | Yes | Yes | Yes | No | No | No }
 { 5 | Bright graphic | Yes | No | No | Yes | No | No }
-{ 7 | ? | No | No | No | Yes | No | Yes }
+{ 7 | Sign of a hostile object's distance to the Skimmer | No | No | No | Yes | No | Yes }
 TABLE#
 
 Each cell of the control panel, rows 0 to 5, holds bit 0, apart from the first
 four. Those four bytes hold a hostile object's distances to the Skimmer, which
-#R$C349(the code that steers it) writes.
+#R$C349(the code that steers it) writes. A negative distance sets bit 7. The
+other writers of the mirror found leave bit 7 clear.
 
 [Region:interrupt-jump:Interrupt jump]
 A jump instruction at $FDFD, which every interrupt reaches through the
@@ -51,4 +52,4 @@ the hatch's bitmap as a graphic of 3×3 cells instead.
 One byte for each cell under the Skimmer, from $FF70 to $FF7F: 4 rows of 4
 cells, rows from the top. A byte holds $FF for a cell where the game does not
 draw the Skimmer, and 0 for any other. Such a cell hides the Skimmer, or lies in the fourth
-column while the Skimmer sits on a cell edge. That $FF is the high byte of the map's address.
+column while the Skimmer sits on a cell edge. That $FF is the high byte of the map's address, and of the background store's, which shares its page.

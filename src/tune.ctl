@@ -9,6 +9,7 @@ c $F009 Title tune player
 D $F009 Plays the title tune: its introduction once, then its two parts over and over until the player presses a key. It encrypts itself again before it returns.
 N $F009 #TABLE(default) { =h Stage | =h Played by | =h Data } { Introduction | #R$F0A2, #R$F06C | #R$F043 to #R$F05C } { First part | #R$F104 | #R$F1BF } { Bridge | #R$F06C | #R$F065 } { Second part | #R$F104 | #R$F30A@main(the title tune notes) } { Noise run | #R$F0E2 | ROM bytes } TABLE#
 N $F009 After the noise run the tune starts again at its first part. A key stops it at the end of any note of the two parts.
+N $F009 The T-state counts of the tone and noise players leave out the ULA's waits. Each OUT to port $FE waits up to 6 T-states more while the ULA reads the display. The ULA does so for 128 T-states of each of the 192 display lines of a frame.
 N $F009 The clip plays the introduction.
 N $F009 #HTML(#PUSHS #AUDIO1,$F009,$F021(title-tune-introduction.wav)#POPS)
   $F009 Play the introduction: a three-tone slide, a two-tone slide, then two more three-tone slides.
@@ -123,7 +124,7 @@ R $F104 O:C 0 at the end of the part, or 255 when the player presses a key
 c $F11E Play two tones
 D $F11E Plays two tones on the speaker at once for a given length.
 N $F11E Each tone keeps its own level and its own counter of passes. Each pass sends both levels to the speaker in turn, the first tone's then the second's. A tone's level flips once its counter runs out.
-N $F11E Every pass takes 96 T-states, except the last of each unit of length, which takes 97. The two levels go out 48 T-states apart, so each tone has the speaker for half the time. A tone of period P sounds at 3.5 MHz ÷ (192 × P), with no ULA wait states. A unit of length is 24,577 T-states, about 7 ms.
+N $F11E Every pass takes 96 T-states, except the last of each unit of length, which takes 97. The two levels go out 48 T-states apart, so each tone has the speaker for half the time. A tone of period P sounds at 3.5 MHz ÷ (192 × P), counting no ULA wait states. A unit of length is 24,577 T-states, about 7 ms.
 R $F11E I:IXh period of the first tone: the passes between flips of its level (0 for 256)
 R $F11E I:L period of the second tone
 R $F11E I:C length in units of 256 passes
@@ -149,8 +150,8 @@ R $F11E I:C length in units of 256 passes
 c $F154 Play three tones
 D $F154 Plays three tones on the speaker at once for a given length.
 N $F154 Each pass gives each of three levels a slot. In its slot a level goes to the speaker, unless its counter runs out. Then the level flips and nothing goes out, so the speaker holds the level of the slot before.
-N $F154 Every pass takes 118 T-states, except the last of each unit of length, which takes 119. The three slots last 31, 31 and 56 T-states, so the third level has the speaker for longest. A level whose counter restarts from period P sounds at 3.5 MHz ÷ (236 × P), with no ULA wait states. A unit of length is 30,209 T-states, about 8.6 ms.
-N $F154 Each counter starts from its own period, then restarts from another's.
+N $F154 Every pass takes 118 T-states, except the last of each unit of length, which takes 119. The three slots last 31, 31 and 56 T-states, so the third level has the speaker for longest. A level whose counter restarts from period P sounds at 3.5 MHz ÷ (236 × P), counting no ULA wait states. A unit of length is 30,209 T-states, about 8.6 ms.
+N $F154 Each counter starts from its own period, then restarts from another's. So after the first counts, the third level, which has the speaker longest, sounds at the second period.
 N $F154 #TABLE(default) { =h Level | =h First count | =h Then every } { First | first period | third period } { Second | second period | first period } { Third | third period | second period } TABLE#
 R $F154 I:D first period (0 for 256)
 R $F154 I:E second period

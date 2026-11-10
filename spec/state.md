@@ -94,12 +94,12 @@ TABLE#
 ## Shots
 
 These hold the shots and their clicks. #TABLE(default)
-{ =h Address | =h Label           | =h Holds                      | =h Values                        }
-{ $C928      | `pulse_laser_shot` | The pulse laser shot          | 14 bytes, below                  }
-{ $C936      | `hostile_shot`     | The hostile objects' shot     | 14 bytes, below                  }
-{ $C927      | `shot_range`       | Range of the shot that moves  | 0–30 cells, or 255 from a defect }
-{ $C944      | `current_shot`     | The shot that moves           | Address of its record            }
-{ $D2CD      | `shot_click_row`   | First pixel row of the clicks | 0 for all, $FE or $FF for none   }
+{ =h Address | =h Label           | =h Holds                      | =h Values                      }
+{ $C928      | `pulse_laser_shot` | The pulse laser shot          | 14 bytes, below                }
+{ $C936      | `hostile_shot`     | The hostile objects' shot     | 14 bytes, below                }
+{ $C927      | `shot_range`       | Range of the shot that moves  | 0–30 cells                     }
+{ $C944      | `current_shot`     | The shot that moves           | Address of its record          }
+{ $D2CD      | `shot_click_row`   | First pixel row of the clicks | 0 for all, $FE or $FF for none }
 { $D2CE      | `shot_click_time`  | Passes left in the clicks     | 0–2                              }
 TABLE#
 

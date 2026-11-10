@@ -103,7 +103,7 @@ A step across an edge of the screen flags an exit, and `check_screen_exit` acts 
 { Bottom  | One row down                   | As it was                   | 6                        }
 TABLE#
 
-At an edge of the hull map no screen lies beyond, and the Skimmer stays at the edge of its screen. The inner sections join up through the same map. The [Skimmer](skimmer.md) page covers how a step reaches an edge.
+At an edge of the hull map no screen lies beyond, and the Skimmer stays at the edge of its screen. A pass takes the vertical step first, and each step flags only an edge it crosses. So a pass that crosses two edges leaves by the side one. When that side edge is an edge of the hull map, it leaves by neither. The inner sections join up through the same map. The [Skimmer](skimmer.md) page covers how a step reaches an edge.
 
 ---
 
