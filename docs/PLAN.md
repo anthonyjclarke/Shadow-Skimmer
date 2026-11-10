@@ -8,10 +8,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Item                | State                                     |
 |:--------------------|:------------------------------------------|
-| Phase               | 3 – depth pass, S Skimmer                 |
+| Phase               | 3 – depth pass, F firing and start-up     |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
-| Baseline findings   | 46                                        |
-| Routines to the bar | 85 of 121 (`$B080–$B811`, `$C09B–$D472` but `$CD86`) |
+| Baseline findings   | 45                                        |
+| Routines to the bar | 99 of 121 (`$61A8–$B811`, `$BD44–$D472` but `$CD86`) |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
 | Catalogs            | graphics, sound, data: not started        |
@@ -70,7 +70,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Address       | Open question                                 |
 |:--------------|:----------------------------------------------|
-| `$61A8`       | What is the code-like stub below the entry?   |
 | `$F009`       | Decrypted listing of the title tune player (see `docs/RESEARCH.md`) |
 | `$F30A–$F45E` | Code or data? No play trace executes it       |
 | `$F480`       | Document the key copy that `$BA3C` jumps to   |
@@ -100,9 +99,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | whole image   | Sectors 2–3 and game end coverage (FuseX)     |
 | `$BA06`       | Title and label of WALL DONE                  |
 | `$C946`       | Limit per slot pair allows twice the launch cells: intended? |
-| `$BF8B`       | Does the `$21` result end the opening?        |
-| `$BF6A`       | Rows and widths of the hatch's bitmap        |
-| `$BEE0`       | Which cell pushes the Skimmer, and how?       |
 | `$B889`       | Shield count at column 5; leaflet says right  |
 | `$B850`       | Rows 0–3 cleared; panel is rows 0–5           |
 | `$F30A`       | Is it the title tune's data?                  |
@@ -128,10 +124,8 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$C43E`       | Explosion's white paint over coloured graphics? |
 | `$C1B1`       | Blocked launch on the Skimmer pushes it: visible? |
 | `$C0AC`       | Image buffers overwrite sysvars: any ROM call reads them? |
-| `$BEE0`       | `OR D` gives Z at a shot's first cell: effect? |
 | `$C8C4`       | Hostile shot's right range stops at column 30: defect? |
 | `$C453`       | Double count of an exploding object: matters at `$C11B`? |
-| `$BEEF`       | Say "adds 20 points" in `$BEEF`               |
 | `$B6F8`       | Row says `add_hostile` draws; it does not     |
 | `$D08A`       | An exit on both axes leaves sideways: say so? |
 | `$C963`       | Merge `$C97B`–`$C9B7` into `move_skimmer_left`? |
@@ -142,8 +136,12 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | site theme    | `#UDGTABLE` cells have no padding: captions touch (`$CD9C`, `$9520`) |
 | `$C28D`       | "pixel offset" → "horizontal offset" in the hostile entries |
 | `$CDC8`       | Split the unused first frame into its own `u` block? |
+| `$BE3F`       | Is the range `$FF` write reachable? Only via `$C8FE` (C AND 3 = 2) |
+| `$C8FE`       | Can C AND 3 be 2 after `update_hostile`? Shot with range 255 |
+| `$9DC8`       | Label and render the eight shot graphics (`$7CD4` split) |
+| `$8B00`       | Label and render the three hull patterns (`$7CD4` split) |
+| `$B04F`       | Split `$B04F`, `$BE1E`, `$BE4D` into entries for `R` rows |
 | `$E141`       | Screen 55's last record runs into the next layout |
-| `$B4FB`       | Does anything call `$B04F` while `$B058` is a NOP? |
 | `$C955`       | Counter value `$17` for the defence device    |
 | `$B363`       | Shadow edge tests use the layout cell, not the drawn one |
 | `$B37B`       | Full top shadow cell on row 6: why?           |
@@ -176,7 +174,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$BD3F`  | Sector number, 1–3                                  |
 | `$BAC6`  | `$5E` means the game ended by `$BD3D`, no GAME OVER |
 | `$C0AC`  | `$C227` fills the image buffers                     |
-| `$BE3F`  | The failed-draw write cannot happen                 |
 | `$C845`  | Push follows the hostile object: 0 up … 3 right     |
 | `$C94E`  | State `$17` is the defence device                   |
 | `$C936`  | The hostile objects' shot                           |
@@ -264,3 +261,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$CD36`  | Kept as its own entry, `cover_map_hide`            |
 | `$CD86`  | Set on a new screen, then toggled old and new each draw |
 | `$CC9B`  | No: step sizes change only at `$D219` from aligned positions |
+| `$61A8`  | Unused relocation code; nothing jumps into it      |
+| `$BF8B`  | `$21` comes after the hatch closes over the Skimmer; then the inner section |
+| `$BF6A`  | 24 rows × 3 bytes; halves rows 0–12 and 11–23      |
+| `$BEE0`  | A Skimmer cell with no hostile mark; push follows the shot for 20 passes |
+| `$BEEF`  | Says "adds 20 points"                               |
+| `$B4FB`  | No: `$B02A` restores `$B058` before every band      |
+| `$BEE0`  | Z only on an upward push with D 0; the hostile shot then launches from `$D2C3` (see `$BE3F`) |

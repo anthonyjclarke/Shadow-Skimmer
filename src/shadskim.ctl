@@ -13,10 +13,11 @@
 @ $61A8 equ=int_vectors=$FE00
 @ $61A8 equ=skimmer_bg_store=$FF10
 @ $61A8 equ=skimmer_cover_map=$FF70
-b $61A8
+b $61A8 Unused relocation code
+D $61A8 Bytes that decode to code the game never runs. They hold a routine that adds a base address to the words a list of offsets names. Seven jumps follow, six of them into the outer hull's graphic directory.
 @ $61FD label=game_entry
 c $61FD Game entry point
-D $61FD The BASIC loader's RANDOMIZE USR starts the game here.
+D $61FD Everything starts here once the game loads.
 b $6200
 s $6703
 b $6705
@@ -68,13 +69,42 @@ b $A2B8
 c $B000 Jump to the main loop
 @ $B003 label=clear_screen
 c $B003 Clear the screen
-D $B003 Blanks the pixels and sets every attribute to white ink on black. It also sets every byte of the attribute mirror to 1.
+D $B003 Blanks the screen to white ink on black paper, and resets the attribute mirror.
+  $B003 Clear the pixels. Each fill seeds the first byte and lets LDIR copy every byte onto the next.
+  $B010 Colour every cell white ink on black paper.
+  $B01D,12 Give every cell of the attribute mirror the bright graphic mark that stops the Skimmer, hostile objects and shots, and no other.
 @ $B02A label=draw_hull_surface
 c $B02A Draw the hull surface
-D $B02A Fills the play area below the control panel with the hull pattern of the current sector at #R$BD3F. Inside the hull it clears the play area instead.
+D $B02A Tiles the play area with the hull pattern of the current sector, in bands of 16 pixel rows from the top. Inside the hull it clears the play area instead.
+  $B02A Start at the play area's top pixel row.
+@ $B02D label=hull_band
+  $B02D Set up a band of 16 pixel rows, with 16 copies of the pattern's row across each. Make the pattern step rewind after each copy.
 @ $B032 ssub=LD ($B058),A
+  $B035 Is the Skimmer inside the hull?
+  $B03A If so, clear the play area instead
+  $B03D Start from the hull pattern of sector 1, 2 bytes per pixel row like the other two.
+  $B043 Is the Skimmer in sector 1? Jump if so
+  $B046 Take the pattern of sector 2. Is the Skimmer in it? Jump if so
+  $B04C Take the pattern of sector 3.
 @ $B04F label=draw_hull_rows
+N $B04F This entry point draws #REGc pixel rows of the pattern at #REGde, down the screen from #REGhl. Each row takes #REGb copies of the pattern's two-byte row.
+  $B04F Keep the band's counts and the row's screen address.
+@ $B051 label=hull_row_copy
+  $B051 Copy the pattern row's two bytes to the screen.
 @ $B058 label=hull_pattern_step
+  $B058 Step back to the pattern row's first byte, so that the next copy repeats the row. A patch to do nothing makes each copy skip the pattern row's third byte.
+  $B059 Copy the row across the pixel row.
+  $B05B Move on to the pattern's next row.
+  $B05D Move down a pixel row. Is it in the same cell row? Jump if so
+  $B064 Move down a cell row. Is it in the next third of the screen? Jump if so
+  $B06A Stay in this third.
+@ $B06E label=hull_next_row
+  $B06E Count the band's pixel rows, and draw the next one.
+  $B073 Is a single band wanted?
+  $B078 Return if so
+  $B079 Does the band reach the bottom of the screen?
+  $B07C Return if so
+  $B07D Draw the next band from the pattern's first row.
 @ $B080 label=cell_addrs
 c $B080 Find the screen addresses of a cell
 D $B080 Gives the pixel address and the attribute address of the character cell at a row and a column.
@@ -859,50 +889,323 @@ B $BD42,1 0 if the defence device of sector 3 stands, $FF if it is destroyed?
 B $BD43,1 1 to draw the hull pattern as one band of 16 pixel rows, 0 to repeat it down to the bottom of the screen
 @ $BD44 label=handle_fire
 c $BD44 Handle the fire key
-D $BD44 With fire and one direction held and no pulse laser shot in flight, it fires that way if the Skimmer lines up on that axis? When it fires nothing, over a hatchway? it starts the hatchway animation, and every call ends with a move of the shots.
+D $BD44 Fires a pulse laser shot along the one direction held with fire, or starts the hatchway animation on fire alone over a hatch. Each call then moves the shots.
+  $BD44 Is a pulse laser shot in flight?
+  $BD49 If so, only move the shots
+  $BD4C Is fire held?
+  $BD51 If not, only move the shots
+N $BD54 Each direction has its own test. The Skimmer must sit half a cell off the grid along the line of fire, and the line must leave room for a shot.
+N $BD54 #TABLE(default) { =h Direction | =h The Skimmer needs | =h First cell of the shot | =h The shot reaches } { Left | a column to its left | left of its second cell row | the screen's left edge } { Right | two columns to its right | right of its second cell row | the screen's right edge } { Up | a play area row above it | above its second column | the play area's top } { Down | a row below it | below its second column | the screen's bottom } TABLE#
+  $BD54 Start with no direction to fire, and keep the directions held.
+  $BD59 Is left the one direction held?
+  $BD5B If not, test right
+  $BD5D Is the Skimmer's horizontal offset half a cell?
+  $BD62 If not, test right
+  $BD64 Is there a column to its left?
+  $BD69 If not, test right
+  $BD6B Fire left from beside the Skimmer's second cell row, as far as the screen's left edge.
+@ $BD72 label=fire_test_right
+  $BD72 Is right the one direction held?
+  $BD75 If not, test up
+  $BD77 Is the Skimmer's horizontal offset half a cell?
+  $BD7C If not, test up
+  $BD7E Are there two columns or more to its right?
+  $BD83 If not, test up
+  $BD85 Fire right from beside the Skimmer's second cell row, as far as the screen's right edge.
+@ $BD91 label=fire_test_up
+  $BD91 Is up the one direction held?
+  $BD94 If not, test down
 @ $BD96 ssub=LD A,($D2B0+1)
+  $BD96 Does the Skimmer's top pixel row lie half a cell down its cell row?
+  $BD9D If not, test down
+  $BD9F Is there a play area row above it?
+  $BDA4 If not, test down
+  $BDA6 Fire up from above the Skimmer's second column, as far as the play area's top.
+@ $BDB0 label=fire_test_down
+  $BDB0 Is down the one direction held?
+  $BDB3 If not, fire nothing
 @ $BDB5 ssub=LD A,($D2B0+1)
+  $BDB5 Does the Skimmer's top pixel row lie half a cell down its cell row?
+  $BDBC If not, fire nothing
+  $BDBE Is there a row below it?
+  $BDC3 If not, fire nothing
+  $BDC5 Fire down from below the Skimmer's second column, as far as the screen's bottom.
+@ $BDD1 label=fire_if_aimed
+  $BDD1 Did a test pass?
+  $BDD4 Jump if not
+  $BDD6 Fire the shot, and move the shots.
+@ $BDDC label=try_hatchway
+  $BDDC Does the Skimmer's top-left cell lie one column inside the hatchway's?
+  $BDE4 If not, only move the shots
+  $BDE7 Does it lie one row inside too? It never does on a screen with no hatchway.
+  $BDED If not, only move the shots
+  $BDF0 Does the Skimmer rest square on the cell, with no direction held?
+  $BDF5 If not, only move the shots
+  $BDF8 Is the hatchway animation under way?
+  $BDFC If so, only move the shots
+  $BDFF Is the Skimmer on the outer hull? Take the first step as the hatch opens under it, and jump if so
+  $BE08 Take the step that starts the trip out of an inner section instead.
+@ $BE0A label=start_hatchway
+  $BE0A Start the animation, with its pass count set so that its first step runs on the next call. Then move the shots.
 @ $BE11 label=fire_laser_shot
 c $BE11 Fire a pulse laser shot
-D $BE11 Launches the pulse laser shot from the cell beside the Skimmer in the chosen direction, unless that cell stops it.
+D $BE11 Launches the pulse laser shot from the cell beside the Skimmer, unless that cell stops it. A hostile object there takes the hit at once, and no shot appears.
+R $BE11 I:A direction of the shot, 0–3 for left, right, up or down
+R $BE11 I:DE step in the attribute mirror from the Skimmer's top-left cell to the shot's first cell
+  $BE11 Find the attribute mirror address of the shot's first cell, and keep the direction.
+  $BE16 Does the cell stop the shot?
+  $BE19 Return if so
+  $BE1A Point at the pulse laser shot's record, and take the direction back.
 @ $BE1E label=launch_shot
+N $BE1E This entry point launches the shot whose record #REGde points at, in direction #REGa, from the cell whose attribute mirror address #REGhl holds.
+  $BE1E Store the direction, marked so that the shot holds its first cell until its next move.
+  $BE22 Start the shot's clicks: the Skimmer draw clicks the speaker on every pixel row for two passes.
+  $BE2C Store the range and the first cell, and point at the store for the saved colour.
+  $BE38 Draw the shot in its first cell. Does the cell stop it?
+  $BE3E Return if not
+N $BE3F BUG: the stop lands on the shot's range, one byte after its direction. So a shot that the draw stops stays in flight, with a range of 255. Only the hostile objects' shot can meet this, when the check at its launch pushes the Skimmer up and so moves #REGhl?
+  $BE3F,4 Store the stop in the shot's record.
 @ $BE44 label=move_shots
 c $BE44 Move the shots
 D $BE44 Moves the pulse laser shot and the hostile objects' shot one cell each. It ends a shot whose range runs out or whose cell stops it.
+  $BE44 Move the pulse laser shot, then go on to the hostile objects' shot.
 @ $BE4D label=move_one_shot
+N $BE4D This entry point moves the shot whose record #REGde points at.
+  $BE4D Is the shot in flight?
+  $BE50 Return if not
+  $BE51 Does it carry the launch mark? If not, move it
+  $BE54,3 Clear the launch mark. The shot holds its first cell until the next call.
+@ $BE58 label=shot_step
+  $BE58 Note which shot moves, and take its direction.
+  $BE5E Count down its range.
+  $BE65 Take its cell, and point at what the shot covers there.
+  $BE6C Put back what the shot covered.
+  $BE6F Never jumps, since the erase always sets the zero flag.
+  $BE71 Move the shot on to the next cell along its direction.
+  $BE75 Is its range used up?
+  $BE7A End the shot if so
+  $BE7C Draw the shot in its new cell. Does the cell stop it?
+  $BE82 End the shot if so
+  $BE84,7 Keep the shot's new cell.
+@ $BE8C label=end_shot
+  $BE8C,7 End the shot.
 @ $BE94 label=step_cell
 c $BE94 Step one cell in a direction
-D $BE94 Moves a position on the play area one cell left, right, up or down.
+D $BE94 Moves a cell's attribute mirror address one cell left, right, up or down, with no test for the screen's edges.
+R $BE94 I:A direction of the step in its low two bits, 0–3 for left, right, up or down
+R $BE94 I:HL attribute mirror address of the cell
+R $BE94 O:HL attribute mirror address of the next cell that way
+  $BE94 Is the step to the left? Jump if so
+  $BE9A Is it to the right? Jump if so
+  $BE9E Is it up? Jump if so
+  $BEA2,4 Is it down? Jump if so
+@ $BEA7 label=step_left
+  $BEA7,1 Step one cell left.
+@ $BEA9 label=step_right
+  $BEA9,1 Step one cell right.
+@ $BEAB label=step_up
+  $BEAB,6 Step one cell row up.
+@ $BEB2 label=step_down
+  $BEB2,6 Step one cell row down.
 @ $BEB9 label=erase_shot
 c $BEB9 Erase a shot
-D $BEB9 Puts back the pixels and colour of the cell a shot covered.
+D $BEB9 Puts back the colour and the pixels of the cell that a shot covered, and takes the shot's mark out of the attribute mirror.
+R $BEB9 I:DE address of the saved colour and pixel rows
+R $BEB9 I:HL attribute mirror address of the shot's cell
+R $BEB9 O:F zero flag always set
+  $BEB9 Did the shot cross this cell hidden?
+  $BEBE Return if so: it left the cell as it was
+  $BEBF Put back the cell's colour.
 @ $BEC2 ssub=SUB (attr_mirror-$5800)/256
+  $BEC7 Find the cell's top pixel row, and count its pixel rows.
+@ $BED2 label=erase_shot_row
+  $BED2 Put back the pixel rows, from the top.
+  $BED8,7 Take the shot's mark out of the cell, and report the cell erased.
 @ $BEE0 label=push_skimmer_from_shot
-c $BEE0 Push the Skimmer after a shot strikes
-D $BEE0 Starts a push on the Skimmer whose direction follows the shot's?
+c $BEE0 Push the Skimmer when a shot strikes it
+D $BEE0 Pushes the Skimmer the way a shot travels, for 20 passes of the play loop.
+R $BEE0 I:C direction of the shot in its low two bits
+R $BEE0 O:F zero flag set only for an upward push while D is 0
+  $BEE0 Time the push.
+  $BEE5 Turn the shot's direction into the push's order, and push the Skimmer that way.
+N $BEED BUG: this reports a stop because #REGd is not 0 while #REGde points at a shot's record. At a shot's first cell, #REGde holds the step to that cell instead. Its high byte is 0 for a step left, right or down, so an upward push reports the cell as free. That push also leaves #REGhl at #R$D2C3(the Skimmer's vertical speed).
+  $BEED,1 Report a stop.
 @ $BEEF label=score_shot_hit
 c $BEEF Score a shot's hit
-D $BEEF Marks the struck cell as hit, counts the hit and adds 160 to the score total at #R$D48A?
+D $BEEF Marks the cell that a shot strikes as a hit, counts it among the hits that wait for their hostile object, and adds 20 points.
+R $BEEF I:HL attribute mirror address of the struck cell
+R $BEEF O:F zero flag clear
+  $BEEF Mark the cell as a hit.
+  $BEF3 Count the hit.
+  $BEFA Add 20 points.
+  $BF02,1 Report a stop: the hit count is never 0 here.
 @ $BF04 label=check_shot_cell
 c $BF04 Check the cell a shot enters
-D $BF04 Decides whether a shot can enter a cell, and hands a cell that the shot strikes to the push or the score routine.
+D $BF04 Reports whether a shot can enter a cell. A shot that strikes the Skimmer pushes it, and one that strikes a hostile object scores a hit.
+N $BF04 The marks in the cell decide. #TABLE(default) { =h Marks | =h Result } { None, or only marks that let a shot through | The shot enters } { The Skimmer's, without a hostile object's | The Skimmer gets a push, and the shot stops } { A hostile object's, without the Skimmer's | The cell becomes a hit, and the shot stops } { Any others | The shot stops } TABLE#
+R $BF04 I:C direction of the shot, which a push follows
+R $BF04 I:HL attribute mirror address of the cell
+R $BF04 O:F zero flag set if the shot can enter the cell
+  $BF04 Leave out the marks that never stop a shot. Are there no others?
+  $BF07 Return if so: the shot enters
+  $BF08 Is the bright graphic or bar mark the only one?
+  $BF0A Return if so: the shot enters
+  $BF0B Does the cell hold the Skimmer, and no hostile object?
+  $BF0F Push the Skimmer if so
+  $BF11 Does it hold a hostile object, and not the Skimmer?
+  $BF13,2 Score a hit if so
 @ $BF16 label=report_shot_stopped
 c $BF16 Report a stopped shot
+R $BF16 O:A $FF, for a cell that stops the shot
+  $BF16,2 The cell stops the shot.
 @ $BF19 label=draw_shot
 c $BF19 Draw a shot
-D $BF19 Draws a shot in its new cell and saves what was there, or reports that the cell stops the shot.
+D $BF19 Draws a shot in a cell and saves what it covers, or reports that the cell stops the shot. A cell with the bright graphic or bar mark hides the shot.
+R $BF19 I:A direction of the shot, 0–3 for the pulse laser shot or 4–7 for the hostile objects' shot
+R $BF19 I:C direction of the shot, which a push follows
+R $BF19 I:DE address in the shot's record for the saved colour and pixel rows
+R $BF19 I:HL attribute mirror address of the cell
+R $BF19 O:A $FF if the cell stops the shot, 0 if not
+  $BF19 Is it the pulse laser shot? Take bright red ink on black paper, and jump if so
+  $BF1F Take bright yellow ink on black paper for the hostile objects' shot.
+@ $BF21 label=draw_shot_check
+  $BF21 Keep the direction. Does the cell stop the shot?
+  $BF25 Report the stop if so
+  $BF27 Does the shot cross this cell hidden, under the bright graphic or bar mark?
+  $BF2E Return if so, with nothing drawn
+  $BF2F Give the cell the shot's mark.
+  $BF35 Save the cell's colour, and paint the cell in the shot's colour.
 @ $BF36 ssub=SUB (attr_mirror-$5800)/256
+  $BF3D Find the cell's top pixel row, keep it, and count its pixel rows.
+@ $BF49 label=draw_shot_save
+  $BF49 Save the pixel rows, from the top.
+  $BF4F Point at the graphic for the shot's direction, 8 bytes each. The four of the pulse laser shot come first, then the four of the hostile objects' shot.
+  $BF5C Carry into the high byte.
+@ $BF5D label=draw_shot_graphic
+  $BF5D Go back to the cell's top pixel row, and count its pixel rows.
+@ $BF60 label=draw_shot_row
+  $BF60 Draw the graphic down the cell.
+  $BF66,3 Report the shot drawn.
 @ $BF6A label=find_hatch_graphic
-c $BF6A Find the graphic for a step of the hatchway animation
-D $BF6A Works out where the rows of the hatch's bitmap for one animation step start, and how many rows it shows?
+c $BF6A Find the halves of the hatch for an animation step
+D $BF6A Finds the parts of the hatch's bitmap that a step of the hatchway animation shows. The hatch parts in the middle, and each step slides each half one pixel row further out.
+N $BF6A The routine takes the upper half as the bitmap's rows 0–12, and the lower half as rows 11–23. So the two middle rows belong to both halves.
+R $BF6A I:A step of the animation in its low four bits, from 0 for the shut hatch to 13 for the open hatch
+R $BF6A O:B pixel rows that each half shows
+R $BF6A O:C bytes in each pixel row of the hatch
+R $BF6A O:DE address of the upper half's first byte
+R $BF6A O:HL address of the lower half's last byte
+  $BF6A Count the rows that each half still shows: all of them when the hatch is shut, none when it is open.
+  $BF71 Point at the upper half's first row that shows, 3 bytes per row down from the bitmap's top.
 @ $BF75 ssub=ADD A,hatch_bitmap%$100
 @ $BF78 ssub=LD D,hatch_bitmap/$100
+  $BF7C Carry into the high byte.
+@ $BF7D label=hatch_lower_end
+  $BF7D Point at the lower half's last byte that shows: the bitmap's last byte, less 3 bytes per row that the half no longer shows.
 @ $BF80 ssub=ADD A,hatch_bitmap%$100
 @ $BF83 ssub=LD H,hatch_bitmap/$100
+  $BF87 Carry into the high byte.
+@ $BF88 label=hatch_row_bytes
+  $BF88,2 Take the hatch's width.
 @ $BF8B label=animate_hatchway
 c $BF8B Step the hatchway animation
-D $BF8B Every fourth call, draws the next step of the hatch as it opens or closes. It returns the step after that one, or zero once the animation is over?
+D $BF8B Runs a step of the hatchway animation on every fourth call, and hands back the step to run next. The hatch opens under the Skimmer and closes over it on the way into an inner section, and the reverse on the way out.
+R $BF8B I:A step of the hatchway animation
+R $BF8B O:A step to run next, or 0 when the animation ends
+  $BF8B Count down the pass count. Is this the fourth pass?
+  $BF96 If not, return the step as it is
+  $BF97 Keep the step. Is the hatch over the Skimmer? Jump if so
+N $BF9D The hatch lies under the Skimmer, in the Skimmer's background store.
+  $BF9D Does the hatch close in this phase? Jump if not
+  $BFA1 Turn the step round, so that the halves come back together.
+@ $BFA7 label=under_halves
+  $BFA7 Find the halves of the hatch, keep the lower half's end, and start at the store's top row.
+  $BFAE Does the upper half show any rows? Jump if not
+  $BFB3 Copy the upper half into the store's top rows.
+@ $BFB4 label=under_upper_row
+  $BFB4 Take the next row.
+@ $BFB6 label=under_upper_byte
+  $BFB6 Copy its bytes into the store row.
+  $BFBC Skip the store row's fourth byte, and copy the next row.
+  $BFC0 Is the hatch shut? If so, leave out the blank row
+@ $BFC6 label=under_upper_blank
+  $BFC6 Blank the store row below the upper half.
+@ $BFC9 label=under_upper_clear
+  $BFC9 Clear its bytes.
+@ $BFCE label=under_lower
+  $BFCE Take the lower half's end, and start at the last byte of the store's bottom row. Does the lower half show any rows? Jump if not
 @ $BFCF ssub=LD HL,skimmer_bg_store+$5E
+  $BFD7 Copy the lower half into the store's bottom rows, from the end back.
+@ $BFD8 label=under_lower_row
+  $BFD8 Take the next row up.
+@ $BFDA label=under_lower_byte
+  $BFDA Copy its bytes from right to left.
+  $BFE0 Skip the fourth byte of the store row above, and copy the next row.
+  $BFE4 Is the hatch shut? If so, leave out the blank row
+@ $BFEB label=under_lower_blank
+  $BFEB Blank the store row above the lower half.
+@ $BFED label=under_lower_clear
+  $BFED Clear its bytes, from right to left.
+@ $BFF1 label=under_show
+  $BFF1 Draw the Skimmer over the store, with the hatch behind it. Then take the next step.
+@ $BFF7 label=hatch_over
+N $BFF7 The hatch lies over the Skimmer. The game draws the Skimmer first, and then the hatch on the screen over it.
+  $BFF7 Draw the Skimmer, and take the step again.
+  $BFFC Does the hatch close in this phase? Jump if not
+  $C000 Turn the step round as well.
+@ $C006 label=over_halves
+  $C006 Find the halves of the hatch, keep the lower half's end, and start at the Skimmer's top-left screen byte.
+  $C00D Does the upper half show any rows? Jump if not
+  $C012 Copy the upper half down from the Skimmer's top pixel row.
+@ $C013 label=over_upper_row
+  $C013 Take the next row.
+@ $C016 label=over_upper_byte
+  $C016 Copy its bytes onto the screen.
+  $C01C Move down a pixel row. Is it in the same cell row? Jump if so
+  $C023 Move down a cell row. Is it in the next third of the screen? Jump if so
+  $C029 Stay in this third.
+@ $C02D label=over_upper_next
+  $C02D Copy the next row.
+  $C030 Is the hatch shut? If so, leave out the blank row
+@ $C036 label=over_upper_blank
+  $C036 Blank the pixel row below the upper half.
+@ $C039 label=over_upper_clear
+  $C039 Clear its bytes.
+@ $C03E label=over_lower
+  $C03E Take the lower half's end. Find the Skimmer's bottom right screen byte, two cell rows down and two bytes right. Is it in the same third? Jump if so
+  $C049 Move into the next third.
+@ $C04B label=over_lower_last
+  $C04B Take the cell row's last pixel row.
+  $C04E Does the lower half show any rows? Jump if not
+  $C053 Copy the lower half up from the Skimmer's bottom pixel row.
+@ $C054 label=over_lower_row
+  $C054 Take the next row up.
+@ $C057 label=over_lower_byte
+  $C057 Copy its bytes onto the screen, from right to left.
+  $C05D Move up a pixel row. Is it in the same cell row? Jump if so
+  $C066 Move up a cell row. Is it in the third above? Jump if so
+  $C06C Stay in this third.
+@ $C070 label=over_lower_next
+  $C070 Copy the next row up.
+  $C073 Is the hatch shut? If so, leave out the blank row
+@ $C079 label=over_lower_blank
+  $C079 Blank the pixel row above the lower half.
+@ $C07B label=over_lower_clear
+  $C07B Clear its bytes, from right to left.
+@ $C07F label=next_hatch_step
+N $C07F Each phase ends after its thirteenth step, and hands on to the next. #TABLE(default) { =h Phase | =h Next phase } { The hatch opens under the Skimmer | It closes over the Skimmer } { It closes over the Skimmer | It opens over the Skimmer } { It opens over the Skimmer | It closes under the Skimmer } { It closes under the Skimmer | None } TABLE#
+  $C07F Take the step after this one. Is the hatch now open under the Skimmer?
+  $C083 Jump if not
+  $C085,2 Close the hatch over the Skimmer next.
+@ $C088 label=test_close_under_end
+  $C088 Is it now shut under the Skimmer? Jump if not
+  $C08C,1 The animation is over.
+@ $C08E label=test_open_over_end
+  $C08E Is it now open over the Skimmer? Jump if not
+  $C092,2 Close the hatch under the Skimmer next.
+@ $C095 label=test_close_over_end
+  $C095 Is it now shut over the Skimmer? If not, return the step
+  $C098,2 Open the hatch over the Skimmer next.
 @ $C09B label=random_below
 c $C09B Random number below a limit
 D $C09B Returns a random number below a limit: the remainder of the refresh register divided by the limit.

@@ -247,12 +247,6 @@ message = "`b $F30A` has no title and publishes as a page headed \"Data at F30A\
 [[finding]]
 check = "identity"
 kind = "UNTITLED_ENTRY"
-at = "$61A8"
-message = "`b $61A8` has no title and publishes as a page headed \"Data at 61A8\". There is no record to fold it into — it opens the file — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
 at = "$6200"
 message = "`b $6200` has no title and publishes as a page headed \"Data at 6200\". There is no record to fold it into — the entry above it is c $61FD — so it is an entry in its own right: write the title"
 

@@ -5,6 +5,8 @@
 ### Added
 
 - Graphics engine documented in depth (`$B080–$B3AF`): cell addresses, the graphic directory fields, cell masks, colour patterns, the pixel, colour, mark and shadow passes, with every basic block commented.
+- Start-up, firing and hatchways documented in depth (`$61A8–$B07F`, `$BD44–$C09A`): the entry, screen clear and hull surface, the fire key, both shots' launch, flight, colours and marks, hits and pushes, and the hatchway animation's halves and phases.
+- Documented two more defects in the game: a failed shot launch writes `$FF` to the range byte instead of the direction (`$BE3F`), and a push at a shot's first cell can report the cell as free (`$BEED`).
 - The Skimmer documented in depth (`$C963–$CDE7`): its four moves and screen exits, the shared draw with its cover map and timing-matched skip, background saves and restores, blocking checks and pushes, and the image, flip and shield-loss frame tables with renders.
 - Documented another defect in the game: the shield-loss animation never shows its first frame (`$CBC6`).
 - Hostile objects documented in depth (`$C09B–$C962`): the four slots, launches, the 13 designs and their shifted images, steering, the four moves, cover maps, collisions, pushes, firing, explosions, and every field of the hostile object workspace.
