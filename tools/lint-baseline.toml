@@ -43,12 +43,6 @@ message = "85 bytes with no sub-directives. Fix it in this order: render it; sta
 [[finding]]
 check = "data-structure"
 kind = "UNTYPED"
-at = "$D473"
-message = "7053 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
-
-[[finding]]
-check = "data-structure"
-kind = "UNTYPED"
 at = "$F009"
 message = "769 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
 
@@ -67,20 +61,8 @@ message = "1421 bytes with no sub-directives. Fix it in this order: render it; s
 [[finding]]
 check = "identity"
 kind = "UNTITLED_ENTRY"
-at = "$D473"
-message = "`b $D473` has no title and publishes as a page headed \"Data at D473\". There is no record to fold it into — the entry above it is c $D41A — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
 at = "$F473"
 message = "`b $F473` has no title and publishes as a page headed \"Data at F473\". There is no record to fold it into — the entry above it is c $F45F — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "publication"
-kind = "MUTABLE"
-at = "$D473"
-message = "`b $D473 ` publishes 7053 bytes as data the program was loaded with, and the code stores to 7 of them: $D47E (*) from $D386, $D488 (*) from $D3AE, $D489 from $D3AE. Bytes the program writes as it runs are `g`, the page SkoolKit heads \"Game status buffer entry at\" — the type is what tells a reader whether a value survives a replay, and an agent-trainer which addresses are state. Retype the entry `g`, or - if the rest of it really is a static table with a runtime slot glued to its tail - split the written bytes into a `g` entry of their own"
 
 [[finding]]
 check = "publication"

@@ -5,6 +5,8 @@
 ### Added
 
 - Graphics engine documented in depth (`$B080–$B3AF`): cell addresses, the graphic directory fields, cell masks, colour patterns, the pixel, colour, mark and shadow passes, with every basic block commented.
+- Documented a defect in the game's data: screen 55's last layout record carries a stray run flag, so that graphic casts no shadow.
+- Screens page (`src/screens.ref`, `src/screens.py`): every outer hull screen, every inner section screen and the whole 10 × 11 hull map, each drawn by the game's own screen code in SkoolKit's simulator; the layout tables split into one labelled list per screen with the record format, and the readout variables at `$D473` split and defined.
 - The outer hull's graphic directory (`$6200`) and all 151 outer hull graphics, each labelled and rendered, with the directory's odd records explained; the inner directory linked to the same schema.
 - Graphics gallery (`src/graphics.ref`) and the sprite block `$7CD4–$A817` split into labelled, rendered entries: the Skimmer's images, flip and shield-loss frames (animated), hull surfaces, defence devices, the animated graphic, the hatch, the 13 hostile object designs, the shots, the explosion (animated), the font and the control panel in its own colours.
 - The title tune player, decrypted by `tools/tune_player.py` and published as its own listing (`src/tune.ctl`, `src/tune.ref`): the introduction's slides, the two-tone and three-tone players with their timing and pitch formulas, the noise run and the key-press exit. The tune listing plays the start of the first part as an `#AUDIO` clip, captured by running the game's own player in SkoolKit's simulator.

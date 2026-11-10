@@ -117,3 +117,13 @@ $(TUNE_SKOOL): $(TUNE_BIN) src/tune.ctl
 	sna2skool.py --hex -o 0xF009 --ctl src/tune.ctl $< > $@
 
 $(HTML_DIR)/.stamp: $(TUNE_SKOOL)
+
+# --- The screens --------------------------------------------------------------
+#
+# Every screen render runs the game's own draw in SkoolKit's simulator
+# (#DRAWSCREEN, defined in src/shadskim.ref). The hull map tiles those draws
+# into one image through a #CALL method of src/screens.py. skool2html reads
+# [Config] HtmlWriterClass only from refs beside the skool file or from -c, so
+# it is passed here.
+SKOOL2HTML += -c "Config/HtmlWriterClass=$(CURDIR)/src:screens.ScreenWriter"
+$(HTML_DIR)/.stamp: src/screens.py

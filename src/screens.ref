@@ -1,0 +1,114 @@
+; The screens of the game, each drawn by the game's own code: #DRAWSCREEN
+; (src/shadskim.ref) runs the screen clear and the screen entry in SkoolKit's
+; simulator, and #SCR takes the play area. The hull map tiles the same draws
+; through ScreenWriter.hull_map (src/screens.py).
+
+[Page:Screens]
+SectionPrefix=Screen
+
+[Screen:hull-map:Hull map]
+Every screen of the outer hull, drawn as at #R$D8DC(the outer hull layouts). The
+screens sit where #R$CE86(the hull map) puts them, from screen 0 at the top left.
+
+#HTML(<div style="overflow-x: auto">)#UDGTABLE { #CALL(hull_map(hull_map)) } TABLE##HTML(</div>)
+
+[Screen:outer-hull:Outer hull]
+Each screen of the outer hull, linked to its #R$D8DC(layout).
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(0,0,0)#SCR1,0,6,32,18(outer_screen_0_small)#POPS | #PUSHS #DRAWSCREEN(1,0,0)#SCR1,0,6,32,18(outer_screen_1_small)#POPS | #PUSHS #DRAWSCREEN(2,0,0)#SCR1,0,6,32,18(outer_screen_2_small)#POPS } { #R$D8DC(Screen 0) | #R$D90D(Screen 1) | #R$D96E(Screen 2) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(3,0,0)#SCR1,0,6,32,18(outer_screen_3_small)#POPS | #PUSHS #DRAWSCREEN(4,0,0)#SCR1,0,6,32,18(outer_screen_4_small)#POPS | #PUSHS #DRAWSCREEN(5,0,0)#SCR1,0,6,32,18(outer_screen_5_small)#POPS } { #R$D96F(Screen 3) | #R$D9A6(Screen 4) | #R$D9D7(Screen 5) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(6,0,0)#SCR1,0,6,32,18(outer_screen_6_small)#POPS | #PUSHS #DRAWSCREEN(7,0,0)#SCR1,0,6,32,18(outer_screen_7_small)#POPS | #PUSHS #DRAWSCREEN(8,0,0)#SCR1,0,6,32,18(outer_screen_8_small)#POPS } { #R$DA02(Screen 6) | #R$DA12(Screen 7) | #R$DA58(Screen 8) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(9,0,0)#SCR1,0,6,32,18(outer_screen_9_small)#POPS | #PUSHS #DRAWSCREEN(0,1,0)#SCR1,0,6,32,18(outer_screen_10_small)#POPS | #PUSHS #DRAWSCREEN(1,1,0)#SCR1,0,6,32,18(outer_screen_11_small)#POPS } { #R$DA59(Screen 9) | #R$DA5A(Screen 10) | #R$DA91(Screen 11) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(2,1,0)#SCR1,0,6,32,18(outer_screen_12_small)#POPS | #PUSHS #DRAWSCREEN(3,1,0)#SCR1,0,6,32,18(outer_screen_13_small)#POPS | #PUSHS #DRAWSCREEN(4,1,0)#SCR1,0,6,32,18(outer_screen_14_small)#POPS } { #R$DAC8(Screen 12) | #R$DAFF(Screen 13) | #R$DB27(Screen 14) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(5,1,0)#SCR1,0,6,32,18(outer_screen_15_small)#POPS | #PUSHS #DRAWSCREEN(6,1,0)#SCR1,0,6,32,18(outer_screen_16_small)#POPS | #PUSHS #DRAWSCREEN(7,1,0)#SCR1,0,6,32,18(outer_screen_17_small)#POPS } { #R$DB3D(Screen 15) | #R$DB53(Screen 16) | #R$DB69(Screen 17) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(8,1,0)#SCR1,0,6,32,18(outer_screen_18_small)#POPS | #PUSHS #DRAWSCREEN(9,1,0)#SCR1,0,6,32,18(outer_screen_19_small)#POPS | #PUSHS #DRAWSCREEN(0,2,0)#SCR1,0,6,32,18(outer_screen_20_small)#POPS } { #R$DB9D(Screen 18) | #R$DB9E(Screen 19) | #R$DB9F(Screen 20) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(1,2,0)#SCR1,0,6,32,18(outer_screen_21_small)#POPS | #PUSHS #DRAWSCREEN(2,2,0)#SCR1,0,6,32,18(outer_screen_22_small)#POPS | #PUSHS #DRAWSCREEN(3,2,0)#SCR1,0,6,32,18(outer_screen_23_small)#POPS } { #R$DBCD(Screen 21) | #R$DC22(Screen 22) | #R$DC50(Screen 23) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(4,2,0)#SCR1,0,6,32,18(outer_screen_24_small)#POPS | #PUSHS #DRAWSCREEN(5,2,0)#SCR1,0,6,32,18(outer_screen_25_small)#POPS | #PUSHS #DRAWSCREEN(6,2,0)#SCR1,0,6,32,18(outer_screen_26_small)#POPS } { #R$DC66(Screen 24) | #R$DC7F(Screen 25) | #R$DCB6(Screen 26) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(7,2,0)#SCR1,0,6,32,18(outer_screen_27_small)#POPS | #PUSHS #DRAWSCREEN(8,2,0)#SCR1,0,6,32,18(outer_screen_28_small)#POPS | #PUSHS #DRAWSCREEN(9,2,0)#SCR1,0,6,32,18(outer_screen_29_small)#POPS } { #R$DCF3(Screen 27) | #R$DD18(Screen 28) | #R$DD19(Screen 29) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(0,3,0)#SCR1,0,6,32,18(outer_screen_30_small)#POPS | #PUSHS #DRAWSCREEN(1,3,0)#SCR1,0,6,32,18(outer_screen_31_small)#POPS | #PUSHS #DRAWSCREEN(2,3,0)#SCR1,0,6,32,18(outer_screen_32_small)#POPS } { #R$DD1A(Screen 30) | #R$DD4E(Screen 31) | #R$DD97(Screen 32) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(3,3,0)#SCR1,0,6,32,18(outer_screen_33_small)#POPS | #PUSHS #DRAWSCREEN(4,3,0)#SCR1,0,6,32,18(outer_screen_34_small)#POPS | #PUSHS #DRAWSCREEN(5,3,0)#SCR1,0,6,32,18(outer_screen_35_small)#POPS } { #R$DDC2(Screen 33) | #R$DDF9(Screen 34) | #R$DE30(Screen 35) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(6,3,0)#SCR1,0,6,32,18(outer_screen_36_small)#POPS | #PUSHS #DRAWSCREEN(7,3,0)#SCR1,0,6,32,18(outer_screen_37_small)#POPS | #PUSHS #DRAWSCREEN(8,3,0)#SCR1,0,6,32,18(outer_screen_38_small)#POPS } { #R$DE5E(Screen 36) | #R$DE9E(Screen 37) | #R$DEB7(Screen 38) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(9,3,0)#SCR1,0,6,32,18(outer_screen_39_small)#POPS | #PUSHS #DRAWSCREEN(0,4,0)#SCR1,0,6,32,18(outer_screen_40_small)#POPS | #PUSHS #DRAWSCREEN(1,4,0)#SCR1,0,6,32,18(outer_screen_41_small)#POPS } { #R$DEB8(Screen 39) | #R$DEB9(Screen 40) | #R$DEDE(Screen 41) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(2,4,0)#SCR1,0,6,32,18(outer_screen_42_small)#POPS | #PUSHS #DRAWSCREEN(3,4,0)#SCR1,0,6,32,18(outer_screen_43_small)#POPS | #PUSHS #DRAWSCREEN(4,4,0)#SCR1,0,6,32,18(outer_screen_44_small)#POPS } { #R$DF18(Screen 42) | #R$DF67(Screen 43) | #R$DFB6(Screen 44) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(5,4,0)#SCR1,0,6,32,18(outer_screen_45_small)#POPS | #PUSHS #DRAWSCREEN(6,4,0)#SCR1,0,6,32,18(outer_screen_46_small)#POPS | #PUSHS #DRAWSCREEN(7,4,0)#SCR1,0,6,32,18(outer_screen_47_small)#POPS } { #R$DFE4(Screen 45) | #R$E015(Screen 46) | #R$E052(Screen 47) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(8,4,0)#SCR1,0,6,32,18(outer_screen_48_small)#POPS | #PUSHS #DRAWSCREEN(9,4,0)#SCR1,0,6,32,18(outer_screen_49_small)#POPS | #PUSHS #DRAWSCREEN(0,5,0)#SCR1,0,6,32,18(outer_screen_50_small)#POPS } { #R$E08C(Screen 48) | #R$E08D(Screen 49) | #R$E08E(Screen 50) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(1,5,0)#SCR1,0,6,32,18(outer_screen_51_small)#POPS | #PUSHS #DRAWSCREEN(2,5,0)#SCR1,0,6,32,18(outer_screen_52_small)#POPS | #PUSHS #DRAWSCREEN(3,5,0)#SCR1,0,6,32,18(outer_screen_53_small)#POPS } { #R$E0B0(Screen 51) | #R$E0CC(Screen 52) | #R$E106(Screen 53) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(4,5,0)#SCR1,0,6,32,18(outer_screen_54_small)#POPS | #PUSHS #DRAWSCREEN(5,5,0)#SCR1,0,6,32,18(outer_screen_55_small)#POPS | #PUSHS #DRAWSCREEN(6,5,0)#SCR1,0,6,32,18(outer_screen_56_small)#POPS } { #R$E119(Screen 54) | #R$E132(Screen 55) | #R$E145(Screen 56) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(7,5,0)#SCR1,0,6,32,18(outer_screen_57_small)#POPS | #PUSHS #DRAWSCREEN(8,5,0)#SCR1,0,6,32,18(outer_screen_58_small)#POPS | #PUSHS #DRAWSCREEN(9,5,0)#SCR1,0,6,32,18(outer_screen_59_small)#POPS } { #R$E164(Screen 57) | #R$E186(Screen 58) | #R$E193(Screen 59) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(0,6,0)#SCR1,0,6,32,18(outer_screen_60_small)#POPS | #PUSHS #DRAWSCREEN(1,6,0)#SCR1,0,6,32,18(outer_screen_61_small)#POPS | #PUSHS #DRAWSCREEN(2,6,0)#SCR1,0,6,32,18(outer_screen_62_small)#POPS } { #R$E19A(Screen 60) | #R$E1BC(Screen 61) | #R$E1F6(Screen 62) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(3,6,0)#SCR1,0,6,32,18(outer_screen_63_small)#POPS | #PUSHS #DRAWSCREEN(4,6,0)#SCR1,0,6,32,18(outer_screen_64_small)#POPS | #PUSHS #DRAWSCREEN(5,6,0)#SCR1,0,6,32,18(outer_screen_65_small)#POPS } { #R$E248(Screen 63) | #R$E285(Screen 64) | #R$E2AA(Screen 65) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(6,6,0)#SCR1,0,6,32,18(outer_screen_66_small)#POPS | #PUSHS #DRAWSCREEN(7,6,0)#SCR1,0,6,32,18(outer_screen_67_small)#POPS | #PUSHS #DRAWSCREEN(8,6,0)#SCR1,0,6,32,18(outer_screen_68_small)#POPS } { #R$E2C9(Screen 66) | #R$E2FA(Screen 67) | #R$E322(Screen 68) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(9,6,0)#SCR1,0,6,32,18(outer_screen_69_small)#POPS | #PUSHS #DRAWSCREEN(0,7,0)#SCR1,0,6,32,18(outer_screen_70_small)#POPS | #PUSHS #DRAWSCREEN(1,7,0)#SCR1,0,6,32,18(outer_screen_71_small)#POPS } { #R$E323(Screen 69) | #R$E32A(Screen 70) | #R$E364(Screen 71) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(2,7,0)#SCR1,0,6,32,18(outer_screen_72_small)#POPS | #PUSHS #DRAWSCREEN(3,7,0)#SCR1,0,6,32,18(outer_screen_73_small)#POPS | #PUSHS #DRAWSCREEN(4,7,0)#SCR1,0,6,32,18(outer_screen_74_small)#POPS } { #R$E3B9(Screen 72) | #R$E3F6(Screen 73) | #R$E43C(Screen 74) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(5,7,0)#SCR1,0,6,32,18(outer_screen_75_small)#POPS | #PUSHS #DRAWSCREEN(6,7,0)#SCR1,0,6,32,18(outer_screen_76_small)#POPS | #PUSHS #DRAWSCREEN(7,7,0)#SCR1,0,6,32,18(outer_screen_77_small)#POPS } { #R$E464(Screen 75) | #R$E47A(Screen 76) | #R$E487(Screen 77) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(8,7,0)#SCR1,0,6,32,18(outer_screen_78_small)#POPS | #PUSHS #DRAWSCREEN(9,7,0)#SCR1,0,6,32,18(outer_screen_79_small)#POPS | #PUSHS #DRAWSCREEN(0,8,0)#SCR1,0,6,32,18(outer_screen_80_small)#POPS } { #R$E4A9(Screen 78) | #R$E4AA(Screen 79) | #R$E4B1(Screen 80) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(1,8,0)#SCR1,0,6,32,18(outer_screen_81_small)#POPS | #PUSHS #DRAWSCREEN(2,8,0)#SCR1,0,6,32,18(outer_screen_82_small)#POPS | #PUSHS #DRAWSCREEN(3,8,0)#SCR1,0,6,32,18(outer_screen_83_small)#POPS } { #R$E4E5(Screen 81) | #R$E52B(Screen 82) | #R$E565(Screen 83) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(4,8,0)#SCR1,0,6,32,18(outer_screen_84_small)#POPS | #PUSHS #DRAWSCREEN(5,8,0)#SCR1,0,6,32,18(outer_screen_85_small)#POPS | #PUSHS #DRAWSCREEN(6,8,0)#SCR1,0,6,32,18(outer_screen_86_small)#POPS } { #R$E59F(Screen 84) | #R$E5F7(Screen 85) | #R$E60A(Screen 86) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(7,8,0)#SCR1,0,6,32,18(outer_screen_87_small)#POPS | #PUSHS #DRAWSCREEN(8,8,0)#SCR1,0,6,32,18(outer_screen_88_small)#POPS | #PUSHS #DRAWSCREEN(9,8,0)#SCR1,0,6,32,18(outer_screen_89_small)#POPS } { #R$E632(Screen 87) | #R$E678(Screen 88) | #R$E679(Screen 89) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(0,9,0)#SCR1,0,6,32,18(outer_screen_90_small)#POPS | #PUSHS #DRAWSCREEN(1,9,0)#SCR1,0,6,32,18(outer_screen_91_small)#POPS | #PUSHS #DRAWSCREEN(2,9,0)#SCR1,0,6,32,18(outer_screen_92_small)#POPS } { #R$E680(Screen 90) | #R$E69C(Screen 91) | #R$E6CD(Screen 92) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(3,9,0)#SCR1,0,6,32,18(outer_screen_93_small)#POPS | #PUSHS #DRAWSCREEN(4,9,0)#SCR1,0,6,32,18(outer_screen_94_small)#POPS | #PUSHS #DRAWSCREEN(5,9,0)#SCR1,0,6,32,18(outer_screen_95_small)#POPS } { #R$E71C(Screen 93) | #R$E759(Screen 94) | #R$E790(Screen 95) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(6,9,0)#SCR1,0,6,32,18(outer_screen_96_small)#POPS | #PUSHS #DRAWSCREEN(7,9,0)#SCR1,0,6,32,18(outer_screen_97_small)#POPS | #PUSHS #DRAWSCREEN(8,9,0)#SCR1,0,6,32,18(outer_screen_98_small)#POPS } { #R$E7B2(Screen 96) | #R$E7EC(Screen 97) | #R$E82C(Screen 98) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(9,9,0)#SCR1,0,6,32,18(outer_screen_99_small)#POPS | #PUSHS #DRAWSCREEN(0,10,0)#SCR1,0,6,32,18(outer_screen_100_small)#POPS | #PUSHS #DRAWSCREEN(1,10,0)#SCR1,0,6,32,18(outer_screen_101_small)#POPS } { #R$E82D(Screen 99) | #R$E834(Screen 100) | #R$E877(Screen 101) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(2,10,0)#SCR1,0,6,32,18(outer_screen_102_small)#POPS | #PUSHS #DRAWSCREEN(3,10,0)#SCR1,0,6,32,18(outer_screen_103_small)#POPS | #PUSHS #DRAWSCREEN(4,10,0)#SCR1,0,6,32,18(outer_screen_104_small)#POPS } { #R$E8B4(Screen 102) | #R$E8BB(Screen 103) | #R$E8EC(Screen 104) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(5,10,0)#SCR1,0,6,32,18(outer_screen_105_small)#POPS | #PUSHS #DRAWSCREEN(6,10,0)#SCR1,0,6,32,18(outer_screen_106_small)#POPS | #PUSHS #DRAWSCREEN(7,10,0)#SCR1,0,6,32,18(outer_screen_107_small)#POPS } { #R$E932(Screen 105) | #R$E963(Screen 106) | #R$E9A0(Screen 107) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(8,10,0)#SCR1,0,6,32,18(outer_screen_108_small)#POPS | #PUSHS #DRAWSCREEN(9,10,0)#SCR1,0,6,32,18(outer_screen_109_small)#POPS } { #R$E9C2(Screen 108) | #R$E9C9(Screen 109) } TABLE#
+
+[Screen:inner-sections:Inner sections]
+Each screen of the inner sections that has a #R$EADC(layout), and the WALL DONE
+screen, which #R$B4D9(the screen draw) shows in place of a layout.
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(5,0,1)#SCR1,0,6,32,18(inner_screen_5_small)#POPS | #PUSHS #DRAWSCREEN(6,0,1)#SCR1,0,6,32,18(inner_screen_6_small)#POPS | #PUSHS #DRAWSCREEN(7,0,1)#SCR1,0,6,32,18(inner_screen_7_small)#POPS } { #R$EAE1(Screen 5, WALL DONE) | #R$EAE2(Screen 6) | #R$EB04(Screen 7) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(8,0,1)#SCR1,0,6,32,18(inner_screen_8_small)#POPS | #PUSHS #DRAWSCREEN(0,5,1)#SCR1,0,6,32,18(inner_screen_50_small)#POPS | #PUSHS #DRAWSCREEN(1,5,1)#SCR1,0,6,32,18(inner_screen_51_small)#POPS } { #R$EB26(Screen 8) | #R$EB62(Screen 50) | #R$EB72(Screen 51) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(2,5,1)#SCR1,0,6,32,18(inner_screen_52_small)#POPS | #PUSHS #DRAWSCREEN(3,5,1)#SCR1,0,6,32,18(inner_screen_53_small)#POPS | #PUSHS #DRAWSCREEN(4,5,1)#SCR1,0,6,32,18(inner_screen_54_small)#POPS } { #R$EB91(Screen 52) | #R$EBBF(Screen 53) | #R$EBE7(Screen 54) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(5,5,1)#SCR1,0,6,32,18(inner_screen_55_small)#POPS | #PUSHS #DRAWSCREEN(6,5,1)#SCR1,0,6,32,18(inner_screen_56_small)#POPS | #PUSHS #DRAWSCREEN(0,6,1)#SCR1,0,6,32,18(inner_screen_60_small)#POPS } { #R$EC12(Screen 55) | #R$EC40(Screen 56) | #R$EC74(Screen 60) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(1,6,1)#SCR1,0,6,32,18(inner_screen_61_small)#POPS | #PUSHS #DRAWSCREEN(2,6,1)#SCR1,0,6,32,18(inner_screen_62_small)#POPS | #PUSHS #DRAWSCREEN(4,6,1)#SCR1,0,6,32,18(inner_screen_64_small)#POPS } { #R$EC93(Screen 61) | #R$ECA6(Screen 62) | #R$ECBA(Screen 64) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(5,6,1)#SCR1,0,6,32,18(inner_screen_65_small)#POPS | #PUSHS #DRAWSCREEN(6,6,1)#SCR1,0,6,32,18(inner_screen_66_small)#POPS | #PUSHS #DRAWSCREEN(7,6,1)#SCR1,0,6,32,18(inner_screen_67_small)#POPS } { #R$ECD0(Screen 65) | #R$ED04(Screen 66) | #R$ED3B(Screen 67) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(0,7,1)#SCR1,0,6,32,18(inner_screen_70_small)#POPS | #PUSHS #DRAWSCREEN(1,7,1)#SCR1,0,6,32,18(inner_screen_71_small)#POPS | #PUSHS #DRAWSCREEN(4,7,1)#SCR1,0,6,32,18(inner_screen_74_small)#POPS } { #R$ED56(Screen 70) | #R$ED75(Screen 71) | #R$ED87(Screen 74) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(5,7,1)#SCR1,0,6,32,18(inner_screen_75_small)#POPS | #PUSHS #DRAWSCREEN(6,7,1)#SCR1,0,6,32,18(inner_screen_76_small)#POPS | #PUSHS #DRAWSCREEN(4,8,1)#SCR1,0,6,32,18(inner_screen_84_small)#POPS } { #R$EDA6(Screen 75) | #R$EDC2(Screen 76) | #R$EDE5(Screen 84) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(1,9,1)#SCR1,0,6,32,18(inner_screen_91_small)#POPS | #PUSHS #DRAWSCREEN(2,9,1)#SCR1,0,6,32,18(inner_screen_92_small)#POPS | #PUSHS #DRAWSCREEN(0,10,1)#SCR1,0,6,32,18(inner_screen_100_small)#POPS } { #R$EE0A(Screen 91) | #R$EE50(Screen 92) | #R$EE82(Screen 100) } TABLE#
+
+#UDGTABLE { #PUSHS #DRAWSCREEN(1,10,1)#SCR1,0,6,32,18(inner_screen_101_small)#POPS } { #R$EE9B(Screen 101) } TABLE#

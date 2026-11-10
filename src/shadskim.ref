@@ -4,8 +4,15 @@
 ; [Index:...], [Paths], [Links] and [Titles] lines, as it is written.
 
 [Config]
-RefFiles=glossary.ref;workspace.ref;graphics.ref;tune.ref
+RefFiles=glossary.ref;workspace.ref;graphics.ref;screens.ref;tune.ref
 GameDir=shadskim
+; #DRAWSCREEN(column,row,inside) draws one screen with the game's own code in
+; SkoolKit's simulator: the screen clear, then the screen entry of the play
+; routine from the hull map position (and the inside-the-hull flag) up to the
+; return from the screen draw. A render then takes the play area with #SCR.
+; It needs the ROM in the snapshot (@rom at the outer hull layouts), since the
+; hatchway draw reads it.
+Expand=#DEF(#DRAWSCREEN(column,row,inside) #SIM($B029,$B003,1,sp=$F7F8)#POKES($BD25,$column)#POKES($BD26,$row)#POKES($BD3E,$inside)#SIM($CF6F,$CEDB))
 
 ; Parsed first, before every other project ref and the skill's theme.ref.
 [Game]
@@ -26,6 +33,7 @@ Copyright=Game &copy; 1987 The Edge / Softek. Disassembly for preservation and s
 [Index:Reference:Reference]
 Glossary
 Graphics
+Screens
 Workspace
 tune-Index
 
@@ -33,17 +41,20 @@ tune-Index
 CodeFiles={address:04X}.html
 Glossary=reference/glossary.html
 Graphics=reference/graphics.html
+Screens=reference/screens.html
 Workspace=reference/workspace.html
 tune-Index=tune/index.html
 
 [Links]
 Glossary=Glossary
 Graphics=Graphics
+Screens=Screens
 Workspace=Workspace
 tune-Index=Title tune player
 
 [Titles]
 Glossary=Glossary
 Graphics=Graphics
+Screens=Screens
 Workspace=Workspace
 tune-Index=Title tune player

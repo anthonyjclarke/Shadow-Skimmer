@@ -1372,7 +1372,7 @@ R $B4D9 I:A number of the screen
   $B533 Fetch the address of the screen's layout from the map, one word per screen number.
   $B541 Start the launch cells afresh, and point at the first record.
 @ $B548 label=read_layout_record
-N $B548 Each record of a layout holds one graphic at one cell, in three bytes. A record that starts a run takes the cell of the record after it as the run's end.
+N $B548 #R$D8DC(The outer hull layouts) give the format of a layout's records.
   $B548 Fetch the graphic number. Is it the end of the layout?
   $B54C Return if so
   $B54D Keep the graphic number, and start from white ink on black.
@@ -3848,7 +3848,7 @@ D $D24A Once the Damage Report Indicator runs out, advances a shield loss by one
   $D25B Return if not
   $D25C Move the loss on by one stage. Is it past its last stage?
   $D261 Return if not
-  $D262 The loss is over. Clear its stage and #R$D48D(the shield loss flag), and refill the indicator and show it.
+  $D262 The loss is over. Clear its stage and #R$D48D(the shield loss due flag), and refill the indicator and show it.
   $D26D Take away a shield. Was it the last one?
   $D271 Jump if not
   $D273,5 End the game, and show that no shields are left.
@@ -3951,7 +3951,7 @@ D $D2D6 Prints a run of digits in inverse video at a character cell of the contr
 R $D2D6 I:B character row of the first digit
 R $D2D6 I:C column of the first digit
 R $D2D6 I:D number of digits
-R $D2D6 I:HL address of the first digit, in the form #R$D2E6(the digit printer) takes
+R $D2D6 I:HL address of the first digit, in the form of #R$D479(the readout digits)
   $D2D6 Find the screen address of the first digit's cell, and keep it in the other register set for the digit printer.
   $D2DC Fetch the number of digits and the address of the first.
 @ $D2DE label=readout_digit
@@ -3959,7 +3959,7 @@ R $D2D6 I:HL address of the first digit, in the form #R$D2E6(the digit printer) 
 @ $D2E6 label=print_inverse_digit
 c $D2E6 Print one control panel digit
 D $D2E6 Prints one digit in inverse video, rolled partway on toward the next digit by its eighths, and moves to the next cell on the right.
-R $D2E6 I:A the digit, as 8 times its value plus its eighths toward the next digit
+R $D2E6 I:A the digit, in the form of #R$D479(the readout digits)
 R $D2E6 I:HL' screen address of the digit's cell
 R $D2E6 O:HL' screen address of the next cell on the right
   $D2E6 Switch to the screen address.
@@ -4013,10 +4013,13 @@ R $D31E O:C 8 if the indicator drops under zero
 @ $D33E label=drain_next_digit
   $D33E,4 Move to the next digit on the left.
 @ $D343 label=update_readouts
+@ $D343 ssub=LD DE,damage_digits+2
 c $D343 Update the Damage Report Indicator and the score
 D $D343 Runs the Damage Report Indicator down, faster while a push on the Skimmer runs, and starts a shield loss when it drops under zero. It also prints the indicator and counts the points still due into the score, one step per call.
   $D343 Take the slow drain for the indicator. Is a push on the Skimmer under way?
+@ $D346 ssub=LD HL,slow_drain+2
   $D34E Jump if not
+@ $D350 ssub=LD HL,fast_drain+2
   $D350 Take the fast drain instead.
 @ $D353 label=drain_indicator
   $D353 Run the indicator down. Does it drop under zero?
@@ -4034,16 +4037,20 @@ N $D37D The points still due wait at #R$D48A(the points due), in eighths of a po
   $D37D Is any step left?
   $D382 Jump if so
   $D384 None is left. Go back to a step of one eighth, and add nothing this call.
+@ $D386 ssub=LD (score_step+5),A
 @ $D38F label=score_steps_left
   $D38F Are 256 steps or more left?
   $D392 Jump if not
   $D394 Is the count even?
   $D396 Jump if not
+@ $D398 ssub=LD DE,score_step+5
   $D398 Is the step under four points?
   $D39E Jump if not
   $D3A0 Halve the count, double the step, and count the times the step doubled.
 @ $D3AD label=score_one_step
   $D3AD Spend one step, and add it to the score.
+@ $D3B1 ssub=LD DE,score_digits+5
+@ $D3B4 ssub=LD HL,score_step+5
   $D3BC Print the score.
 @ $D3C7 label=take_points_due
   $D3C7 Fetch the points due and the times the step doubled. Is the step still one eighth?
@@ -4095,33 +4102,752 @@ D $D41A Advances the timers of the animated graphics in the #R$C909(animation li
   $D466 Store the timer, and move to the next graphic, 13 bytes per entry.
   $D46E,4 Cross into the next page.
 @ $D472 label=anim_done
-b $D473
-@ $D475 label=*
-B $D475
-@ $D478 label=*
-B $D478
-@ $D47E label=*
-B $D47E
-@ $D47F label=*
-B $D47F
-@ $D481 label=*
-B $D481
-@ $D482 label=*
-B $D482
-@ $D487 label=*
-B $D487
-@ $D488 label=*
-B $D488
-@ $D48A label=*
-B $D48A
-@ $D48C label=*
-B $D48C
-@ $D48D label=*
-B $D48D
-@ $D800 label=*
-B $D800
-@ $EA00 label=*
-B $EA00
+@ $D473 label=slow_drain
+b $D473 Damage Report Indicator drains
+D $D473 The amounts that the Damage Report Indicator loses on each update, as three digits in the form of #R$D479(the readout digits).
+B $D473,3 Slow drain, while no push on the Skimmer runs: one eighth of a unit
+@ $D476 label=fast_drain
+B $D476,3 Fast drain, while a push on the Skimmer runs: three units and one eighth
+@ $D479 label=score_step
+g $D479 Readout digits
+D $D479 The score step, the Damage Report Indicator and the score, as decimal digits, first digit first. Each digit takes one byte: eight times its value, plus its eighths on the way to the next value, from 0 to 79.
+B $D479,6 Score step, in the last digit: an eighth, a quarter or a half of a point, or 1, 2 or 4 points
+@ $D47F label=damage_digits
+B $D47F,3 Damage Report Indicator, from 0 to 999
+@ $D482 label=score_digits
+B $D482,6 Score
+@ $D488 label=step_count
+g $D488 Score step count
+W $D488,2 Number of score steps still to add to the score
+@ $D48A label=points_due
+g $D48A Points due
+W $D48A,2 Points still to count into the score, in eighths of a point
+@ $D48C label=step_doublings
+g $D48C Score step doublings
+B $D48C,1 Number of times the score step doubled from one eighth of a point, 0–5
+@ $D48D label=shield_loss_due
+g $D48D Shield loss due
+B $D48D,1 1 while a shield loss is due or runs, 0 otherwise
+u $D48E Unused bytes
+@ $D800 label=outer_layout_addrs
+w $D800 Outer hull layout addresses
+D $D800 The address of the #R$D8DC(layout) of each outer hull screen, one word per screen number.
+@ $D8DC label=outer_layout_0
+@ $D8DC rom
+b $D8DC Outer hull screen layouts
+D $D8DC The graphics on each screen of the outer hull, one layout for each screen number, in the order of #R$D800(their addresses). #R$B4D9 draws them.
+N $D8DC Each record of a layout places one graphic at one cell, in three bytes.
+N $D8DC #TABLE(default) { =h Byte | =h Bits | =h Content } { 1 | 0–7 | Number of the graphic, or $FF after the last record } { 2 | 0–4 | Column of the graphic's top-left cell, 0–31 } { 2 | 5–7 | Ink of the graphic, which draws bright on black paper, or 0 for white ink, not bright } { 3 | 0–4 | Row of the graphic's top-left cell, 0 for the top row of the play area } { 3 | 5–7 | For the animated graphic, the calls of #R$D41A(the animation step) that each frame lasts, less 2 } { 3 | 7 | 1 if the graphic repeats in a run to the cell of the next record } TABLE#
+N $D8DC A run repeats its graphic across to the next record's column, or down to its row when the two records share a column (#R$B59E).
+N $D8DC Each render shows the play area as the game draws the screen at the start of a game, before the Skimmer appears.
+N $D8DC #UDGTABLE { #PUSHS #DRAWSCREEN(0,0,0)#SCR2,0,6,32,18(outer_screen_0)#POPS } { Screen 0 } TABLE#
+B $D8DC,48,3
+B $D90C,1 End of the layout
+@ $D90D label=outer_layout_1
+N $D90D #UDGTABLE { #PUSHS #DRAWSCREEN(1,0,0)#SCR2,0,6,32,18(outer_screen_1)#POPS } { Screen 1 } TABLE#
+B $D90D,96,3
+B $D96D,1 End of the layout
+@ $D96E label=outer_layout_2
+N $D96E #UDGTABLE { #PUSHS #DRAWSCREEN(2,0,0)#SCR2,0,6,32,18(outer_screen_2)#POPS } { Screen 2 } TABLE#
+B $D96E,1 End of the layout
+@ $D96F label=outer_layout_3
+N $D96F #UDGTABLE { #PUSHS #DRAWSCREEN(3,0,0)#SCR2,0,6,32,18(outer_screen_3)#POPS } { Screen 3 } TABLE#
+B $D96F,54,3
+B $D9A5,1 End of the layout
+@ $D9A6 label=outer_layout_4
+N $D9A6 #UDGTABLE { #PUSHS #DRAWSCREEN(4,0,0)#SCR2,0,6,32,18(outer_screen_4)#POPS } { Screen 4 } TABLE#
+B $D9A6,48,3
+B $D9D6,1 End of the layout
+@ $D9D7 label=outer_layout_5
+N $D9D7 #UDGTABLE { #PUSHS #DRAWSCREEN(5,0,0)#SCR2,0,6,32,18(outer_screen_5)#POPS } { Screen 5 } TABLE#
+B $D9D7,42,3
+B $DA01,1 End of the layout
+@ $DA02 label=outer_layout_6
+N $DA02 #UDGTABLE { #PUSHS #DRAWSCREEN(6,0,0)#SCR2,0,6,32,18(outer_screen_6)#POPS } { Screen 6 } TABLE#
+B $DA02,15,3
+B $DA11,1 End of the layout
+@ $DA12 label=outer_layout_7
+N $DA12 #UDGTABLE { #PUSHS #DRAWSCREEN(7,0,0)#SCR2,0,6,32,18(outer_screen_7)#POPS } { Screen 7 } TABLE#
+B $DA12,69,3
+B $DA57,1 End of the layout
+@ $DA58 label=outer_layout_8
+N $DA58 #UDGTABLE { #PUSHS #DRAWSCREEN(8,0,0)#SCR2,0,6,32,18(outer_screen_8)#POPS } { Screen 8 } TABLE#
+B $DA58,1 End of the layout
+@ $DA59 label=outer_layout_9
+N $DA59 #UDGTABLE { #PUSHS #DRAWSCREEN(9,0,0)#SCR2,0,6,32,18(outer_screen_9)#POPS } { Screen 9 } TABLE#
+B $DA59,1 End of the layout
+@ $DA5A label=outer_layout_10
+N $DA5A #UDGTABLE { #PUSHS #DRAWSCREEN(0,1,0)#SCR2,0,6,32,18(outer_screen_10)#POPS } { Screen 10 } TABLE#
+B $DA5A,54,3
+B $DA90,1 End of the layout
+@ $DA91 label=outer_layout_11
+N $DA91 #UDGTABLE { #PUSHS #DRAWSCREEN(1,1,0)#SCR2,0,6,32,18(outer_screen_11)#POPS } { Screen 11 } TABLE#
+B $DA91,54,3
+B $DAC7,1 End of the layout
+@ $DAC8 label=outer_layout_12
+N $DAC8 #UDGTABLE { #PUSHS #DRAWSCREEN(2,1,0)#SCR2,0,6,32,18(outer_screen_12)#POPS } { Screen 12 } TABLE#
+B $DAC8,54,3
+B $DAFE,1 End of the layout
+@ $DAFF label=outer_layout_13
+N $DAFF #UDGTABLE { #PUSHS #DRAWSCREEN(3,1,0)#SCR2,0,6,32,18(outer_screen_13)#POPS } { Screen 13 } TABLE#
+B $DAFF,39,3
+B $DB26,1 End of the layout
+@ $DB27 label=outer_layout_14
+N $DB27 #UDGTABLE { #PUSHS #DRAWSCREEN(4,1,0)#SCR2,0,6,32,18(outer_screen_14)#POPS } { Screen 14 } TABLE#
+B $DB27,21,3
+B $DB3C,1 End of the layout
+@ $DB3D label=outer_layout_15
+N $DB3D #UDGTABLE { #PUSHS #DRAWSCREEN(5,1,0)#SCR2,0,6,32,18(outer_screen_15)#POPS } { Screen 15 } TABLE#
+B $DB3D,21,3
+B $DB52,1 End of the layout
+@ $DB53 label=outer_layout_16
+N $DB53 #UDGTABLE { #PUSHS #DRAWSCREEN(6,1,0)#SCR2,0,6,32,18(outer_screen_16)#POPS } { Screen 16 } TABLE#
+B $DB53,21,3
+B $DB68,1 End of the layout
+@ $DB69 label=outer_layout_17
+N $DB69 #UDGTABLE { #PUSHS #DRAWSCREEN(7,1,0)#SCR2,0,6,32,18(outer_screen_17)#POPS } { Screen 17 } TABLE#
+B $DB69,51,3
+B $DB9C,1 End of the layout
+@ $DB9D label=outer_layout_18
+N $DB9D #UDGTABLE { #PUSHS #DRAWSCREEN(8,1,0)#SCR2,0,6,32,18(outer_screen_18)#POPS } { Screen 18 } TABLE#
+B $DB9D,1 End of the layout
+@ $DB9E label=outer_layout_19
+N $DB9E #UDGTABLE { #PUSHS #DRAWSCREEN(9,1,0)#SCR2,0,6,32,18(outer_screen_19)#POPS } { Screen 19 } TABLE#
+B $DB9E,1 End of the layout
+@ $DB9F label=outer_layout_20
+N $DB9F #UDGTABLE { #PUSHS #DRAWSCREEN(0,2,0)#SCR2,0,6,32,18(outer_screen_20)#POPS } { Screen 20 } TABLE#
+B $DB9F,45,3
+B $DBCC,1 End of the layout
+@ $DBCD label=outer_layout_21
+N $DBCD #UDGTABLE { #PUSHS #DRAWSCREEN(1,2,0)#SCR2,0,6,32,18(outer_screen_21)#POPS } { Screen 21 } TABLE#
+B $DBCD,84,3
+B $DC21,1 End of the layout
+@ $DC22 label=outer_layout_22
+N $DC22 #UDGTABLE { #PUSHS #DRAWSCREEN(2,2,0)#SCR2,0,6,32,18(outer_screen_22)#POPS } { Screen 22 } TABLE#
+B $DC22,45,3
+B $DC4F,1 End of the layout
+@ $DC50 label=outer_layout_23
+N $DC50 #UDGTABLE { #PUSHS #DRAWSCREEN(3,2,0)#SCR2,0,6,32,18(outer_screen_23)#POPS } { Screen 23 } TABLE#
+B $DC50,21,3
+B $DC65,1 End of the layout
+@ $DC66 label=outer_layout_24
+N $DC66 #UDGTABLE { #PUSHS #DRAWSCREEN(4,2,0)#SCR2,0,6,32,18(outer_screen_24)#POPS } { Screen 24 } TABLE#
+B $DC66,24,3
+B $DC7E,1 End of the layout
+@ $DC7F label=outer_layout_25
+N $DC7F #UDGTABLE { #PUSHS #DRAWSCREEN(5,2,0)#SCR2,0,6,32,18(outer_screen_25)#POPS } { Screen 25 } TABLE#
+B $DC7F,54,3
+B $DCB5,1 End of the layout
+@ $DCB6 label=outer_layout_26
+N $DCB6 #UDGTABLE { #PUSHS #DRAWSCREEN(6,2,0)#SCR2,0,6,32,18(outer_screen_26)#POPS } { Screen 26 } TABLE#
+B $DCB6,60,3
+B $DCF2,1 End of the layout
+@ $DCF3 label=outer_layout_27
+N $DCF3 #UDGTABLE { #PUSHS #DRAWSCREEN(7,2,0)#SCR2,0,6,32,18(outer_screen_27)#POPS } { Screen 27 } TABLE#
+B $DCF3,36,3
+B $DD17,1 End of the layout
+@ $DD18 label=outer_layout_28
+N $DD18 #UDGTABLE { #PUSHS #DRAWSCREEN(8,2,0)#SCR2,0,6,32,18(outer_screen_28)#POPS } { Screen 28 } TABLE#
+B $DD18,1 End of the layout
+@ $DD19 label=outer_layout_29
+N $DD19 #UDGTABLE { #PUSHS #DRAWSCREEN(9,2,0)#SCR2,0,6,32,18(outer_screen_29)#POPS } { Screen 29 } TABLE#
+B $DD19,1 End of the layout
+@ $DD1A label=outer_layout_30
+N $DD1A #UDGTABLE { #PUSHS #DRAWSCREEN(0,3,0)#SCR2,0,6,32,18(outer_screen_30)#POPS } { Screen 30 } TABLE#
+B $DD1A,51,3
+B $DD4D,1 End of the layout
+@ $DD4E label=outer_layout_31
+N $DD4E #UDGTABLE { #PUSHS #DRAWSCREEN(1,3,0)#SCR2,0,6,32,18(outer_screen_31)#POPS } { Screen 31 } TABLE#
+B $DD4E,72,3
+B $DD96,1 End of the layout
+@ $DD97 label=outer_layout_32
+N $DD97 #UDGTABLE { #PUSHS #DRAWSCREEN(2,3,0)#SCR2,0,6,32,18(outer_screen_32)#POPS } { Screen 32 } TABLE#
+B $DD97,42,3
+B $DDC1,1 End of the layout
+@ $DDC2 label=outer_layout_33
+N $DDC2 #UDGTABLE { #PUSHS #DRAWSCREEN(3,3,0)#SCR2,0,6,32,18(outer_screen_33)#POPS } { Screen 33 } TABLE#
+B $DDC2,54,3
+B $DDF8,1 End of the layout
+@ $DDF9 label=outer_layout_34
+N $DDF9 #UDGTABLE { #PUSHS #DRAWSCREEN(4,3,0)#SCR2,0,6,32,18(outer_screen_34)#POPS } { Screen 34 } TABLE#
+B $DDF9,54,3
+B $DE2F,1 End of the layout
+@ $DE30 label=outer_layout_35
+N $DE30 #UDGTABLE { #PUSHS #DRAWSCREEN(5,3,0)#SCR2,0,6,32,18(outer_screen_35)#POPS } { Screen 35 } TABLE#
+B $DE30,45,3
+B $DE5D,1 End of the layout
+@ $DE5E label=outer_layout_36
+N $DE5E #UDGTABLE { #PUSHS #DRAWSCREEN(6,3,0)#SCR2,0,6,32,18(outer_screen_36)#POPS } { Screen 36 } TABLE#
+B $DE5E,63,3
+B $DE9D,1 End of the layout
+@ $DE9E label=outer_layout_37
+N $DE9E #UDGTABLE { #PUSHS #DRAWSCREEN(7,3,0)#SCR2,0,6,32,18(outer_screen_37)#POPS } { Screen 37 } TABLE#
+B $DE9E,24,3
+B $DEB6,1 End of the layout
+@ $DEB7 label=outer_layout_38
+N $DEB7 #UDGTABLE { #PUSHS #DRAWSCREEN(8,3,0)#SCR2,0,6,32,18(outer_screen_38)#POPS } { Screen 38 } TABLE#
+B $DEB7,1 End of the layout
+@ $DEB8 label=outer_layout_39
+N $DEB8 #UDGTABLE { #PUSHS #DRAWSCREEN(9,3,0)#SCR2,0,6,32,18(outer_screen_39)#POPS } { Screen 39 } TABLE#
+B $DEB8,1 End of the layout
+@ $DEB9 label=outer_layout_40
+N $DEB9 #UDGTABLE { #PUSHS #DRAWSCREEN(0,4,0)#SCR2,0,6,32,18(outer_screen_40)#POPS } { Screen 40 } TABLE#
+B $DEB9,36,3
+B $DEDD,1 End of the layout
+@ $DEDE label=outer_layout_41
+N $DEDE #UDGTABLE { #PUSHS #DRAWSCREEN(1,4,0)#SCR2,0,6,32,18(outer_screen_41)#POPS } { Screen 41 } TABLE#
+B $DEDE,57,3
+B $DF17,1 End of the layout
+@ $DF18 label=outer_layout_42
+N $DF18 #UDGTABLE { #PUSHS #DRAWSCREEN(2,4,0)#SCR2,0,6,32,18(outer_screen_42)#POPS } { Screen 42 } TABLE#
+B $DF18,78,3
+B $DF66,1 End of the layout
+@ $DF67 label=outer_layout_43
+N $DF67 #UDGTABLE { #PUSHS #DRAWSCREEN(3,4,0)#SCR2,0,6,32,18(outer_screen_43)#POPS } { Screen 43 } TABLE#
+B $DF67,78,3
+B $DFB5,1 End of the layout
+@ $DFB6 label=outer_layout_44
+N $DFB6 #UDGTABLE { #PUSHS #DRAWSCREEN(4,4,0)#SCR2,0,6,32,18(outer_screen_44)#POPS } { Screen 44 } TABLE#
+B $DFB6,45,3
+B $DFE3,1 End of the layout
+@ $DFE4 label=outer_layout_45
+N $DFE4 #UDGTABLE { #PUSHS #DRAWSCREEN(5,4,0)#SCR2,0,6,32,18(outer_screen_45)#POPS } { Screen 45 } TABLE#
+B $DFE4,48,3
+B $E014,1 End of the layout
+@ $E015 label=outer_layout_46
+N $E015 #UDGTABLE { #PUSHS #DRAWSCREEN(6,4,0)#SCR2,0,6,32,18(outer_screen_46)#POPS } { Screen 46 } TABLE#
+B $E015,60,3
+B $E051,1 End of the layout
+@ $E052 label=outer_layout_47
+N $E052 #UDGTABLE { #PUSHS #DRAWSCREEN(7,4,0)#SCR2,0,6,32,18(outer_screen_47)#POPS } { Screen 47 } TABLE#
+B $E052,57,3
+B $E08B,1 End of the layout
+@ $E08C label=outer_layout_48
+N $E08C #UDGTABLE { #PUSHS #DRAWSCREEN(8,4,0)#SCR2,0,6,32,18(outer_screen_48)#POPS } { Screen 48 } TABLE#
+B $E08C,1 End of the layout
+@ $E08D label=outer_layout_49
+N $E08D #UDGTABLE { #PUSHS #DRAWSCREEN(9,4,0)#SCR2,0,6,32,18(outer_screen_49)#POPS } { Screen 49 } TABLE#
+B $E08D,1 End of the layout
+@ $E08E label=outer_layout_50
+N $E08E #UDGTABLE { #PUSHS #DRAWSCREEN(0,5,0)#SCR2,0,6,32,18(outer_screen_50)#POPS } { Screen 50 } TABLE#
+B $E08E,33,3
+B $E0AF,1 End of the layout
+@ $E0B0 label=outer_layout_51
+N $E0B0 #UDGTABLE { #PUSHS #DRAWSCREEN(1,5,0)#SCR2,0,6,32,18(outer_screen_51)#POPS } { Screen 51 } TABLE#
+B $E0B0,27,3
+B $E0CB,1 End of the layout
+@ $E0CC label=outer_layout_52
+N $E0CC #UDGTABLE { #PUSHS #DRAWSCREEN(2,5,0)#SCR2,0,6,32,18(outer_screen_52)#POPS } { Screen 52 } TABLE#
+B $E0CC,57,3
+B $E105,1 End of the layout
+@ $E106 label=outer_layout_53
+N $E106 #UDGTABLE { #PUSHS #DRAWSCREEN(3,5,0)#SCR2,0,6,32,18(outer_screen_53)#POPS } { Screen 53 } TABLE#
+B $E106,18,3
+B $E118,1 End of the layout
+@ $E119 label=outer_layout_54
+N $E119 #UDGTABLE { #PUSHS #DRAWSCREEN(4,5,0)#SCR2,0,6,32,18(outer_screen_54)#POPS } { Screen 54 } TABLE#
+B $E119,24,3
+B $E131,1 End of the layout
+@ $E132 label=outer_layout_55
+N $E132 BUG: the last record starts a run, so the run takes its end column from #R$E145(the next screen's layout). The graphic draws once. The shadow switch keeps that column, so the graphic casts no shadow, and the cell below its right half stays unshaded.
+N $E132 #UDGTABLE { #PUSHS #DRAWSCREEN(5,5,0)#SCR2,0,6,32,18(outer_screen_55)#POPS } { Screen 55 } TABLE#
+B $E132,18,3
+B $E144,1 End of the layout
+@ $E145 label=outer_layout_56
+N $E145 #UDGTABLE { #PUSHS #DRAWSCREEN(6,5,0)#SCR2,0,6,32,18(outer_screen_56)#POPS } { Screen 56 } TABLE#
+B $E145,30,3
+B $E163,1 End of the layout
+@ $E164 label=outer_layout_57
+N $E164 #UDGTABLE { #PUSHS #DRAWSCREEN(7,5,0)#SCR2,0,6,32,18(outer_screen_57)#POPS } { Screen 57 } TABLE#
+B $E164,33,3
+B $E185,1 End of the layout
+@ $E186 label=outer_layout_58
+N $E186 #UDGTABLE { #PUSHS #DRAWSCREEN(8,5,0)#SCR2,0,6,32,18(outer_screen_58)#POPS } { Screen 58 } TABLE#
+B $E186,12,3
+B $E192,1 End of the layout
+@ $E193 label=outer_layout_59
+N $E193 #UDGTABLE { #PUSHS #DRAWSCREEN(9,5,0)#SCR2,0,6,32,18(outer_screen_59)#POPS } { Screen 59 } TABLE#
+B $E193,6,3
+B $E199,1 End of the layout
+@ $E19A label=outer_layout_60
+N $E19A #UDGTABLE { #PUSHS #DRAWSCREEN(0,6,0)#SCR2,0,6,32,18(outer_screen_60)#POPS } { Screen 60 } TABLE#
+B $E19A,33,3
+B $E1BB,1 End of the layout
+@ $E1BC label=outer_layout_61
+N $E1BC #UDGTABLE { #PUSHS #DRAWSCREEN(1,6,0)#SCR2,0,6,32,18(outer_screen_61)#POPS } { Screen 61 } TABLE#
+B $E1BC,57,3
+B $E1F5,1 End of the layout
+@ $E1F6 label=outer_layout_62
+N $E1F6 #UDGTABLE { #PUSHS #DRAWSCREEN(2,6,0)#SCR2,0,6,32,18(outer_screen_62)#POPS } { Screen 62 } TABLE#
+B $E1F6,81,3
+B $E247,1 End of the layout
+@ $E248 label=outer_layout_63
+N $E248 #UDGTABLE { #PUSHS #DRAWSCREEN(3,6,0)#SCR2,0,6,32,18(outer_screen_63)#POPS } { Screen 63 } TABLE#
+B $E248,60,3
+B $E284,1 End of the layout
+@ $E285 label=outer_layout_64
+N $E285 #UDGTABLE { #PUSHS #DRAWSCREEN(4,6,0)#SCR2,0,6,32,18(outer_screen_64)#POPS } { Screen 64 } TABLE#
+B $E285,36,3
+B $E2A9,1 End of the layout
+@ $E2AA label=outer_layout_65
+N $E2AA #UDGTABLE { #PUSHS #DRAWSCREEN(5,6,0)#SCR2,0,6,32,18(outer_screen_65)#POPS } { Screen 65 } TABLE#
+B $E2AA,30,3
+B $E2C8,1 End of the layout
+@ $E2C9 label=outer_layout_66
+N $E2C9 #UDGTABLE { #PUSHS #DRAWSCREEN(6,6,0)#SCR2,0,6,32,18(outer_screen_66)#POPS } { Screen 66 } TABLE#
+B $E2C9,48,3
+B $E2F9,1 End of the layout
+@ $E2FA label=outer_layout_67
+N $E2FA #UDGTABLE { #PUSHS #DRAWSCREEN(7,6,0)#SCR2,0,6,32,18(outer_screen_67)#POPS } { Screen 67 } TABLE#
+B $E2FA,39,3
+B $E321,1 End of the layout
+@ $E322 label=outer_layout_68
+N $E322 #UDGTABLE { #PUSHS #DRAWSCREEN(8,6,0)#SCR2,0,6,32,18(outer_screen_68)#POPS } { Screen 68 } TABLE#
+B $E322,1 End of the layout
+@ $E323 label=outer_layout_69
+N $E323 #UDGTABLE { #PUSHS #DRAWSCREEN(9,6,0)#SCR2,0,6,32,18(outer_screen_69)#POPS } { Screen 69 } TABLE#
+B $E323,6,3
+B $E329,1 End of the layout
+@ $E32A label=outer_layout_70
+N $E32A #UDGTABLE { #PUSHS #DRAWSCREEN(0,7,0)#SCR2,0,6,32,18(outer_screen_70)#POPS } { Screen 70 } TABLE#
+B $E32A,57,3
+B $E363,1 End of the layout
+@ $E364 label=outer_layout_71
+N $E364 #UDGTABLE { #PUSHS #DRAWSCREEN(1,7,0)#SCR2,0,6,32,18(outer_screen_71)#POPS } { Screen 71 } TABLE#
+B $E364,84,3
+B $E3B8,1 End of the layout
+@ $E3B9 label=outer_layout_72
+N $E3B9 #UDGTABLE { #PUSHS #DRAWSCREEN(2,7,0)#SCR2,0,6,32,18(outer_screen_72)#POPS } { Screen 72 } TABLE#
+B $E3B9,60,3
+B $E3F5,1 End of the layout
+@ $E3F6 label=outer_layout_73
+N $E3F6 #UDGTABLE { #PUSHS #DRAWSCREEN(3,7,0)#SCR2,0,6,32,18(outer_screen_73)#POPS } { Screen 73 } TABLE#
+B $E3F6,69,3
+B $E43B,1 End of the layout
+@ $E43C label=outer_layout_74
+N $E43C #UDGTABLE { #PUSHS #DRAWSCREEN(4,7,0)#SCR2,0,6,32,18(outer_screen_74)#POPS } { Screen 74 } TABLE#
+B $E43C,39,3
+B $E463,1 End of the layout
+@ $E464 label=outer_layout_75
+N $E464 #UDGTABLE { #PUSHS #DRAWSCREEN(5,7,0)#SCR2,0,6,32,18(outer_screen_75)#POPS } { Screen 75 } TABLE#
+B $E464,21,3
+B $E479,1 End of the layout
+@ $E47A label=outer_layout_76
+N $E47A #UDGTABLE { #PUSHS #DRAWSCREEN(6,7,0)#SCR2,0,6,32,18(outer_screen_76)#POPS } { Screen 76 } TABLE#
+B $E47A,12,3
+B $E486,1 End of the layout
+@ $E487 label=outer_layout_77
+N $E487 #UDGTABLE { #PUSHS #DRAWSCREEN(7,7,0)#SCR2,0,6,32,18(outer_screen_77)#POPS } { Screen 77 } TABLE#
+B $E487,33,3
+B $E4A8,1 End of the layout
+@ $E4A9 label=outer_layout_78
+N $E4A9 #UDGTABLE { #PUSHS #DRAWSCREEN(8,7,0)#SCR2,0,6,32,18(outer_screen_78)#POPS } { Screen 78 } TABLE#
+B $E4A9,1 End of the layout
+@ $E4AA label=outer_layout_79
+N $E4AA #UDGTABLE { #PUSHS #DRAWSCREEN(9,7,0)#SCR2,0,6,32,18(outer_screen_79)#POPS } { Screen 79 } TABLE#
+B $E4AA,6,3
+B $E4B0,1 End of the layout
+@ $E4B1 label=outer_layout_80
+N $E4B1 #UDGTABLE { #PUSHS #DRAWSCREEN(0,8,0)#SCR2,0,6,32,18(outer_screen_80)#POPS } { Screen 80 } TABLE#
+B $E4B1,51,3
+B $E4E4,1 End of the layout
+@ $E4E5 label=outer_layout_81
+N $E4E5 #UDGTABLE { #PUSHS #DRAWSCREEN(1,8,0)#SCR2,0,6,32,18(outer_screen_81)#POPS } { Screen 81 } TABLE#
+B $E4E5,69,3
+B $E52A,1 End of the layout
+@ $E52B label=outer_layout_82
+N $E52B #UDGTABLE { #PUSHS #DRAWSCREEN(2,8,0)#SCR2,0,6,32,18(outer_screen_82)#POPS } { Screen 82 } TABLE#
+B $E52B,57,3
+B $E564,1 End of the layout
+@ $E565 label=outer_layout_83
+N $E565 #UDGTABLE { #PUSHS #DRAWSCREEN(3,8,0)#SCR2,0,6,32,18(outer_screen_83)#POPS } { Screen 83 } TABLE#
+B $E565,57,3
+B $E59E,1 End of the layout
+@ $E59F label=outer_layout_84
+N $E59F #UDGTABLE { #PUSHS #DRAWSCREEN(4,8,0)#SCR2,0,6,32,18(outer_screen_84)#POPS } { Screen 84 } TABLE#
+B $E59F,87,3
+B $E5F6,1 End of the layout
+@ $E5F7 label=outer_layout_85
+N $E5F7 #UDGTABLE { #PUSHS #DRAWSCREEN(5,8,0)#SCR2,0,6,32,18(outer_screen_85)#POPS } { Screen 85 } TABLE#
+B $E5F7,18,3
+B $E609,1 End of the layout
+@ $E60A label=outer_layout_86
+N $E60A #UDGTABLE { #PUSHS #DRAWSCREEN(6,8,0)#SCR2,0,6,32,18(outer_screen_86)#POPS } { Screen 86 } TABLE#
+B $E60A,39,3
+B $E631,1 End of the layout
+@ $E632 label=outer_layout_87
+N $E632 #UDGTABLE { #PUSHS #DRAWSCREEN(7,8,0)#SCR2,0,6,32,18(outer_screen_87)#POPS } { Screen 87 } TABLE#
+B $E632,69,3
+B $E677,1 End of the layout
+@ $E678 label=outer_layout_88
+N $E678 #UDGTABLE { #PUSHS #DRAWSCREEN(8,8,0)#SCR2,0,6,32,18(outer_screen_88)#POPS } { Screen 88 } TABLE#
+B $E678,1 End of the layout
+@ $E679 label=outer_layout_89
+N $E679 #UDGTABLE { #PUSHS #DRAWSCREEN(9,8,0)#SCR2,0,6,32,18(outer_screen_89)#POPS } { Screen 89 } TABLE#
+B $E679,6,3
+B $E67F,1 End of the layout
+@ $E680 label=outer_layout_90
+N $E680 #UDGTABLE { #PUSHS #DRAWSCREEN(0,9,0)#SCR2,0,6,32,18(outer_screen_90)#POPS } { Screen 90 } TABLE#
+B $E680,27,3
+B $E69B,1 End of the layout
+@ $E69C label=outer_layout_91
+N $E69C #UDGTABLE { #PUSHS #DRAWSCREEN(1,9,0)#SCR2,0,6,32,18(outer_screen_91)#POPS } { Screen 91 } TABLE#
+B $E69C,48,3
+B $E6CC,1 End of the layout
+@ $E6CD label=outer_layout_92
+N $E6CD #UDGTABLE { #PUSHS #DRAWSCREEN(2,9,0)#SCR2,0,6,32,18(outer_screen_92)#POPS } { Screen 92 } TABLE#
+B $E6CD,78,3
+B $E71B,1 End of the layout
+@ $E71C label=outer_layout_93
+N $E71C #UDGTABLE { #PUSHS #DRAWSCREEN(3,9,0)#SCR2,0,6,32,18(outer_screen_93)#POPS } { Screen 93 } TABLE#
+B $E71C,60,3
+B $E758,1 End of the layout
+@ $E759 label=outer_layout_94
+N $E759 #UDGTABLE { #PUSHS #DRAWSCREEN(4,9,0)#SCR2,0,6,32,18(outer_screen_94)#POPS } { Screen 94 } TABLE#
+B $E759,54,3
+B $E78F,1 End of the layout
+@ $E790 label=outer_layout_95
+N $E790 #UDGTABLE { #PUSHS #DRAWSCREEN(5,9,0)#SCR2,0,6,32,18(outer_screen_95)#POPS } { Screen 95 } TABLE#
+B $E790,33,3
+B $E7B1,1 End of the layout
+@ $E7B2 label=outer_layout_96
+N $E7B2 #UDGTABLE { #PUSHS #DRAWSCREEN(6,9,0)#SCR2,0,6,32,18(outer_screen_96)#POPS } { Screen 96 } TABLE#
+B $E7B2,57,3
+B $E7EB,1 End of the layout
+@ $E7EC label=outer_layout_97
+N $E7EC #UDGTABLE { #PUSHS #DRAWSCREEN(7,9,0)#SCR2,0,6,32,18(outer_screen_97)#POPS } { Screen 97 } TABLE#
+B $E7EC,63,3
+B $E82B,1 End of the layout
+@ $E82C label=outer_layout_98
+N $E82C #UDGTABLE { #PUSHS #DRAWSCREEN(8,9,0)#SCR2,0,6,32,18(outer_screen_98)#POPS } { Screen 98 } TABLE#
+B $E82C,1 End of the layout
+@ $E82D label=outer_layout_99
+N $E82D #UDGTABLE { #PUSHS #DRAWSCREEN(9,9,0)#SCR2,0,6,32,18(outer_screen_99)#POPS } { Screen 99 } TABLE#
+B $E82D,6,3
+B $E833,1 End of the layout
+@ $E834 label=outer_layout_100
+N $E834 #UDGTABLE { #PUSHS #DRAWSCREEN(0,10,0)#SCR2,0,6,32,18(outer_screen_100)#POPS } { Screen 100 } TABLE#
+B $E834,66,3
+B $E876,1 End of the layout
+@ $E877 label=outer_layout_101
+N $E877 #UDGTABLE { #PUSHS #DRAWSCREEN(1,10,0)#SCR2,0,6,32,18(outer_screen_101)#POPS } { Screen 101 } TABLE#
+B $E877,60,3
+B $E8B3,1 End of the layout
+@ $E8B4 label=outer_layout_102
+N $E8B4 #UDGTABLE { #PUSHS #DRAWSCREEN(2,10,0)#SCR2,0,6,32,18(outer_screen_102)#POPS } { Screen 102 } TABLE#
+B $E8B4,6,3
+B $E8BA,1 End of the layout
+@ $E8BB label=outer_layout_103
+N $E8BB #UDGTABLE { #PUSHS #DRAWSCREEN(3,10,0)#SCR2,0,6,32,18(outer_screen_103)#POPS } { Screen 103 } TABLE#
+B $E8BB,48,3
+B $E8EB,1 End of the layout
+@ $E8EC label=outer_layout_104
+N $E8EC #UDGTABLE { #PUSHS #DRAWSCREEN(4,10,0)#SCR2,0,6,32,18(outer_screen_104)#POPS } { Screen 104 } TABLE#
+B $E8EC,69,3
+B $E931,1 End of the layout
+@ $E932 label=outer_layout_105
+N $E932 #UDGTABLE { #PUSHS #DRAWSCREEN(5,10,0)#SCR2,0,6,32,18(outer_screen_105)#POPS } { Screen 105 } TABLE#
+B $E932,48,3
+B $E962,1 End of the layout
+@ $E963 label=outer_layout_106
+N $E963 #UDGTABLE { #PUSHS #DRAWSCREEN(6,10,0)#SCR2,0,6,32,18(outer_screen_106)#POPS } { Screen 106 } TABLE#
+B $E963,60,3
+B $E99F,1 End of the layout
+@ $E9A0 label=outer_layout_107
+N $E9A0 #UDGTABLE { #PUSHS #DRAWSCREEN(7,10,0)#SCR2,0,6,32,18(outer_screen_107)#POPS } { Screen 107 } TABLE#
+B $E9A0,33,3
+B $E9C1,1 End of the layout
+@ $E9C2 label=outer_layout_108
+N $E9C2 #UDGTABLE { #PUSHS #DRAWSCREEN(8,10,0)#SCR2,0,6,32,18(outer_screen_108)#POPS } { Screen 108 } TABLE#
+B $E9C2,6,3
+B $E9C8,1 End of the layout
+@ $E9C9 label=outer_layout_109
+N $E9C9 #UDGTABLE { #PUSHS #DRAWSCREEN(9,10,0)#SCR2,0,6,32,18(outer_screen_109)#POPS } { Screen 109 } TABLE#
+B $E9C9,12,3
+B $E9D5,1 End of the layout
+u $E9D6 Unused bytes
+@ $EA00 label=inner_layout_addrs
+w $EA00 Inner section layout addresses
+D $EA00 The address of the #R$EADC(layout) of each inner section screen, one word per screen number.
+@ $EADC label=inner_layout_0
+b $EADC Inner section screen layouts
+D $EADC The graphics on each screen of the inner sections, one layout for each screen number, in the order of #R$EA00(their addresses). The records take the form of #R$D8DC(the outer hull layouts), with graphic numbers from #R$A818(the inner section directory).
+N $EADC The renders show each screen as at #R$D8DC(the outer hull layouts).
+B $EADC,1 End of the layout
+@ $EADD label=inner_layout_1
+B $EADD,1 End of the layout
+@ $EADE label=inner_layout_2
+B $EADE,1 End of the layout
+@ $EADF label=inner_layout_3
+B $EADF,1 End of the layout
+@ $EAE0 label=inner_layout_4
+B $EAE0,1 End of the layout
+@ $EAE1 label=inner_layout_5
+N $EAE1 #UDGTABLE { #PUSHS #DRAWSCREEN(5,0,1)#SCR2,0,6,32,18(inner_screen_5)#POPS } { Screen 5, WALL DONE } TABLE#
+B $EAE1,1 End of the layout
+@ $EAE2 label=inner_layout_6
+N $EAE2 #UDGTABLE { #PUSHS #DRAWSCREEN(6,0,1)#SCR2,0,6,32,18(inner_screen_6)#POPS } { Screen 6 } TABLE#
+B $EAE2,33,3
+B $EB03,1 End of the layout
+@ $EB04 label=inner_layout_7
+N $EB04 #UDGTABLE { #PUSHS #DRAWSCREEN(7,0,1)#SCR2,0,6,32,18(inner_screen_7)#POPS } { Screen 7 } TABLE#
+B $EB04,33,3
+B $EB25,1 End of the layout
+@ $EB26 label=inner_layout_8
+N $EB26 #UDGTABLE { #PUSHS #DRAWSCREEN(8,0,1)#SCR2,0,6,32,18(inner_screen_8)#POPS } { Screen 8 } TABLE#
+B $EB26,18,3
+B $EB38,1 End of the layout
+@ $EB39 label=inner_layout_9
+B $EB39,1 End of the layout
+@ $EB3A label=inner_layout_10
+B $EB3A,1 End of the layout
+@ $EB3B label=inner_layout_11
+B $EB3B,1 End of the layout
+@ $EB3C label=inner_layout_12
+B $EB3C,1 End of the layout
+@ $EB3D label=inner_layout_13
+B $EB3D,1 End of the layout
+@ $EB3E label=inner_layout_14
+B $EB3E,1 End of the layout
+@ $EB3F label=inner_layout_15
+B $EB3F,1 End of the layout
+@ $EB40 label=inner_layout_16
+B $EB40,1 End of the layout
+@ $EB41 label=inner_layout_17
+B $EB41,1 End of the layout
+@ $EB42 label=inner_layout_18
+B $EB42,1 End of the layout
+@ $EB43 label=inner_layout_19
+B $EB43,1 End of the layout
+@ $EB44 label=inner_layout_20
+B $EB44,1 End of the layout
+@ $EB45 label=inner_layout_21
+B $EB45,1 End of the layout
+@ $EB46 label=inner_layout_22
+B $EB46,1 End of the layout
+@ $EB47 label=inner_layout_23
+B $EB47,1 End of the layout
+@ $EB48 label=inner_layout_24
+B $EB48,1 End of the layout
+@ $EB49 label=inner_layout_25
+B $EB49,1 End of the layout
+@ $EB4A label=inner_layout_26
+B $EB4A,1 End of the layout
+@ $EB4B label=inner_layout_27
+B $EB4B,1 End of the layout
+@ $EB4C label=inner_layout_28
+B $EB4C,1 End of the layout
+@ $EB4D label=inner_layout_29
+B $EB4D,1 End of the layout
+@ $EB4E label=inner_layout_30
+B $EB4E,1 End of the layout
+@ $EB4F label=inner_layout_31
+B $EB4F,1 End of the layout
+@ $EB50 label=inner_layout_32
+B $EB50,1 End of the layout
+@ $EB51 label=inner_layout_33
+B $EB51,1 End of the layout
+@ $EB52 label=inner_layout_34
+B $EB52,1 End of the layout
+@ $EB53 label=inner_layout_35
+B $EB53,1 End of the layout
+@ $EB54 label=inner_layout_36
+B $EB54,1 End of the layout
+@ $EB55 label=inner_layout_37
+B $EB55,1 End of the layout
+@ $EB56 label=inner_layout_38
+B $EB56,1 End of the layout
+@ $EB57 label=inner_layout_39
+B $EB57,1 End of the layout
+@ $EB58 label=inner_layout_40
+B $EB58,1 End of the layout
+@ $EB59 label=inner_layout_41
+B $EB59,1 End of the layout
+@ $EB5A label=inner_layout_42
+B $EB5A,1 End of the layout
+@ $EB5B label=inner_layout_43
+B $EB5B,1 End of the layout
+@ $EB5C label=inner_layout_44
+B $EB5C,1 End of the layout
+@ $EB5D label=inner_layout_45
+B $EB5D,1 End of the layout
+@ $EB5E label=inner_layout_46
+B $EB5E,1 End of the layout
+@ $EB5F label=inner_layout_47
+B $EB5F,1 End of the layout
+@ $EB60 label=inner_layout_48
+B $EB60,1 End of the layout
+@ $EB61 label=inner_layout_49
+B $EB61,1 End of the layout
+@ $EB62 label=inner_layout_50
+N $EB62 #UDGTABLE { #PUSHS #DRAWSCREEN(0,5,1)#SCR2,0,6,32,18(inner_screen_50)#POPS } { Screen 50 } TABLE#
+B $EB62,15,3
+B $EB71,1 End of the layout
+@ $EB72 label=inner_layout_51
+N $EB72 #UDGTABLE { #PUSHS #DRAWSCREEN(1,5,1)#SCR2,0,6,32,18(inner_screen_51)#POPS } { Screen 51 } TABLE#
+B $EB72,30,3
+B $EB90,1 End of the layout
+@ $EB91 label=inner_layout_52
+N $EB91 #UDGTABLE { #PUSHS #DRAWSCREEN(2,5,1)#SCR2,0,6,32,18(inner_screen_52)#POPS } { Screen 52 } TABLE#
+B $EB91,45,3
+B $EBBE,1 End of the layout
+@ $EBBF label=inner_layout_53
+N $EBBF #UDGTABLE { #PUSHS #DRAWSCREEN(3,5,1)#SCR2,0,6,32,18(inner_screen_53)#POPS } { Screen 53 } TABLE#
+B $EBBF,39,3
+B $EBE6,1 End of the layout
+@ $EBE7 label=inner_layout_54
+N $EBE7 #UDGTABLE { #PUSHS #DRAWSCREEN(4,5,1)#SCR2,0,6,32,18(inner_screen_54)#POPS } { Screen 54 } TABLE#
+B $EBE7,42,3
+B $EC11,1 End of the layout
+@ $EC12 label=inner_layout_55
+N $EC12 #UDGTABLE { #PUSHS #DRAWSCREEN(5,5,1)#SCR2,0,6,32,18(inner_screen_55)#POPS } { Screen 55 } TABLE#
+B $EC12,45,3
+B $EC3F,1 End of the layout
+@ $EC40 label=inner_layout_56
+N $EC40 #UDGTABLE { #PUSHS #DRAWSCREEN(6,5,1)#SCR2,0,6,32,18(inner_screen_56)#POPS } { Screen 56 } TABLE#
+B $EC40,48,3
+B $EC70,1 End of the layout
+@ $EC71 label=inner_layout_57
+B $EC71,1 End of the layout
+@ $EC72 label=inner_layout_58
+B $EC72,1 End of the layout
+@ $EC73 label=inner_layout_59
+B $EC73,1 End of the layout
+@ $EC74 label=inner_layout_60
+N $EC74 #UDGTABLE { #PUSHS #DRAWSCREEN(0,6,1)#SCR2,0,6,32,18(inner_screen_60)#POPS } { Screen 60 } TABLE#
+B $EC74,30,3
+B $EC92,1 End of the layout
+@ $EC93 label=inner_layout_61
+N $EC93 #UDGTABLE { #PUSHS #DRAWSCREEN(1,6,1)#SCR2,0,6,32,18(inner_screen_61)#POPS } { Screen 61 } TABLE#
+B $EC93,18,3
+B $ECA5,1 End of the layout
+@ $ECA6 label=inner_layout_62
+N $ECA6 #UDGTABLE { #PUSHS #DRAWSCREEN(2,6,1)#SCR2,0,6,32,18(inner_screen_62)#POPS } { Screen 62 } TABLE#
+B $ECA6,18,3
+B $ECB8,1 End of the layout
+@ $ECB9 label=inner_layout_63
+B $ECB9,1 End of the layout
+@ $ECBA label=inner_layout_64
+N $ECBA #UDGTABLE { #PUSHS #DRAWSCREEN(4,6,1)#SCR2,0,6,32,18(inner_screen_64)#POPS } { Screen 64 } TABLE#
+B $ECBA,21,3
+B $ECCF,1 End of the layout
+@ $ECD0 label=inner_layout_65
+N $ECD0 #UDGTABLE { #PUSHS #DRAWSCREEN(5,6,1)#SCR2,0,6,32,18(inner_screen_65)#POPS } { Screen 65 } TABLE#
+B $ECD0,51,3
+B $ED03,1 End of the layout
+@ $ED04 label=inner_layout_66
+N $ED04 #UDGTABLE { #PUSHS #DRAWSCREEN(6,6,1)#SCR2,0,6,32,18(inner_screen_66)#POPS } { Screen 66 } TABLE#
+B $ED04,54,3
+B $ED3A,1 End of the layout
+@ $ED3B label=inner_layout_67
+N $ED3B #UDGTABLE { #PUSHS #DRAWSCREEN(7,6,1)#SCR2,0,6,32,18(inner_screen_67)#POPS } { Screen 67 } TABLE#
+B $ED3B,24,3
+B $ED53,1 End of the layout
+@ $ED54 label=inner_layout_68
+B $ED54,1 End of the layout
+@ $ED55 label=inner_layout_69
+B $ED55,1 End of the layout
+@ $ED56 label=inner_layout_70
+N $ED56 #UDGTABLE { #PUSHS #DRAWSCREEN(0,7,1)#SCR2,0,6,32,18(inner_screen_70)#POPS } { Screen 70 } TABLE#
+B $ED56,30,3
+B $ED74,1 End of the layout
+@ $ED75 label=inner_layout_71
+N $ED75 #UDGTABLE { #PUSHS #DRAWSCREEN(1,7,1)#SCR2,0,6,32,18(inner_screen_71)#POPS } { Screen 71 } TABLE#
+B $ED75,15,3
+B $ED84,1 End of the layout
+@ $ED85 label=inner_layout_72
+B $ED85,1 End of the layout
+@ $ED86 label=inner_layout_73
+B $ED86,1 End of the layout
+@ $ED87 label=inner_layout_74
+N $ED87 #UDGTABLE { #PUSHS #DRAWSCREEN(4,7,1)#SCR2,0,6,32,18(inner_screen_74)#POPS } { Screen 74 } TABLE#
+B $ED87,30,3
+B $EDA5,1 End of the layout
+@ $EDA6 label=inner_layout_75
+N $EDA6 #UDGTABLE { #PUSHS #DRAWSCREEN(5,7,1)#SCR2,0,6,32,18(inner_screen_75)#POPS } { Screen 75 } TABLE#
+B $EDA6,27,3
+B $EDC1,1 End of the layout
+@ $EDC2 label=inner_layout_76
+N $EDC2 #UDGTABLE { #PUSHS #DRAWSCREEN(6,7,1)#SCR2,0,6,32,18(inner_screen_76)#POPS } { Screen 76 } TABLE#
+B $EDC2,27,3
+B $EDDD,1 End of the layout
+@ $EDDE label=inner_layout_77
+B $EDDE,1 End of the layout
+@ $EDDF label=inner_layout_78
+B $EDDF,1 End of the layout
+@ $EDE0 label=inner_layout_79
+B $EDE0,1 End of the layout
+@ $EDE1 label=inner_layout_80
+B $EDE1,1 End of the layout
+@ $EDE2 label=inner_layout_81
+B $EDE2,1 End of the layout
+@ $EDE3 label=inner_layout_82
+B $EDE3,1 End of the layout
+@ $EDE4 label=inner_layout_83
+B $EDE4,1 End of the layout
+@ $EDE5 label=inner_layout_84
+N $EDE5 #UDGTABLE { #PUSHS #DRAWSCREEN(4,8,1)#SCR2,0,6,32,18(inner_screen_84)#POPS } { Screen 84 } TABLE#
+B $EDE5,30,3
+B $EE03,1 End of the layout
+@ $EE04 label=inner_layout_85
+B $EE04,1 End of the layout
+@ $EE05 label=inner_layout_86
+B $EE05,1 End of the layout
+@ $EE06 label=inner_layout_87
+B $EE06,1 End of the layout
+@ $EE07 label=inner_layout_88
+B $EE07,1 End of the layout
+@ $EE08 label=inner_layout_89
+B $EE08,1 End of the layout
+@ $EE09 label=inner_layout_90
+B $EE09,1 End of the layout
+@ $EE0A label=inner_layout_91
+N $EE0A #UDGTABLE { #PUSHS #DRAWSCREEN(1,9,1)#SCR2,0,6,32,18(inner_screen_91)#POPS } { Screen 91 } TABLE#
+B $EE0A,69,3
+B $EE4F,1 End of the layout
+@ $EE50 label=inner_layout_92
+N $EE50 #UDGTABLE { #PUSHS #DRAWSCREEN(2,9,1)#SCR2,0,6,32,18(inner_screen_92)#POPS } { Screen 92 } TABLE#
+B $EE50,42,3
+B $EE7A,1 End of the layout
+@ $EE7B label=inner_layout_93
+B $EE7B,1 End of the layout
+@ $EE7C label=inner_layout_94
+B $EE7C,1 End of the layout
+@ $EE7D label=inner_layout_95
+B $EE7D,1 End of the layout
+@ $EE7E label=inner_layout_96
+B $EE7E,1 End of the layout
+@ $EE7F label=inner_layout_97
+B $EE7F,1 End of the layout
+@ $EE80 label=inner_layout_98
+B $EE80,1 End of the layout
+@ $EE81 label=inner_layout_99
+B $EE81,1 End of the layout
+@ $EE82 label=inner_layout_100
+N $EE82 #UDGTABLE { #PUSHS #DRAWSCREEN(0,10,1)#SCR2,0,6,32,18(inner_screen_100)#POPS } { Screen 100 } TABLE#
+B $EE82,24,3
+B $EE9A,1 End of the layout
+@ $EE9B label=inner_layout_101
+N $EE9B #UDGTABLE { #PUSHS #DRAWSCREEN(1,10,1)#SCR2,0,6,32,18(inner_screen_101)#POPS } { Screen 101 } TABLE#
+B $EE9B,30,3
+B $EEB9,1 End of the layout
+@ $EEBA label=inner_layout_102
+B $EEBA,1 End of the layout
+@ $EEBB label=inner_layout_103
+B $EEBB,1 End of the layout
+@ $EEBC label=inner_layout_104
+B $EEBC,1 End of the layout
+@ $EEBD label=inner_layout_105
+B $EEBD,1 End of the layout
+@ $EEBE label=inner_layout_106
+B $EEBE,1 End of the layout
+@ $EEBF label=inner_layout_107
+B $EEBF,1 End of the layout
+@ $EEC0 label=inner_layout_108
+B $EEC0,1 End of the layout
+@ $EEC1 label=inner_layout_109
+B $EEC1,1 End of the layout
+u $EEC2 Unused bytes
 @ $F000 label=play_title_tune
 c $F000 Play the title tune
 D $F000 Plays the title tune with interrupts off, over and over until the player presses a key.

@@ -10,7 +10,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 |:--------------------|:------------------------------------------|
 | Phase               | 4 – catalogs: graphics (sprite block)     |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
-| Baseline findings   | 12                                        |
+| Baseline findings   | 9                                         |
 | Routines to the bar | 118 of 121 (3 flagged only for a bare well-named JP or CALL) |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
@@ -24,7 +24,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Target              | Lane | State                                |
 |:--------------------|:-----|:-------------------------------------|
-| Graphics GX1a `$6200–$7CD3`, `$A818` | catalog | review |
+| Graphics GX1b layouts, screens, hull map | catalog | review |
 
 ---
 
@@ -72,9 +72,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 |:--------------|:----------------------------------------------|
 | `$F480`       | Split the key copy out of `b $F473` as code (moves `$F473` baseline keys) |
 | `$B20A`       | Split plot_graphic, plot_unmasked, cast_shadow, draw_shadow into entries |
-| `$D800`       | Split the layout tables and lists; record `#TABLE` |
 | `$D2E7`       | Label the font; its address is built from immediates |
-| `$D473`       | Split the readout block; state the digit format and drain amounts there |
 | `$CE26`       | Split `flag_interrupt` into its own entry     |
 
 ### Game behaviour
@@ -84,13 +82,11 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | whole image   | Sectors 2–3 and game end coverage (FuseX)     |
 | `$C946`       | Limit per slot pair allows twice the launch cells: intended? |
 | `$B889`       | Shield count at row 3 col 5, not far right as the leaflet says |
-| `$B5F6`       | Column-0 vertical runs shade twice: visible?  |
 | `$B7B7`       | Bit 7: only the steering distances' sign bits? |
 | `$B3B0`       | A zero-length bar loops 256 times: document?  |
 | `$B3F0`       | Why do the two bars' shadow offsets differ?   |
 | `$C802`       | Does `$C0D4`'s reset to `$08` pair the explosion toggles? |
 | `$FF70`       | Cover map `$FF` is the map's page byte (relocation) |
-| `$D48D`       | Label `shield_loss_due` (split `$D473`)       |
 | `$F840`       | Label the hostile slots' state bytes (split `$F473`) |
 | `$D219`       | Note the movement flag +1 in the `D`          |
 | `$D2B5`       | Snapshot `$01` sets a blue border on the first click? |
@@ -114,6 +110,8 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$C28D`       | "pixel offset" → "horizontal offset" in the hostile entries |
 | `$CDC8`       | Split the unused first frame into its own `u` block? |
 | `$BE3F`       | Is the range `$FF` write reachable? Only via `$C8FE` (C AND 3 = 2) |
+| screens       | Renders show every defence device standing (graphic 150) |
+| graphics      | List the graphics no layout places on the Graphics page? |
 | `$C8FE`       | Can C AND 3 be 2 after `update_hostile`? Shot with range 255 |
 | `$B04F`       | Split `$B04F`, `$BE1E`, `$BE4D` into entries for `R` rows |
 | `$BD13`       | Merge `$BD13/$BD14`, `$BD21/$BD22` into words (`@ssub` at `$B5BD`, `$B60D`, `$B4C5`) |
@@ -134,10 +132,8 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$C500`       | Link `#R$A018` instead of "after the explosion masks" |
 | glyph 10      | `?` reaches the second 0; no message prints `?` |
 | `g` pages     | `g` entries get SkoolKit's "Game status buffer" header |
-| layouts       | Show graphics no layout places, via the GX1b decoder |
 | graphic 35    | Names for graphics 77–79 and 86–87, cells of hatchway graphic 35 |
 | decoder       | Render graphic 24 with its dropped cell, and 104–109 in their colour patterns |
-| `$E141`       | Screen 55's last record runs into the next layout |
 | `$C955`       | Counter value `$17` for the defence device    |
 | `$B363`       | Shadow edge tests use the layout cell, not the drawn one |
 | `$B37B`       | Full top shadow cell on row 6: why?           |
@@ -290,3 +286,9 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$7CD4`  | Graphic 109 one sub-block; entry starts at `$645C`  |
 | `$A818`  | Confirmed; schema linked to `$6200`                 |
 | mark bit 5 | Cell mask 7, used by graphics 44 and 47 only      |
+| `$D473`  | Split: drains, readout digits, step count, points due, doublings |
+| `$D48D`  | `shield_loss_due`                                   |
+| `$D800`  | Pointer tables and one labelled list per screen     |
+| `$E141`  | Bug: the stray run flag leaves the shadow switch set, so screen 55's last graphic casts no shadow |
+| `$B5F6`  | No: shading twice changes nothing (24 screens simulated) |
+| layouts  | Every screen and the hull map rendered by the game's own code |
