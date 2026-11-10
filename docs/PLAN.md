@@ -10,7 +10,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 |:--------------------|:------------------------------------------|
 | Phase               | 4 – catalogs: graphics (sprite block)     |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
-| Baseline findings   | 26                                        |
+| Baseline findings   | 12                                        |
 | Routines to the bar | 118 of 121 (3 flagged only for a bare well-named JP or CALL) |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
@@ -24,7 +24,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Target              | Lane | State                                |
 |:--------------------|:-----|:-------------------------------------|
-| Graphics GX2 `$7CD4–$A817` | catalog | review |
+| Graphics GX1a `$6200–$7CD3`, `$A818` | catalog | review |
 
 ---
 
@@ -71,7 +71,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | Address       | Open question                                 |
 |:--------------|:----------------------------------------------|
 | `$F480`       | Split the key copy out of `b $F473` as code (moves `$F473` baseline keys) |
-| `$6200`       | Document the graphic directory record (also `$A818`, needs a split) |
 | `$B20A`       | Split plot_graphic, plot_unmasked, cast_shadow, draw_shadow into entries |
 | `$D800`       | Split the layout tables and lists; record `#TABLE` |
 | `$D2E7`       | Label the font; its address is built from immediates |
@@ -90,7 +89,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B3B0`       | A zero-length bar loops 256 times: document?  |
 | `$B3F0`       | Why do the two bars' shadow offsets differ?   |
 | `$C802`       | Does `$C0D4`'s reset to `$08` pair the explosion toggles? |
-| mark bit 5    | Which graphics use cell mask 7?               |
 | `$FF70`       | Cover map `$FF` is the map's page byte (relocation) |
 | `$D48D`       | Label `shield_loss_due` (split `$D473`)       |
 | `$F840`       | Label the hostile slots' state bytes (split `$F473`) |
@@ -132,12 +130,13 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | lint-prose    | Vale is not installed, so the prose lint never runs |
 | `$9810`       | Unused graphics: confirm the 3×2 / 2×2 grouping |
 | `$6200`       | Entries 117/120 overlap 118/121; 119 points at ROM `$145C` |
-| `$7CD4`       | Starts inside graphic 109; merge with `$645C–$7CD3` (GX1) |
 | `$99A0`       | Render the hatch at opening steps with the GX1 decoder |
 | `$C500`       | Link `#R$A018` instead of "after the explosion masks" |
-| `$A818`       | Review the minimal inner directory entries (GX1) |
 | glyph 10      | `?` reaches the second 0; no message prints `?` |
 | `g` pages     | `g` entries get SkoolKit's "Game status buffer" header |
+| layouts       | Show graphics no layout places, via the GX1b decoder |
+| graphic 35    | Names for graphics 77–79 and 86–87, cells of hatchway graphic 35 |
+| decoder       | Render graphic 24 with its dropped cell, and 104–109 in their colour patterns |
 | `$E141`       | Screen 55's last record runs into the next layout |
 | `$C955`       | Counter value `$17` for the defence device    |
 | `$B363`       | Shadow edge tests use the layout cell, not the drawn one |
@@ -287,3 +286,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B16F`  | Targets labelled `colour_pat_33/34`                |
 | `$95B0`  | Unused bytes past the third device design          |
 | `$C4DB`  | Table addresses from immediates now `@ssub`        |
+| `$6200`  | 38 and 43 never read; 117/120 overlap; 119 ROM 0×0 |
+| `$7CD4`  | Graphic 109 one sub-block; entry starts at `$645C`  |
+| `$A818`  | Confirmed; schema linked to `$6200`                 |
+| mark bit 5 | Cell mask 7, used by graphics 44 and 47 only      |

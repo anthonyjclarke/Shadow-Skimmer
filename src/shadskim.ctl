@@ -18,20 +18,536 @@ D $61A8 Bytes that decode to code the game never runs. They hold a routine that 
 @ $61FD label=game_entry
 c $61FD Game entry point
 D $61FD Everything starts here once the game loads.
-b $6200
-s $6703
-b $6705
-s $6B64
-b $6B6C
-s $6B74
-b $6B75
-s $7CD2
-b $7CD4 Outer hull graphics
-D $7CD4 The end of one graphic of the #R$6200(outer hull's graphic directory), then every graphic that the directory lists after it. A graphic holds 8 bytes per cell, cell by cell along each row of cells from the top. The directory gives each graphic's address and size, and some graphics share bytes.
-N $7CD4 The renders show the pixels of each graphic at the size its directory entry gives, under its graphic number. The colours come from the screen layout and the graphic's colour pattern, so the renders use black ink on white paper.
-N $7CD4 #UDGTABLE { #UDGARRAY6,,2($7C34-$7CEC-8)(outer_graphic_109) | #UDGARRAY4,,2($7CF4-$7D4C-8)(outer_graphic_110) | #UDGARRAY3,,2($7D54-$7DAC-8)(outer_graphic_111) | #UDGARRAY4,,2($7DB4-$7E0C-8)(outer_graphic_112) | #UDGARRAY3,,2($7E14-$7E6C-8)(outer_graphic_113) | #UDGARRAY4,,2($7E74-$7ECC-8)(outer_graphic_114) | #UDGARRAY3,,2($7ED4-$7F2C-8)(outer_graphic_115) } { 109 | 110 | 111 | 112 | 113 | 114 | 115 } { #UDGARRAY4,,2($7F34-$7F8C-8)(outer_graphic_116) | #UDGARRAY3,,2($7F94-$7FEC-8)(outer_graphic_117) | #UDGARRAY5,,2($7FB0-$8020-8)(outer_graphic_118) | #UDGARRAY5,,2($7FF4-$8064-8)(outer_graphic_120) | #UDGARRAY3,,2($8028-$8098-8)(outer_graphic_121) | #UDGARRAY5,,2($80A0-$8110-8)(outer_graphic_122) | #UDGARRAY3,,2($8118-$8188-8)(outer_graphic_123) } { 116 | 117 | 118 | 120 | 121 | 122 | 123 } { #UDGARRAY6,,2($8190-$8218-8)(outer_graphic_124) | #UDGARRAY3,,2($8220-$82A8-8)(outer_graphic_125) | #UDGARRAY6,,2($82B0-$8338-8)(outer_graphic_126) | #UDGARRAY3,,2($8340-$83C8-8)(outer_graphic_127) | #UDGARRAY5,,2($83D0-$83F0-8)(outer_graphic_128) | #UDGARRAY1,,2($83F8-$8418-8)(outer_graphic_129) | #UDGARRAY5,,2($8420-$8440-8)(outer_graphic_130) } { 124 | 125 | 126 | 127 | 128 | 129 | 130 } { #UDGARRAY1,,2($8448-$8468-8)(outer_graphic_131) | #UDGARRAY3,,2($8470-$8480-8)(outer_graphic_132) | #UDGARRAY1,,2($8488-$8498-8)(outer_graphic_133) | #UDGARRAY3,,2($84A0-$84B0-8)(outer_graphic_134) | #UDGARRAY1,,2($84B8-$84C8-8)(outer_graphic_135) | #UDGARRAY1,,2($84D0-$84E0-8)(outer_graphic_136) | #UDGARRAY1,,2($84E8-$84F0-8)(outer_graphic_137) } { 131 | 132 | 133 | 134 | 135 | 136 | 137 } { #UDGARRAY1,,2($84F8-$8510-8)(outer_graphic_138) | #UDGARRAY3,,2($8518-$8540-8)(outer_graphic_139) | #UDGARRAY1,,2($8548-$8560-8)(outer_graphic_140) | #UDGARRAY1,,2($8568-$8570-8)(outer_graphic_141) | #UDGARRAY6,,2($8578-$8600-8)(outer_graphic_142) | #UDGARRAY4,,2($8608-$8660-8)(outer_graphic_143) | #UDGARRAY2,,2($8668-$8690-8)(outer_graphic_144) } { 138 | 139 | 140 | 141 | 142 | 143 | 144 } { #UDGARRAY3,,2($8698-$86C0-8)(outer_graphic_145) | #UDGARRAY3,,2($86C8-$8708-8)(outer_graphic_146) | #UDGARRAY2,,2($8710-$8738-8)(outer_graphic_147) | #UDGARRAY3,,2($8740-$8768-8)(outer_graphic_148) | #UDGARRAY3,,2($8770-$87B0-8)(outer_graphic_149) | #UDGARRAY3,,2($87B8-$87F8-8)(outer_graphic_150) } { 145 | 146 | 147 | 148 | 149 | 150 } TABLE#
-B $7CD4,32,8
-  $7CD4,32 The last four cells of graphic 109
+@ $6200 label=outer_graphic_dir
+b $6200 Outer hull graphic directory
+D $6200 The record of each of the 151 graphics of the outer hull, by graphic number from 0, 4 bytes per graphic. A graphic's record therefore starts 4 × its number bytes into the directory.
+N $6200 #TABLE(default,,,:w) { =h Byte | =h Bits | =h Content } { 0–1 | All | Address of the graphic's #R$645C(pixels) } { 2 | 0–2 | Width in cells } { 2 | 3–7 | Number of the graphic's colour pattern in #R$B12F(the colour pattern addresses), from 1, or 0 for a graphic in one colour } { 3 | 0–2 | Height in cells } { 3 | 3–7 | Number of the graphic's cell mask in #R$B0BE(the cell mask addresses), from 1, or 0 for a graphic that draws every cell } TABLE#
+N $6200 #TABLE(default,,:w) { =h Graphic | =h What its record holds } { 38 | A record the game never reads, since #R$B640(a layout graphic's draw) shades the cell of a lone shadow cell and draws nothing } { 43 | A record the game never reads, since the animated graphic draws from #R$95D0(its own frames). It points at the pixels of graphic 44, three cells to a row } { 117 | Pixels that run into those of graphic 118 from the middle of the fourth cell } { 119 | An address in the ROM, with a width and a height of 0 } { 120 | Pixels that run into those of graphic 121 from the middle of the seventh cell } TABLE#
+W $6200,2 Pixels
+B $6202,2 Width and height in cells
+W $6204,2 Pixels
+B $6206,2 Width and height in cells
+W $6208,2 Pixels
+B $620A,2 Width and height in cells
+W $620C,2 Pixels
+B $620E,2 Width and height in cells
+W $6210,2 Pixels
+B $6212,2 Width and height in cells
+W $6214,2 Pixels
+B $6216,2 Width and height in cells
+W $6218,2 Pixels
+B $621A,2 Width and height in cells
+W $621C,2 Pixels
+B $621E,2 Width and height in cells
+W $6220,2 Pixels
+B $6222,2 Width and height in cells
+W $6224,2 Pixels
+B $6226,2 Width and height in cells
+W $6228,2 Pixels
+B $622A,2 Width and height in cells
+W $622C,2 Pixels
+B $622E,2 Width and height in cells
+W $6230,2 Pixels
+B $6232,2 Width and height in cells
+W $6234,2 Pixels
+B $6236,2 Width and height in cells
+W $6238,2 Pixels
+B $623A,2 Width and height in cells
+W $623C,2 Pixels
+B $623E,2 Width and height in cells
+W $6240,2 Pixels
+B $6242,2 Width and height in cells
+W $6244,2 Pixels
+B $6246,2 Width and height in cells
+W $6248,2 Pixels
+B $624A,2 Width and height in cells
+W $624C,2 Pixels
+B $624E,2 Width and height in cells
+W $6250,2 Pixels
+B $6252,2 Width and height in cells
+W $6254,2 Pixels
+B $6256,2 Width and height in cells
+W $6258,2 Pixels
+B $625A,2 Width and height in cells
+W $625C,2 Pixels
+B $625E,2 Width and height in cells
+W $6260,2 Pixels
+B $6262,2 Width in cells, height and cell mask
+W $6264,2 Pixels
+B $6266,2 Width and height in cells
+W $6268,2 Pixels
+B $626A,2 Width in cells, height and cell mask
+W $626C,2 Pixels
+B $626E,2 Width and colour pattern, height and cell mask
+W $6270,2 Pixels
+B $6272,2 Width and colour pattern, height and cell mask
+W $6274,2 Pixels
+B $6276,2 Width and colour pattern, height and cell mask
+W $6278,2 Pixels
+B $627A,2 Width and colour pattern, height and cell mask
+W $627C,2 Pixels
+B $627E,2 Width in cells, height and cell mask
+W $6280,2 Pixels
+B $6282,2 Width in cells, height and cell mask
+W $6284,2 Pixels
+B $6286,2 Width in cells, height and cell mask
+W $6288,2 Pixels
+B $628A,2 Width in cells, height and cell mask
+W $628C,2 Pixels
+B $628E,2 Width and height in cells
+W $6290,2 Pixels
+B $6292,2 Width and height in cells
+W $6294,2 Pixels
+B $6296,2 Width and height in cells
+W $6298,2 Pixels
+B $629A,2 Width and height in cells
+W $629C,2 Pixels
+B $629E,2 Width and height in cells
+W $62A0,2 Pixels
+B $62A2,2 Width and height in cells
+W $62A4,2 Pixels
+B $62A6,2 Width and height in cells
+W $62A8,2 Pixels
+B $62AA,2 Width and height in cells
+W $62AC,2 Pixels: the first cells of graphic 44
+B $62AE,2 Width and height in cells
+W $62B0,2 Pixels
+B $62B2,2 Width in cells, height and cell mask
+W $62B4,2 Pixels
+B $62B6,2 Width and height in cells
+W $62B8,2 Pixels
+B $62BA,2 Width and height in cells
+W $62BC,2 Pixels
+B $62BE,2 Width in cells, height and cell mask
+W $62C0,2 Pixels
+B $62C2,2 Width and height in cells
+W $62C4,2 Pixels
+B $62C6,2 Width and height in cells
+W $62C8,2 Pixels
+B $62CA,2 Width and height in cells
+W $62CC,2 Pixels
+B $62CE,2 Width and height in cells
+W $62D0,2 Pixels
+B $62D2,2 Width and height in cells
+W $62D4,2 Pixels
+B $62D6,2 Width and height in cells
+W $62D8,2 Pixels
+B $62DA,2 Width and colour pattern, height and cell mask
+W $62DC,2 Pixels
+B $62DE,2 Width and colour pattern, height and cell mask
+W $62E0,2 Pixels
+B $62E2,2 Width and height in cells
+W $62E4,2 Pixels
+B $62E6,2 Width and height in cells
+W $62E8,2 Pixels
+B $62EA,2 Width and height in cells
+W $62EC,2 Pixels
+B $62EE,2 Width and height in cells
+W $62F0,2 Pixels
+B $62F2,2 Width and height in cells
+W $62F4,2 Pixels
+B $62F6,2 Width and height in cells
+W $62F8,2 Pixels
+B $62FA,2 Width and height in cells
+W $62FC,2 Pixels
+B $62FE,2 Width and height in cells
+W $6300,2 Pixels
+B $6302,2 Width and height in cells
+W $6304,2 Pixels
+B $6306,2 Width and height in cells
+W $6308,2 Pixels
+B $630A,2 Width and height in cells
+W $630C,2 Pixels
+B $630E,2 Width and height in cells
+W $6310,2 Pixels
+B $6312,2 Width and height in cells
+W $6314,2 Pixels
+B $6316,2 Width and height in cells
+W $6318,2 Pixels
+B $631A,2 Width and height in cells
+W $631C,2 Pixels
+B $631E,2 Width and colour pattern, height and cell mask
+W $6320,2 Pixels
+B $6322,2 Width and colour pattern, height and cell mask
+W $6324,2 Pixels
+B $6326,2 Width and colour pattern, height and cell mask
+W $6328,2 Pixels
+B $632A,2 Width and colour pattern, height and cell mask
+W $632C,2 Pixels: the top row of graphic 19
+B $632E,2 Width and height in cells
+W $6330,2 Pixels
+B $6332,2 Width and height in cells
+W $6334,2 Pixels
+B $6336,2 Width and height in cells
+W $6338,2 Pixels
+B $633A,2 Width and height in cells
+W $633C,2 Pixels
+B $633E,2 Width and height in cells
+W $6340,2 Pixels
+B $6342,2 Width and height in cells
+W $6344,2 Pixels
+B $6346,2 Width and height in cells
+W $6348,2 Pixels
+B $634A,2 Width and height in cells
+W $634C,2 Pixels
+B $634E,2 Width and height in cells
+W $6350,2 Pixels
+B $6352,2 Width and height in cells
+W $6354,2 Pixels
+B $6356,2 Width and height in cells
+W $6358,2 Pixels
+B $635A,2 Width and height in cells
+W $635C,2 Pixels
+B $635E,2 Width and height in cells
+W $6360,2 Pixels
+B $6362,2 Width and height in cells
+W $6364,2 Pixels
+B $6366,2 Width and height in cells
+W $6368,2 Pixels
+B $636A,2 Width and height in cells
+W $636C,2 Pixels
+B $636E,2 Width and height in cells
+W $6370,2 Pixels
+B $6372,2 Width and height in cells
+W $6374,2 Pixels
+B $6376,2 Width and height in cells
+W $6378,2 Pixels
+B $637A,2 Width and height in cells
+W $637C,2 Pixels
+B $637E,2 Width and height in cells
+W $6380,2 Pixels
+B $6382,2 Width and height in cells
+W $6384,2 Pixels
+B $6386,2 Width and height in cells
+W $6388,2 Pixels
+B $638A,2 Width and height in cells
+W $638C,2 Pixels
+B $638E,2 Width and height in cells
+W $6390,2 Pixels
+B $6392,2 Width and height in cells
+W $6394,2 Pixels
+B $6396,2 Width and height in cells
+W $6398,2 Pixels
+B $639A,2 Width and height in cells
+W $639C,2 Pixels
+B $639E,2 Width and height in cells
+W $63A0,2 Pixels
+B $63A2,2 Width and colour pattern, height in cells
+W $63A4,2 Pixels
+B $63A6,2 Width and colour pattern, height in cells
+W $63A8,2 Pixels
+B $63AA,2 Width and colour pattern, height in cells
+W $63AC,2 Pixels
+B $63AE,2 Width and colour pattern, height in cells
+W $63B0,2 Pixels
+B $63B2,2 Width and colour pattern, height in cells
+W $63B4,2 Pixels
+B $63B6,2 Width and colour pattern, height in cells
+W $63B8,2 Pixels
+B $63BA,2 Width and height in cells
+W $63BC,2 Pixels
+B $63BE,2 Width and height in cells
+W $63C0,2 Pixels
+B $63C2,2 Width and height in cells
+W $63C4,2 Pixels
+B $63C6,2 Width and height in cells
+W $63C8,2 Pixels
+B $63CA,2 Width and height in cells
+W $63CC,2 Pixels
+B $63CE,2 Width and height in cells
+W $63D0,2 Pixels
+B $63D2,2 Width and height in cells
+W $63D4,2 Pixels
+B $63D6,2 Width and height in cells
+W $63D8,2 Pixels
+B $63DA,2 Width and height in cells
+W $63DC,2 Pixels, in the ROM
+B $63DE,2 Width and height in cells
+W $63E0,2 Pixels
+B $63E2,2 Width and height in cells
+W $63E4,2 Pixels
+B $63E6,2 Width and height in cells
+W $63E8,2 Pixels
+B $63EA,2 Width and height in cells
+W $63EC,2 Pixels
+B $63EE,2 Width and height in cells
+W $63F0,2 Pixels
+B $63F2,2 Width and height in cells
+W $63F4,2 Pixels
+B $63F6,2 Width and height in cells
+W $63F8,2 Pixels
+B $63FA,2 Width and height in cells
+W $63FC,2 Pixels
+B $63FE,2 Width and height in cells
+W $6400,2 Pixels
+B $6402,2 Width and height in cells
+W $6404,2 Pixels
+B $6406,2 Width and height in cells
+W $6408,2 Pixels
+B $640A,2 Width and height in cells
+W $640C,2 Pixels
+B $640E,2 Width and height in cells
+W $6410,2 Pixels
+B $6412,2 Width and height in cells
+W $6414,2 Pixels
+B $6416,2 Width and height in cells
+W $6418,2 Pixels
+B $641A,2 Width and height in cells
+W $641C,2 Pixels
+B $641E,2 Width and height in cells
+W $6420,2 Pixels
+B $6422,2 Width and height in cells
+W $6424,2 Pixels
+B $6426,2 Width and height in cells
+W $6428,2 Pixels
+B $642A,2 Width and height in cells
+W $642C,2 Pixels
+B $642E,2 Width and height in cells
+W $6430,2 Pixels
+B $6432,2 Width and height in cells
+W $6434,2 Pixels
+B $6436,2 Width and height in cells
+W $6438,2 Pixels
+B $643A,2 Width and height in cells
+W $643C,2 Pixels
+B $643E,2 Width and height in cells
+W $6440,2 Pixels
+B $6442,2 Width and colour pattern, height in cells
+W $6444,2 Pixels
+B $6446,2 Width and colour pattern, height in cells
+W $6448,2 Pixels
+B $644A,2 Width and colour pattern, height in cells
+W $644C,2 Pixels
+B $644E,2 Width and colour pattern, height in cells
+W $6450,2 Pixels
+B $6452,2 Width and colour pattern, height in cells
+W $6454,2 Pixels
+B $6456,2 Width and colour pattern, height in cells
+W $6458,2 Pixels
+B $645A,2 Width and colour pattern, height in cells
+@ $645C label=outer_graphic_0
+b $645C Outer hull graphics
+D $645C Every graphic that #R$6200(the outer hull's graphic directory) lists, at the address and the size that its record gives. A graphic holds 8 bytes per cell, cell by cell along each row of cells from the top. Some graphics share bytes, so one graphic can start inside another.
+N $645C The renders show the pixels of each graphic at the size its record gives, under its graphic number. The colours come from the screen layout and the graphic's colour pattern, so the renders use black ink on white paper. Graphic 119 has no render, since #R$6200(its record) gives it no pixels.
+N $645C Cell mask 1 leaves out the bottom middle cell of graphic 24, so the draw keeps that cell's pixels and colour.
+N $645C #UDGTABLE { #UDGARRAY5,,2($645C-$64F4-8)(outer_graphic_0) | #UDGARRAY3,,2($64FC-$653C-8)(outer_graphic_1) | #UDGARRAY2,,2($6544-$656C-8)(outer_graphic_2) | #UDGARRAY2,,2($6574-$659C-8)(outer_graphic_3) | #UDGARRAY2,,2($65A4-$65DC-8)(outer_graphic_4) | #UDGARRAY3,,2($65E4-$660C-8)(outer_graphic_5) | #UDGARRAY3,,2($6614-$663C-8)(outer_graphic_6) } { 0 | 1 | 2 | 3 | 4 | 5 | 6 } { #UDGARRAY2,,2($6644-$665C-8)(outer_graphic_7) | #UDGARRAY2,,2($6664-$667C-8)(outer_graphic_8) | #UDGARRAY3,,2($6684-$66AC-8)(outer_graphic_9) | #UDGARRAY1,,2($66B4-$66BC-8)(outer_graphic_10) | #UDGARRAY1,,2($66C4-$66CC-8)(outer_graphic_11) | #UDGARRAY3,,2($66D4-$66E4-8)(outer_graphic_12) | #UDGARRAY3,,2($66EC-$66FC-8)(outer_graphic_13) } { 7 | 8 | 9 | 10 | 11 | 12 | 13 } { #UDGARRAY5,,2($6704-$679C-8)(outer_graphic_14) | #UDGARRAY3,,2($67A4-$67FC-8)(outer_graphic_15) | #UDGARRAY5,,2($6804-$689C-8)(outer_graphic_16) | #UDGARRAY3,,2($68A4-$68FC-8)(outer_graphic_17) | #UDGARRAY2,,2($6904-$692C-8)(outer_graphic_18) | #UDGARRAY3,,2($6934-$695C-8)(outer_graphic_19) | #UDGARRAY3,,2($6964-$69D4-8)(outer_graphic_20) } { 14 | 15 | 16 | 17 | 18 | 19 | 20 } { #UDGARRAY3,,2($69DC-$6A4C-8)(outer_graphic_21) | #UDGARRAY5,,2($6A54-$6AC4-8)(outer_graphic_22) | #UDGARRAY5,,2($6ACC-$6B3C-8)(outer_graphic_23) | #UDGARRAY3,,2($6B44-$6B6C-8)(outer_graphic_24) | #UDGARRAY3,,2($6B74-$6B9C-8)(outer_graphic_25) | #UDGARRAY3,,2($6BA4-$6BE4-8)(outer_graphic_26) | #UDGARRAY2,,2($6BEC-$6C04-8)(outer_graphic_27) } { 21 | 22 | 23 | 24 | 25 | 26 | 27 } { #UDGARRAY2,,2($6C0C-$6C24-8)(outer_graphic_28) | #UDGARRAY2,,2($6C2C-$6C44-8)(outer_graphic_29) | #UDGARRAY2,,2($6C4C-$6C64-8)(outer_graphic_30) | #UDGARRAY4,,2($6C6C-$6CE4-8)(outer_graphic_31) | #UDGARRAY4,,2($6CEC-$6D64-8)(outer_graphic_32) | #UDGARRAY4,,2($6D6C-$6DE4-8)(outer_graphic_33) | #UDGARRAY4,,2($6DEC-$6E64-8)(outer_graphic_34) } { 28 | 29 | 30 | 31 | 32 | 33 | 34 } { #UDGARRAY5,,2($6E6C-$6F2C-8)(outer_graphic_35) | #UDGARRAY2,,2($6F34-$6F4C-8)(outer_graphic_36) | #UDGARRAY3,,2($6F54-$6F94-8)(outer_graphic_37) | #UDGARRAY1,,2($6F9C-$6F9C-8)(outer_graphic_38) | #UDGARRAY2,,2($6FA4-$6FAC-8)(outer_graphic_39) | #UDGARRAY2,,2($6FB4-$6FBC-8)(outer_graphic_40) | #UDGARRAY1,,2($6FC4-$6FCC-8)(outer_graphic_41) } { 35 | 36 | 37 | 38 | 39 | 40 | 41 } { #UDGARRAY1,,2($6FD4-$6FDC-8)(outer_graphic_42) | #UDGARRAY3,,2($6FE4-$7024-8)(outer_graphic_43) | #UDGARRAY4,,2($6FE4-$707C-8)(outer_graphic_44) | #UDGARRAY2,,2($7084-$708C-8)(outer_graphic_45) | #UDGARRAY2,,2($7094-$709C-8)(outer_graphic_46) | #UDGARRAY5,,2($70A4-$713C-8)(outer_graphic_47) | #UDGARRAY1,,2($7144-$714C-8)(outer_graphic_48) } { 42 | 43 | 44 | 45 | 46 | 47 | 48 } { #UDGARRAY1,,2($7154-$715C-8)(outer_graphic_49) | #UDGARRAY5,,2($7164-$71FC-8)(outer_graphic_50) | #UDGARRAY5,,2($7204-$729C-8)(outer_graphic_51) | #UDGARRAY4,,2($72A4-$733C-8)(outer_graphic_52) | #UDGARRAY4,,2($7344-$73DC-8)(outer_graphic_53) | #UDGARRAY1,,2($73E4-$73EC-8)(outer_graphic_54) | #UDGARRAY2,,2($73F4-$73FC-8)(outer_graphic_55) } { 49 | 50 | 51 | 52 | 53 | 54 | 55 } { #UDGARRAY3,,2($7404-$7444-8)(outer_graphic_56) | #UDGARRAY3,,2($744C-$748C-8)(outer_graphic_57) | #UDGARRAY3,,2($7494-$74D4-8)(outer_graphic_58) | #UDGARRAY3,,2($74DC-$751C-8)(outer_graphic_59) | #UDGARRAY2,,2($7524-$755C-8)(outer_graphic_60) | #UDGARRAY2,,2($7564-$75BC-8)(outer_graphic_61) | #UDGARRAY2,,2($75C4-$761C-8)(outer_graphic_62) } { 56 | 57 | 58 | 59 | 60 | 61 | 62 } { #UDGARRAY1,,2($7624-$762C-8)(outer_graphic_63) | #UDGARRAY1,,2($7634-$763C-8)(outer_graphic_64) | #UDGARRAY2,,2($7644-$766C-8)(outer_graphic_65) | #UDGARRAY2,,2($7674-$769C-8)(outer_graphic_66) | #UDGARRAY2,,2($76A4-$76AC-8)(outer_graphic_67) | #UDGARRAY2,,2($76B4-$76BC-8)(outer_graphic_68) | #UDGARRAY3,,2($76C4-$76D4-8)(outer_graphic_69) } { 63 | 64 | 65 | 66 | 67 | 68 | 69 } { #UDGARRAY3,,2($76F4-$7704-8)(outer_graphic_70) | #UDGARRAY2,,2($7724-$773C-8)(outer_graphic_71) | #UDGARRAY2,,2($7744-$775C-8)(outer_graphic_72) | #UDGARRAY2,,2($7764-$777C-8)(outer_graphic_73) | #UDGARRAY2,,2($7784-$779C-8)(outer_graphic_74) | #UDGARRAY3,,2($6934-$6944-8)(outer_graphic_75) | #UDGARRAY1,,2($77A4-$77B4-8)(outer_graphic_76) } { 70 | 71 | 72 | 73 | 74 | 75 | 76 } { #UDGARRAY1,,2($6E9C-$6E9C-8)(outer_graphic_77) | #UDGARRAY1,,2($6EA4-$6EA4-8)(outer_graphic_78) | #UDGARRAY1,,2($6EAC-$6EAC-8)(outer_graphic_79) | #UDGARRAY3,,2($76DC-$76EC-8)(outer_graphic_80) | #UDGARRAY3,,2($770C-$771C-8)(outer_graphic_81) | #UDGARRAY1,,2($77BC-$77CC-8)(outer_graphic_82) | #UDGARRAY1,,2($77D4-$77E4-8)(outer_graphic_83) } { 77 | 78 | 79 | 80 | 81 | 82 | 83 } { #UDGARRAY1,,2($77EC-$77FC-8)(outer_graphic_84) | #UDGARRAY1,,2($7804-$7814-8)(outer_graphic_85) | #UDGARRAY1,,2($6EC4-$6EC4-8)(outer_graphic_86) | #UDGARRAY1,,2($6ECC-$6ECC-8)(outer_graphic_87) | #UDGARRAY3,,2($694C-$695C-8)(outer_graphic_88) | #UDGARRAY2,,2($781C-$7824-8)(outer_graphic_89) | #UDGARRAY2,,2($782C-$7834-8)(outer_graphic_90) } { 84 | 85 | 86 | 87 | 88 | 89 | 90 } { #UDGARRAY2,,2($783C-$7844-8)(outer_graphic_91) | #UDGARRAY2,,2($784C-$7854-8)(outer_graphic_92) | #UDGARRAY1,,2($785C-$7864-8)(outer_graphic_93) | #UDGARRAY1,,2($786C-$7874-8)(outer_graphic_94) | #UDGARRAY1,,2($787C-$7884-8)(outer_graphic_95) | #UDGARRAY1,,2($788C-$7894-8)(outer_graphic_96) | #UDGARRAY1,,2($76AC-$76AC-8)(outer_graphic_97) } { 91 | 92 | 93 | 94 | 95 | 96 | 97 } { #UDGARRAY1,,2($76BC-$76BC-8)(outer_graphic_98) | #UDGARRAY1,,2($789C-$78AC-8)(outer_graphic_99) | #UDGARRAY2,,2($78B4-$78CC-8)(outer_graphic_100) | #UDGARRAY2,,2($78D4-$78EC-8)(outer_graphic_101) | #UDGARRAY2,,2($78F4-$790C-8)(outer_graphic_102) | #UDGARRAY2,,2($7914-$792C-8)(outer_graphic_103) | #UDGARRAY5,,2($7934-$79CC-8)(outer_graphic_104) } { 98 | 99 | 100 | 101 | 102 | 103 | 104 } { #UDGARRAY4,,2($79D4-$7A4C-8)(outer_graphic_105) | #UDGARRAY5,,2($7A54-$7AEC-8)(outer_graphic_106) | #UDGARRAY4,,2($7AF4-$7B6C-8)(outer_graphic_107) | #UDGARRAY6,,2($7B74-$7C2C-8)(outer_graphic_108) | #UDGARRAY6,,2($7C34-$7CEC-8)(outer_graphic_109) | #UDGARRAY4,,2($7CF4-$7D4C-8)(outer_graphic_110) | #UDGARRAY3,,2($7D54-$7DAC-8)(outer_graphic_111) } { 105 | 106 | 107 | 108 | 109 | 110 | 111 } { #UDGARRAY4,,2($7DB4-$7E0C-8)(outer_graphic_112) | #UDGARRAY3,,2($7E14-$7E6C-8)(outer_graphic_113) | #UDGARRAY4,,2($7E74-$7ECC-8)(outer_graphic_114) | #UDGARRAY3,,2($7ED4-$7F2C-8)(outer_graphic_115) | #UDGARRAY4,,2($7F34-$7F8C-8)(outer_graphic_116) | #UDGARRAY3,,2($7F94-$7FEC-8)(outer_graphic_117) | #UDGARRAY5,,2($7FB0-$8020-8)(outer_graphic_118) } { 112 | 113 | 114 | 115 | 116 | 117 | 118 } { #UDGARRAY5,,2($7FF4-$8064-8)(outer_graphic_120) | #UDGARRAY3,,2($8028-$8098-8)(outer_graphic_121) | #UDGARRAY5,,2($80A0-$8110-8)(outer_graphic_122) | #UDGARRAY3,,2($8118-$8188-8)(outer_graphic_123) | #UDGARRAY6,,2($8190-$8218-8)(outer_graphic_124) | #UDGARRAY3,,2($8220-$82A8-8)(outer_graphic_125) | #UDGARRAY6,,2($82B0-$8338-8)(outer_graphic_126) } { 120 | 121 | 122 | 123 | 124 | 125 | 126 } { #UDGARRAY3,,2($8340-$83C8-8)(outer_graphic_127) | #UDGARRAY5,,2($83D0-$83F0-8)(outer_graphic_128) | #UDGARRAY1,,2($83F8-$8418-8)(outer_graphic_129) | #UDGARRAY5,,2($8420-$8440-8)(outer_graphic_130) | #UDGARRAY1,,2($8448-$8468-8)(outer_graphic_131) | #UDGARRAY3,,2($8470-$8480-8)(outer_graphic_132) | #UDGARRAY1,,2($8488-$8498-8)(outer_graphic_133) } { 127 | 128 | 129 | 130 | 131 | 132 | 133 } { #UDGARRAY3,,2($84A0-$84B0-8)(outer_graphic_134) | #UDGARRAY1,,2($84B8-$84C8-8)(outer_graphic_135) | #UDGARRAY1,,2($84D0-$84E0-8)(outer_graphic_136) | #UDGARRAY1,,2($84E8-$84F0-8)(outer_graphic_137) | #UDGARRAY1,,2($84F8-$8510-8)(outer_graphic_138) | #UDGARRAY3,,2($8518-$8540-8)(outer_graphic_139) | #UDGARRAY1,,2($8548-$8560-8)(outer_graphic_140) } { 134 | 135 | 136 | 137 | 138 | 139 | 140 } { #UDGARRAY1,,2($8568-$8570-8)(outer_graphic_141) | #UDGARRAY6,,2($8578-$8600-8)(outer_graphic_142) | #UDGARRAY4,,2($8608-$8660-8)(outer_graphic_143) | #UDGARRAY2,,2($8668-$8690-8)(outer_graphic_144) | #UDGARRAY3,,2($8698-$86C0-8)(outer_graphic_145) | #UDGARRAY3,,2($86C8-$8708-8)(outer_graphic_146) | #UDGARRAY2,,2($8710-$8738-8)(outer_graphic_147) } { 141 | 142 | 143 | 144 | 145 | 146 | 147 } { #UDGARRAY3,,2($8740-$8768-8)(outer_graphic_148) | #UDGARRAY3,,2($8770-$87B0-8)(outer_graphic_149) | #UDGARRAY3,,2($87B8-$87F8-8)(outer_graphic_150) } { 148 | 149 | 150 } TABLE#
+B $645C,160,8
+@ $64FC label=outer_graphic_1
+B $64FC,72,8
+@ $6544 label=outer_graphic_2
+B $6544,48,8
+@ $6574 label=outer_graphic_3
+B $6574,48,8
+@ $65A4 label=outer_graphic_4
+B $65A4,64,8
+@ $65E4 label=outer_graphic_5
+B $65E4,48,8
+@ $6614 label=outer_graphic_6
+B $6614,48,8
+@ $6644 label=outer_graphic_7
+B $6644,32,8
+@ $6664 label=outer_graphic_8
+B $6664,32,8
+@ $6684 label=outer_graphic_9
+B $6684,48,8
+@ $66B4 label=outer_graphic_10
+B $66B4,16,8
+@ $66C4 label=outer_graphic_11
+B $66C4,16,8
+@ $66D4 label=outer_graphic_12
+B $66D4,24,8
+@ $66EC label=outer_graphic_13
+B $66EC,24,8
+@ $6704 label=outer_graphic_14
+B $6704,160,8
+@ $67A4 label=outer_graphic_15
+B $67A4,96,8
+@ $6804 label=outer_graphic_16
+B $6804,160,8
+@ $68A4 label=outer_graphic_17
+B $68A4,96,8
+@ $6904 label=outer_graphic_18
+B $6904,48,8
+@ $6934 label=outer_graphic_19
+B $6934,24,8 Top row, which is also graphic 75
+@ $694C label=outer_graphic_88
+B $694C,24,8 Bottom row of graphic 19
+@ $6964 label=outer_graphic_20
+B $6964,120,8
+@ $69DC label=outer_graphic_21
+B $69DC,120,8
+@ $6A54 label=outer_graphic_22
+B $6A54,120,8
+@ $6ACC label=outer_graphic_23
+B $6ACC,120,8
+@ $6B44 label=outer_graphic_24
+B $6B44,48,8
+@ $6B74 label=outer_graphic_25
+B $6B74,48,8
+@ $6BA4 label=outer_graphic_26
+B $6BA4,72,8
+@ $6BEC label=outer_graphic_27
+B $6BEC,32,8
+@ $6C0C label=outer_graphic_28
+B $6C0C,32,8
+@ $6C2C label=outer_graphic_29
+B $6C2C,32,8
+@ $6C4C label=outer_graphic_30
+B $6C4C,32,8
+@ $6C6C label=outer_graphic_31
+B $6C6C,128,8
+@ $6CEC label=outer_graphic_32
+B $6CEC,128,8
+@ $6D6C label=outer_graphic_33
+B $6D6C,128,8
+@ $6DEC label=outer_graphic_34
+B $6DEC,128,8
+@ $6E6C label=outer_graphic_35
+B $6E6C,48,8 First row and the first cell of row 2
+@ $6E9C label=outer_graphic_77
+B $6E9C,8 Graphic 35's cell in row 2, column 2
+@ $6EA4 label=outer_graphic_78
+B $6EA4,8 Graphic 35's cell in row 2, column 3
+@ $6EAC label=outer_graphic_79
+B $6EAC,8 Graphic 35's cell in row 2, column 4
+B $6EB4,16,8 Graphic 35's cells in row 2, column 5 and row 3, column 1
+@ $6EC4 label=outer_graphic_86
+B $6EC4,8 Graphic 35's cell in row 3, column 2
+@ $6ECC label=outer_graphic_87
+B $6ECC,8 Graphic 35's cell in row 3, column 3
+B $6ED4,96,8 Graphic 35's cells from row 3, column 4 to its end
+@ $6F34 label=outer_graphic_36
+B $6F34,32,8
+@ $6F54 label=outer_graphic_37
+B $6F54,72,8
+@ $6F9C label=outer_graphic_38
+B $6F9C,8
+@ $6FA4 label=outer_graphic_39
+B $6FA4,16,8
+@ $6FB4 label=outer_graphic_40
+B $6FB4,16,8
+@ $6FC4 label=outer_graphic_41
+B $6FC4,16,8
+@ $6FD4 label=outer_graphic_42
+B $6FD4,16,8
+@ $6FE4 label=outer_graphic_44
+B $6FE4,160,8 Also the pixels of the record of graphic 43
+@ $7084 label=outer_graphic_45
+B $7084,16,8
+@ $7094 label=outer_graphic_46
+B $7094,16,8
+@ $70A4 label=outer_graphic_47
+B $70A4,160,8
+@ $7144 label=outer_graphic_48
+B $7144,16,8
+@ $7154 label=outer_graphic_49
+B $7154,16,8
+@ $7164 label=outer_graphic_50
+B $7164,160,8
+@ $7204 label=outer_graphic_51
+B $7204,160,8
+@ $72A4 label=outer_graphic_52
+B $72A4,160,8
+@ $7344 label=outer_graphic_53
+B $7344,160,8
+@ $73E4 label=outer_graphic_54
+B $73E4,16,8
+@ $73F4 label=outer_graphic_55
+B $73F4,16,8
+@ $7404 label=outer_graphic_56
+B $7404,72,8
+@ $744C label=outer_graphic_57
+B $744C,72,8
+@ $7494 label=outer_graphic_58
+B $7494,72,8
+@ $74DC label=outer_graphic_59
+B $74DC,72,8
+@ $7524 label=outer_graphic_60
+B $7524,64,8
+@ $7564 label=outer_graphic_61
+B $7564,96,8
+@ $75C4 label=outer_graphic_62
+B $75C4,96,8
+@ $7624 label=outer_graphic_63
+B $7624,16,8
+@ $7634 label=outer_graphic_64
+B $7634,16,8
+@ $7644 label=outer_graphic_65
+B $7644,48,8
+@ $7674 label=outer_graphic_66
+B $7674,48,8
+@ $76A4 label=outer_graphic_67
+B $76A4,8 Left cell
+@ $76AC label=outer_graphic_97
+B $76AC,8 Right cell of graphic 67
+@ $76B4 label=outer_graphic_68
+B $76B4,8 Left cell
+@ $76BC label=outer_graphic_98
+B $76BC,8 Right cell of graphic 68
+@ $76C4 label=outer_graphic_69
+B $76C4,24,8
+@ $76DC label=outer_graphic_80
+B $76DC,24,8
+@ $76F4 label=outer_graphic_70
+B $76F4,24,8
+@ $770C label=outer_graphic_81
+B $770C,24,8
+@ $7724 label=outer_graphic_71
+B $7724,32,8
+@ $7744 label=outer_graphic_72
+B $7744,32,8
+@ $7764 label=outer_graphic_73
+B $7764,32,8
+@ $7784 label=outer_graphic_74
+B $7784,32,8
+@ $77A4 label=outer_graphic_76
+B $77A4,24,8
+@ $77BC label=outer_graphic_82
+B $77BC,24,8
+@ $77D4 label=outer_graphic_83
+B $77D4,24,8
+@ $77EC label=outer_graphic_84
+B $77EC,24,8
+@ $7804 label=outer_graphic_85
+B $7804,24,8
+@ $781C label=outer_graphic_89
+B $781C,16,8
+@ $782C label=outer_graphic_90
+B $782C,16,8
+@ $783C label=outer_graphic_91
+B $783C,16,8
+@ $784C label=outer_graphic_92
+B $784C,16,8
+@ $785C label=outer_graphic_93
+B $785C,16,8
+@ $786C label=outer_graphic_94
+B $786C,16,8
+@ $787C label=outer_graphic_95
+B $787C,16,8
+@ $788C label=outer_graphic_96
+B $788C,16,8
+@ $789C label=outer_graphic_99
+B $789C,24,8
+@ $78B4 label=outer_graphic_100
+B $78B4,32,8
+@ $78D4 label=outer_graphic_101
+B $78D4,32,8
+@ $78F4 label=outer_graphic_102
+B $78F4,32,8
+@ $7914 label=outer_graphic_103
+B $7914,32,8
+@ $7934 label=outer_graphic_104
+B $7934,160,8
+@ $79D4 label=outer_graphic_105
+B $79D4,128,8
+@ $7A54 label=outer_graphic_106
+B $7A54,160,8
+@ $7AF4 label=outer_graphic_107
+B $7AF4,128,8
+@ $7B74 label=outer_graphic_108
+B $7B74,192,8
+@ $7C34 label=outer_graphic_109
+B $7C34,192,8
 @ $7CF4 label=outer_graphic_110
 B $7CF4,96,8
 @ $7D54 label=outer_graphic_111
@@ -355,7 +871,7 @@ B $A758,96,16 Colour pattern of the left half
 B $A7B8,96,16 Colour pattern of the right half
 @ $A818 label=inner_graphic_dir
 b $A818 Inner section graphic directory
-D $A818 The address and the size of each of the 18 graphics of the inner sections, 4 bytes per graphic in graphic number order. A record holds the address of the graphic's pixels, then its width in cells and its height in cells.
+D $A818 The record of each of the 18 graphics of the inner sections, by graphic number from 0, 4 bytes per graphic. Each record is laid out as one of #R$6200(the outer hull's graphic directory).
 W $A818,2 Pixels
 B $A81A,2 Width and height in cells
 W $A81C,2 Pixels
