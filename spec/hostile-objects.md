@@ -63,7 +63,7 @@ The [Graphics page](../reference/graphics.html#outer-hull-graphics) shows the la
 
 A move steps the object 2 pixels in its direction, which `hostile_state` holds. So an object moves 1 pixel per pass, and 8 passes take it across a cell. The [State](state.md#hostile-objects) page gives the values of the state.
 
-The offset of the image in its column, 0–3 in steps of 2 pixels, sits in `hostile_pixel_offset`. The object covers 2 columns at offset 0, and 3 otherwise. It covers 2 rows when its top lies on a cell's top, and 3 otherwise.
+The offset of the image in its column, 0–3 in steps of 2 pixels, sits in `hostile_x_shift`. The object covers 2 columns at offset 0, and 3 otherwise. It covers 2 rows when its top lies on a cell's top, and 3 otherwise.
 
 An object can leave the play area. It moves on until its column is −2 or 32, or its row is 4 or 24. There it can move no further, and its next move takes it out of the game. Cells off the play area take no marks and no draw.
 
@@ -85,7 +85,7 @@ The object lifts its own mark while it moves, so it never blocks itself.
 
 ## Draw
 
-The draw puts the object's image through its mask over its background store, at its pixel offset. The launch builds the four shifted images and masks of the design, through `preshift_hostile`. The draw writes pixels only, so the object takes the colours of the cells it crosses. The routine is `draw_hostile`.
+The draw puts the object's image through its mask over its background store, at its horizontal offset. The launch builds the four shifted images and masks of the design, through `preshift_hostile`. The draw writes pixels only, so the object takes the colours of the cells it crosses. The routine is `draw_hostile`.
 
 The object does not draw in a cell that a bright graphic, a bar or the Skimmer marks. Its cover map records those cells, as the Skimmer's does.
 

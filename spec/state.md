@@ -147,7 +147,7 @@ TABLE#
 The record is the 16 bytes that each move copies to the current hostile object at $C947. #TABLE(default)
 { =h Byte | =h Label               | =h Holds                        | =h Values                      }
 { 0–1     | `hostile_screen_pos`   | Screen address of its top row   | Pixel row in the high byte     }
-{ 2       | `hostile_pixel_offset` | Offset in its column            | 0–3, in steps of 2 pixels      }
+{ 2       | `hostile_x_shift`      | Offset in its column            | 0–3, in steps of 2 pixels      }
 { 3       | `hostile_column`       | Column of its left cell         | −2 to 32                       }
 { 4       | `hostile_row`          | Row of its top cell             | 4–24                           }
 { 5–6     | `hostile_attr_pos`     | Its top-left cell in the mirror | Address                        }
@@ -195,8 +195,7 @@ A digit takes one byte: eight times its value, plus its eighths on the way to th
 These hold the work of the screen draw, and change only while a screen draws. #TABLE(default)
 { =h Address | =h Label                 | =h Holds                                | =h Values                                 }
 { $BD11      | `graphic_attr_addr`      | Attribute address of the latest graphic | Address                                   }
-{ $BD13      | `pattern_mirror_addr_lo` | Mirror address of a pattern, low byte   | Low byte of an address                    }
-{ $BD14      | `pattern_mirror_addr_hi` | Mirror address of a pattern, high byte  | High byte of an address                   }
+{ $BD13      | `pattern_mirror_addr`    | Mirror address of a pattern             | Address                                   }
 { $BD15      | `draw_attr`              | Attribute of the draw                   | Attribute, or $80 to keep the colours     }
 { $BD16      | `plot_width`             | Width in cells of the graphic           | Cells                                     }
 { $BD17      | `layout_column`          | Column of the layout graphic            | 0–31                                      }
@@ -208,8 +207,7 @@ These hold the work of the screen draw, and change only while a screen draws. #T
 { $BD1D      | `prev_layout_cell`       | Cell of the graphic before              | Column, then row                          }
 { $BD1F      | `prev_layout_graphic`    | Number of the graphic before            | Graphic number                            }
 { $BD20      | `layout_graphic`         | Number of the layout graphic            | Graphic number                            }
-{ $BD21      | `graphic_pixel_addr_lo`  | Screen address of a graphic, low byte   | Low byte of an address                    }
-{ $BD22      | `graphic_pixel_addr_hi`  | Screen address of a graphic, high byte  | High byte of an address                   }
+{ $BD21      | `graphic_pixel_addr`     | Screen address of a graphic             | Address                                   }
 { $BD23      | `mirror_mark`            | Mark the graphic sets                   | 0 for none, 1 for cell masks, 2 for a bar }
 { $BD32      | `colour_pattern`         | Colour pattern of the latest graphic    | Twice its number, 0 for one colour        }
 { $BD34      | `skip_shadow`            | Shadow switch                           | 0 for own shadows, any other for none     }

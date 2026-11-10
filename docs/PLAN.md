@@ -70,10 +70,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Address       | Open question                                 |
 |:--------------|:----------------------------------------------|
-| `$F480`       | Split the key copy out of `b $F473` as code (moves `$F473` baseline keys) |
-| `$B20A`       | Split plot_graphic, plot_unmasked, cast_shadow, draw_shadow into entries |
-| `$D2E7`       | Label the font; its address is built from immediates |
-| `$CE26`       | Split `flag_interrupt` into its own entry     |
 
 ### Game behaviour
 
@@ -87,33 +83,20 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B3F0`       | Why do the two bars' shadow offsets differ?   |
 | `$C802`       | Does `$C0D4`'s reset to `$08` pair the explosion toggles? |
 | `$FF70`       | Cover map `$FF` is the map's page byte (relocation) |
-| `$F840`       | Label the hostile slots' state bytes (split `$F473`) |
-| `$D219`       | Note the movement flag +1 in the `D`          |
 | `$C845`       | Push sets speed ±3 without new rates: visible? |
 | `$CF9E`       | Dead `LD A,n` loads before calls: note them?  |
-| `$C204`       | Split `add_hostile` into its own entry        |
-| `$F473`       | Split the hostile slots and table their schema |
 | `$C43E`       | Explosion's white paint over coloured graphics? |
 | `$C1B1`       | Blocked launch on the Skimmer pushes it: visible? |
 | `$C0AC`       | Image buffers overwrite sysvars: any ROM call reads them? |
 | `$C8C4`       | Hostile shot's right range stops at column 30: defect? |
-| `$B6F8`       | Row says `add_hostile` draws; it does not     |
 | `$D08A`       | An exit on both axes leaves sideways: say so? |
-| `$C963`       | Merge `$C97B`–`$C9B7` into `move_skimmer_left`? |
-| `$CD89`       | Split into its own entry for `R` rows         |
-| `$CBF3`       | Split the shared draw loop for its contract   |
-| `$CC57`       | Split for `R` rows                            |
-| `$C28D`       | "pixel offset" → "horizontal offset" in the hostile entries |
-| `$CDC8`       | Split the unused first frame into its own `u` block? |
 | `$BE3F`       | Is the range `$FF` write reachable? Only via `$C8FE` (C AND 3 = 2) |
 | screens       | Renders show every defence device standing (graphic 150) |
 | graphics      | List the graphics no layout places on the Graphics page? |
-| inline audio  | Tune part clips need `$F30A` in the tune snapshot; `$F0E2`/`$F043` clips wait on SYNTH_ECHO |
+| inline audio  | Tune part clips need `$F30A` in the tune snapshot (the `$F009` rows hold the introduction, bridge and noise run clips) |
 | `$CEDB`       | Screen entry cancels a due shield loss; the indicator stays at 0 |
 | `$C8FE`       | Can C AND 3 be 2 after `update_hostile`? Shot with range 255 |
-| `$B04F`       | Split `$B04F`, `$BE1E`, `$BE4D` into entries for `R` rows |
-| `$BD13`       | Merge `$BD13/$BD14`, `$BD21/$BD22` into words (`@ssub` at `$B5BD`, `$B60D`, `$B4C5`) |
-| `$BAC6`       | What is at `$F7F8–$F7FF`, above the stack's start? |
+| `$F493`       | How deep does the stack grow from `$F7F8`? |
 | `$BB6D`       | Does any message wrap past column 31 within a third? |
 | `$F154`       | Crosswise counter reloads in the three-tone player: quirk? |
 | `$F11E`       | Tone formulas assume no contended port wait states |
@@ -125,7 +108,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$9810`       | Unused graphics: confirm the 3×2 / 2×2 grouping |
 | `$6200`       | Entries 117/120 overlap 118/121; 119 points at ROM `$145C` |
 | `$99A0`       | Render the hatch at opening steps with the GX1 decoder |
-| `$C500`       | Link `#R$A018` instead of "after the explosion masks" |
 | glyph 10      | `?` reaches the second 0; no message prints `?` |
 | graphic 35    | Names for graphics 77–79 and 86–87, cells of hatchway graphic 35 |
 | decoder       | Render graphic 24 with its dropped cell, and 104–109 in their colour patterns |
@@ -297,6 +279,16 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B5F6`  | No: shading twice changes nothing (24 screens simulated) |
 | layouts  | Every screen and the hull map rendered by the game's own code |
 | `#AUDIO`  | Sound page: every effect and the whole tune, from the game's own code |
+| `$BAC6`  | Nothing found reads or writes `$F7F8–$F7FF`; the stack starts below them |
+| `$B20A`  | Plotters and shadow casters are their own entries   |
+| `$B04F`  | `$B04F`, `$BE1E`, `$BE4D` split, with `R` rows       |
+| `$CBF3`  | Draw loop, `$CC57`, `$CD89`, `$CE26`, `$C204` split  |
+| `$C963`  | `$C97B–$C9D9` merged into `move_skimmer_left`        |
+| `$CDC8`  | No split: `$CBC2` indexes from it (ENT-2, UNU-1)     |
+| `$F473`  | Unused, `copy_new_keys`, stack, slots with schema    |
+| `$BD13`  | `$BD13`, `$BD21` are words; `@ssub` at the readers   |
+| `$D2E7`  | Font labelled `font`, operands as expressions        |
+| wording  | `$B6F8`, `$D219`, `$C500`; "horizontal offset" (`$C28D`) |
 | `$B850`   | Clears rows 1–4 (`LD HL,$4021`, `LD BC,$201E`)      |
 | `g` pages | Headed "Variables" via `[PageHeaders]`/`[Titles]` |
 | Screens page | Two screens across: fits 800 px            |

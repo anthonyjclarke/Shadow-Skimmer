@@ -972,7 +972,12 @@ D $B02A Tiles the play area with the hull pattern of the current sector, in band
   $B046 Take the pattern of sector 2. Is the Skimmer in it? Jump if so
   $B04C Take the pattern of sector 3.
 @ $B04F label=draw_hull_rows
-N $B04F This entry point draws #REGc pixel rows of the pattern at #REGde, down the screen from #REGhl. Each row takes #REGb copies of the pattern's two-byte row.
+c $B04F Draw rows of a hull pattern
+D $B04F Draws pixel rows of a hull pattern down the screen, with each row of the pattern repeated across its pixel row. Unless #R$BD43(the one-band flag) holds 1, it goes on in bands to the bottom of the screen.
+R $B04F I:B copies of the pattern's two-byte row across each pixel row
+R $B04F I:C pixel rows in a band
+R $B04F I:DE address of the pattern
+R $B04F I:HL screen address of the first pixel row
   $B04F Keep the band's counts and the row's screen address.
 @ $B051 label=hull_row_copy
   $B051 Copy the pattern row's two bytes to the screen.
@@ -1094,9 +1099,16 @@ R $B20A O:HL' attribute mirror address of the cell below the graphic's bottom-le
 @ $B219 label=find_graphic_entry
   $B219 Point at the graphic's entry, 4 bytes per graphic.
   $B228 Fetch the address of the graphic's pixels, then the width byte and the height byte.
-  $B22F Recover the cell and the attribute.
+  $B22F Recover the cell and the attribute, and go on into #R$B231 to draw the graphic.
 @ $B231 label=plot_graphic
-N $B231 This entry point draws a graphic from outside the directories. The caller holds the pixel address, the two size bytes, the cell and the attribute as the directory path leaves them.
+c $B231 Draw a graphic from outside the directories
+D $B231 Draws a graphic from its pixels and its two size bytes, and colours it, as #R$B20A(the graphic draw) does for a graphic of the directories.
+R $B231 I:A attribute of the graphic, or $80 to draw its pixels alone
+R $B231 I:B height byte, with the height in cells and the mask number
+R $B231 I:C width byte, with the width in cells and the colour pattern
+R $B231 I:DE address of the graphic's pixels
+R $B231 I:H character row of the graphic's top-left cell
+R $B231 I:L column of the graphic's top-left cell
   $B231 Keep the attribute for the colour pass.
   $B234 Is the graphic bright?
   $B236 Jump if not
@@ -1116,7 +1128,12 @@ N $B231 This entry point draws a graphic from outside the directories. The calle
 @ $B275 label=read_mask_addr
   $B275 Push the mask's address for the three passes.
 @ $B27D label=plot_unmasked
-N $B27D This entry point draws a graphic with no mask. A caller that enters here sets the attribute, the mirror mark and the colour pattern first, and the top-left cell's attribute address (#R$BD11). Its size can then run past 7 cells each way.
+c $B27D Draw a graphic with no mask
+D $B27D Draws a graphic with no mask, at a size that can run past 7 cells each way. The caller first sets the attribute, the mirror mark, the colour pattern and the top-left cell's attribute address (#R$BD11).
+R $B27D I:B height in cells
+R $B27D I:C width in cells
+R $B27D I:DE address of the graphic's pixels
+R $B27D I:HL screen address of the top pixel row of the graphic's top-left cell
   $B27D Use the attribute mirror's top rows, from column 4, as the mask. #R$B003 fills them with 1, and later marks only set more bits, so every cell draws.
 @ $B27E ssub=LD BC,attr_mirror+4
 @ $B283 label=plot_store_size
@@ -1190,14 +1207,23 @@ N $B309 The mark pass. A marked graphic sets the bits of each covered cell's mas
   $B334 Does the graphic leave its shadow to the caller?
   $B339 Jump if so
 @ $B33B label=cast_shadow
-N $B33B This entry point casts the shadow of a block of cells. It takes the block's size and the attribute mirror address of the cell below its bottom-left cell. It returns with the two register sets exchanged, the address in HL'.
-N $B33B A shadow covers the cells the block sweeps over as it slides one cell down and one cell right. It forms a band under the block and up its right side, with a half cell cut at 45° at each end. It shades only cells that the attribute mirror leaves clear (#R$B7B7).
+c $B33B Cast the shadow of a block of cells
+D $B33B Casts the shadow of a block of cells, unless the block is unmarked or the Skimmer is inside the hull.
+R $B33B I:B height of the block in cells
+R $B33B I:C width of the block in cells
+R $B33B I:HL attribute mirror address of the cell below the block's bottom-left cell
+R $B33B O:HL' attribute mirror address of the cell below the block's bottom-left cell, after an exchange of the register sets
   $B33B Is the block unmarked?
   $B341 Jump if so: it casts no shadow
   $B343 Is the Skimmer inside the hull?
   $B348 Jump if so: nothing casts a shadow there
 @ $B34A label=draw_shadow
-N $B34A This entry point casts the shadow of any block, marked or not. It leaves through a pop that takes its own return address, so a CALL to it returns to its caller's caller.
+c $B34A Cast the shadow of a block, marked or not
+D $B34A Casts the shadow of a block of cells, marked or not. It leaves through a pop that takes its own return address, so a CALL to it returns to its caller's caller.
+N $B34A A shadow covers the cells the block sweeps over as it slides one cell down and one cell right. It forms a band under the block and up its right side, with a half cell cut at 45° at each end. It shades only cells that the attribute mirror leaves clear (#R$B7B7).
+R $B34A I:B height of the block in cells
+R $B34A I:C width of the block in cells
+R $B34A I:HL attribute mirror address of the cell below the block's bottom-left cell
   $B34A Is the bottom edge's first cell in column 0?
   $B34E Jump if so: it starts with a full cell
   $B350 Start the bottom edge with its cut corner.
@@ -1341,6 +1367,7 @@ R $B4A7 I:D attribute of the graphic
   $B4A7 Draw the first frame, 3×3 cells with no mask and no colour pattern, in the graphic's attribute.
   $B4B3 Start a new entry at the end of the list with the template's fields. Nothing checks that the list has room.
   $B4C0 Add the screen address of the graphic's top-left cell.
+@ $B4C5 ssub=LD A,(graphic_pixel_addr+1)
   $B4CA Record the new end of the list, and close the list with its end byte.
   $B4D1,7 Set how many calls each frame lasts from the layout record's flags.
 @ $B4D9 label=draw_screen
@@ -1401,6 +1428,7 @@ N $B59E A run repeats its graphic toward the end cell, one graphic width or heig
   $B5AF Keep the length twice, as the distance left and as the width of the shadow, and keep the start cell.
 @ $B5B6 label=draw_run_across
   $B5B6 Draw the graphic, and recover its attribute, which the draw keeps at #R$BD15(the draw attribute).
+@ $B5BD ssub=LD DE,(draw_attr-1)
   $B5C2 Take the graphic's width off the distance left. Is the end reached?
   $B5CC Jump if so
   $B5CE Jump if the run overshoots the end
@@ -1420,6 +1448,7 @@ N $B5F6 A run down keeps its own column in #R$BD34(the shadow switch). In column
   $B5FF Keep the length twice, as the rows left and as the height of the shadow, and keep the start cell.
 @ $B606 label=draw_run_down
   $B606 Draw the graphic, and recover its attribute, which the draw keeps at #R$BD15(the draw attribute).
+@ $B60D ssub=LD DE,(draw_attr-1)
   $B612 Take the graphic's height off the rows left. Is the end reached?
   $B61C Jump if so
   $B61E Jump if the run overshoots the end
@@ -1497,7 +1526,7 @@ N $B6DD The Skimmer is inside the hull.
   $B6ED Keep the cell, and point at the device's slot.
 @ $B6F4 label=clear_device_slot
   $B6F4 Clear the slot.
-  $B6F8,10 Set up the device at the cell. Copy its record into the slot, and draw it (#R$C204).
+  $B6F8,10 Set up the device at the cell, and copy its record into the slot.
 @ $B703 label=record_inner_hatchway
   $B703 Record the hatchway's cell, and draw it.
 @ $B70B label=set_hostile_cell
@@ -1977,10 +2006,8 @@ u $BD0F Unused bytes
 g $BD11 Game variables
 D $BD11 The graphic, pattern, character or layout record that the game draws, the control method, and the current screen with its launch cells.
 W $BD11,2 Attribute address of the top-left cell of the latest graphic or pattern
-@ $BD13 label=pattern_mirror_addr_lo
-B $BD13,1 Low byte of the attribute mirror address of the first cell of the latest pattern row or column
-@ $BD14 label=pattern_mirror_addr_hi
-B $BD14,1 High byte of the attribute mirror address of the first cell of the latest pattern row or column
+@ $BD13 label=pattern_mirror_addr
+W $BD13,2 Attribute mirror address of the first cell of the latest pattern row or column
 @ $BD15 label=draw_attr
 B $BD15,1 Attribute of the current graphic, pattern, character or hostile object, or $80 for a graphic that keeps the colours of its cells
 @ $BD16 label=plot_width
@@ -2003,10 +2030,8 @@ B $BD1D,2 Column, then row, of the layout graphic before the current one
 B $BD1F,1 Number of the layout graphic before the current one
 @ $BD20 label=layout_graphic
 B $BD20,1 Number of the current layout graphic
-@ $BD21 label=graphic_pixel_addr_lo
-B $BD21,1 Low byte of the screen address of the top pixel row of the latest graphic's top-left cell
-@ $BD22 label=graphic_pixel_addr_hi
-B $BD22,1 High byte of the screen address of the top pixel row of the latest graphic's top-left cell
+@ $BD21 label=graphic_pixel_addr
+W $BD21,2 Screen address of the top pixel row of the latest graphic's top-left cell
 @ $BD23 label=mirror_mark
 B $BD23,1 Attribute mirror mark of the current graphic or pattern: 0 for none, 1 for a bright graphic's cell masks, 2 for a bar
 @ $BD24 label=control_method
@@ -2118,9 +2143,13 @@ R $BE11 I:DE step in the attribute mirror from the Skimmer's top-left cell to th
   $BE19 Return if so
   $BE1A Point at the pulse laser shot's record, and take the direction back.
 @ $BE1E label=launch_shot
-N $BE1E This entry point launches the shot whose record #REGde points at, in direction #REGa, from the cell whose attribute mirror address #REGhl holds.
+c $BE1E Launch a shot
+D $BE1E Launches a shot from a cell, and draws it there.
 N $BE1E The clip plays the launch of a hostile objects' shot.
 N $BE1E #HTML(#PUSHS #SIM($BAEB,$BAC6,1)#SIM($CF92,$BB17)#SIM($C906,execint=1)#SIM($CF95,execint=1)#AUDIO1,$CF95,$D11D,1(shot.wav)#POPS)
+R $BE1E I:A direction of the shot, 0–3 for the pulse laser shot or 4–7 for the hostile objects' shot, each for left, right, up or down
+R $BE1E I:DE address of the shot's record, #R$C928 or #R$C936
+R $BE1E I:HL attribute mirror address of the shot's first cell
   $BE1E Store the direction, marked so that the shot holds its first cell until its next move.
   $BE22 Start the shot's clicks: the Skimmer draw clicks the speaker on every pixel row for two passes.
   $BE2C Store the range and the first cell, and point at the store for the saved colour.
@@ -2130,10 +2159,12 @@ N $BE3F BUG: the stop lands on the shot's range, one byte after its direction. S
   $BE3F,4 Store the stop in the shot's record.
 @ $BE44 label=move_shots
 c $BE44 Move the shots
-D $BE44 Moves the pulse laser shot and the hostile objects' shot one cell each. It ends a shot whose range runs out or whose cell stops it.
+D $BE44 Moves the pulse laser shot and the hostile objects' shot one cell each.
   $BE44 Move the pulse laser shot, then go on to the hostile objects' shot.
 @ $BE4D label=move_one_shot
-N $BE4D This entry point moves the shot whose record #REGde points at.
+c $BE4D Move a shot
+D $BE4D Moves one shot a cell along its direction. It ends the shot when its range runs out or its cell stops it.
+R $BE4D I:DE address of the shot's record, #R$C928 or #R$C936
   $BE4D Is the shot in flight?
   $BE50 Return if not
   $BE51 Does it carry the launch mark? If not, move it
@@ -2452,7 +2483,9 @@ N $C16C No slot is free.
   $C1FB It first steers toward the Skimmer on its fifth whole cell on the play area.
   $C200 Point at the new object's slot.
 @ $C204 label=add_hostile
-N $C204 This entry point adds the current hostile object to the slot at #REGde, as an object of the current screen. It draws nothing, so the object first shows at its next move.
+c $C204 Add the current hostile object to a slot
+D $C204 Adds the current hostile object to a slot, as an object of the current screen. It draws nothing, so the object first shows at its next move.
+R $C204 I:DE address of the slot
   $C204 Tie the object to the current screen, and copy its record into the slot.
 @ $C216 label=place_hostile
   $C216,16 Save the background behind the object, note the cells that hide it, and give its cells the hostile object mark.
@@ -2484,8 +2517,8 @@ R $C25E I:E 0 for an image row, $FF for a mask row
   $C285,7 Move the build position to the next row.
 @ $C28D label=draw_hostile
 c $C28D Draw a hostile object
-D $C28D Draws the current hostile object's image for its pixel offset, through its mask, over its saved background. It leaves out the cells that hide it (#R$C76A).
-  $C28D Find the image's distance from the first image, by the pixel offset.
+D $C28D Draws the current hostile object's image for its horizontal offset, through its mask, over its saved background. It leaves out the cells that hide it (#R$C76A).
+  $C28D Find the image's distance from the first image, by the horizontal offset.
 @ $C299 label=draw_hostile_offset
   $C299 Add it to the address of the object's images.
 @ $C2A2 label=draw_hostile_mask
@@ -2674,28 +2707,28 @@ R $C4DB O:HL address of the image
   $C4E5,12 Add the image's distance to the first image's address.
 @ $C4F2 label=draw_explosion
 c $C4F2 Draw a hostile object's explosion frame
-D $C4F2 Draws the current explosion frame at the hostile object's position, after it shifts the frame to the hostile object's pixel offset when they differ.
+D $C4F2 Draws the current explosion frame at the hostile object's position, after it shifts the frame to the hostile object's horizontal offset when they differ.
   $C4F2 Take the explosion frame from the object's state, 0 for the first.
   $C4F8 Find the frame's image among the explosion frames.
 @ $C500 ssub=ADD A,explosion_offsets%$100
-  $C500 Point at the pixel offset that the frame's image sits at, one byte per frame after the explosion masks.
+  $C500 Point at the horizontal offset that #R$A018 records for the frame's image.
 @ $C503 ssub=LD H,explosion_offsets/$100
   $C507 Never runs: those bytes do not cross a page.
 @ $C508 label=draw_explosion_shift
-  $C508 Does the frame sit at another pixel offset than the object's? If so, shift it to the object's.
+  $C508 Does the frame sit at another horizontal offset than the object's? If so, shift it to the object's.
   $C50F Keep the frame's image for the draw.
-  $C511 Find the explosion mask for the object's pixel offset, one of the four explosion masks.
+  $C511 Find the explosion mask for the object's horizontal offset, one of the four explosion masks.
   $C51B,8 Draw the frame through the mask over the object's background store, except in the cells its cover map hides.
 @ $C526 label=shift_explosion
 c $C526 Shift an explosion frame
-D $C526 Shifts one explosion frame in place to the current hostile object's pixel offset and records that offset.
-R $C526 I:A pixel offset to shift the frame to, 0–3
+D $C526 Shifts one explosion frame in place to the current hostile object's horizontal offset and records that offset.
+R $C526 I:A horizontal offset to shift the frame to, 0–3
 R $C526 I:DE address of the frame's image
-R $C526 I:HL address of the frame's recorded pixel offset
-  $C526 Find how many 2-pixel steps the object's pixel offset lies right of the frame's. Does it lie left of it instead?
+R $C526 I:HL address of the frame's recorded horizontal offset
+  $C526 Find how many 2-pixel steps the object's horizontal offset lies right of the frame's. Does it lie left of it instead?
   $C527 Jump if so
   $C529 Shift right by 2 pixels per step, over each of the frame's pixel rows.
-  $C52D Record the object's pixel offset as the frame's.
+  $C52D Record the object's horizontal offset as the frame's.
   $C531 Start at the frame's top row.
 @ $C533 label=expl_right_row
   $C533 Count the pixels to shift this row by.
@@ -2704,7 +2737,7 @@ R $C526 I:HL address of the frame's recorded pixel offset
   $C542,6 Move on to the next row, 3 bytes per row.
 @ $C549 label=expl_left
   $C549 Shift left by 2 pixels per step, over each of the frame's pixel rows.
-  $C54F Record the object's pixel offset as the frame's.
+  $C54F Record the object's horizontal offset as the frame's.
   $C553 Start at the last byte of the frame's top row.
 @ $C557 label=expl_left_row
   $C557 Count the pixels to shift this row by.
@@ -2714,14 +2747,14 @@ R $C526 I:HL address of the frame's recorded pixel offset
 @ $C56D label=step_hostile_left
 c $C56D Move a hostile object left
 D $C56D Moves the current hostile object 2 pixels left, with its background store. A blocked new column turns it back, and once it is clear of the screen's left edge it does not move.
-  $C56D Step the pixel offset one place left. Is the image back at the left edge of its column?
+  $C56D Step the horizontal offset one place left. Is the image back at the left edge of its column?
   $C571 Jump if so
   $C573 Was it at the left edge already?
-  $C575 If not, store the new pixel offset
+  $C575 If not, store the new horizontal offset
   $C577 Step into the column to the left.
 @ $C57A label=step_left_vacate
   $C57A The image now leaves the third byte of its rows blank, so its cover map hides that column. Put back that column of the background, except in the cells that hide the object.
-  $C594 Store the pixel offset of the left edge.
+  $C594 Store the horizontal offset of the left edge.
 @ $C598 label=step_left_column
   $C598 Is the object clear of the screen's left edge already?
   $C59D Return if so, without a move
@@ -2735,7 +2768,7 @@ D $C56D Moves the current hostile object 2 pixels left, with its background stor
   $C5CE Save the new left column of the background.
   $C5D8 Put the image 6 pixels into its new column.
 @ $C5DA label=step_left_store
-  $C5DA,7 Store the new pixel offset, and record the move.
+  $C5DA,7 Store the new horizontal offset, and record the move.
 @ $C5E2 label=undo_step_right
 c $C5E2 Turn back a hostile object blocked on the right
 D $C5E2 Takes back the current hostile object's last step right, then turns it round.
@@ -2746,7 +2779,7 @@ D $C5E2 Takes back the current hostile object's last step right, then turns it r
 @ $C5F3 label=step_hostile_right
 c $C5F3 Move a hostile object right
 D $C5F3 Moves the current hostile object 2 pixels right, with its background store. A blocked new column turns it back, and once it is clear of the screen's right edge it does not move.
-  $C5F3 Step the pixel offset one place right.
+  $C5F3 Step the horizontal offset one place right.
   $C5FA Does the image now reach into the third byte of its rows?
   $C5FC Jump if not
   $C5FE Is the object clear of the screen's right edge already?
@@ -2754,7 +2787,7 @@ D $C5F3 Moves the current hostile object 2 pixels right, with its background sto
   $C604 Are the object's cells, now three columns wide, blocked?
   $C607 If so, take the step back and turn round
   $C609 Save the third byte column of the background, which the image now reaches into.
-  $C61A Recover the new pixel offset.
+  $C61A Recover the new horizontal offset.
 @ $C61C label=step_right_column
   $C61C Has the image passed the right edge of its column?
   $C61E Jump if not
@@ -2763,7 +2796,7 @@ D $C5F3 Moves the current hostile object 2 pixels right, with its background sto
   $C63B Shift the background store one byte left, so its second and third columns become the first two.
   $C648 Move the screen address one byte right, and put the image at the left edge of its new column.
 @ $C650 label=step_right_store
-  $C650,7 Store the new pixel offset, and record the move.
+  $C650,7 Store the new horizontal offset, and record the move.
 @ $C658 label=step_hostile_up
 c $C658 Move a hostile object up
 D $C658 Moves the current hostile object 2 pixel rows up, with its background store. A blocked new cell row turns it back, and once it is clear of the play area's top it does not move.
@@ -2857,7 +2890,7 @@ N $C76A The map holds one byte for each of the object's 3×3 cells, in rows from
 @ $C79A label=clip_hostile
 c $C79A Find a hostile object's cells on the play area
 D $C79A Finds the cells of the current hostile object that lie on the play area, as a block of rows and columns.
-N $C79A An image at pixel offset 0 fills 2 cells across, and at any other offset 3. An image square on a cell row fills 2 cells down, and otherwise 3.
+N $C79A An image at horizontal offset 0 fills 2 cells across, and at any other offset 3. An image square on a cell row fills 2 cells down, and otherwise 3.
 R $C79A O:B number of cell rows on the play area, 0–3
 R $C79A O:C number of cell columns on the play area, 0–3
 R $C79A O:DE address in the cover map of the first cell on the play area
@@ -2976,7 +3009,7 @@ R $C866 O:F carry set if a cell blocks the object
 @ $C880 label=hostile_fire
 c $C880 Let a hostile object fire
 D $C880 Fires the hostile objects' shot from the current hostile object at right angles to its travel, toward the Skimmer's side. The defence device never fires.
-N $C880 A hostile object turns only when it lies square on a cell, so it always lies square on a cell across its travel. The first test joins its pixel offset across and its pixel row down its cell. So it passes only when the object lies half a cell into its travel, where its middle meets a cell's middle.
+N $C880 A hostile object turns only when it lies square on a cell, so it always lies square on a cell across its travel. The first test joins its horizontal offset across and its pixel row down its cell. So it passes only when the object lies half a cell into its travel, where its middle meets a cell's middle.
   $C880 Is the object half a cell into its travel?
   $C88B Return if not
   $C88C Is the hostile objects' shot free?
@@ -3061,8 +3094,8 @@ D $C947 A copy of the record of the hostile object that moves, from its slot.
 N $C947 The state of the hostile object takes these values:
 N $C947 #TABLE(default) { =h State | =h What it is } { 0–3 | It moves up, down, left or right } { $17 | It is the defence device, which never moves } { $80–$86 | It shows explosion frame 1–7 } { $FE | The slot is empty, or a struck object turned back in its move } { $FF | A struck object, whose explosion starts in its move } TABLE#
 W $C947,2 Screen address of the hostile object's top pixel row
-@ $C949 label=hostile_pixel_offset
-B $C949,1 Pixel offset of the hostile object's image from the left edge of its column, 0–3 in steps of 2 pixels
+@ $C949 label=hostile_x_shift
+B $C949,1 Horizontal offset of the hostile object's image from the left edge of its column, 0–3 in steps of 2 pixels
 @ $C94A label=hostile_column
 B $C94A,1 Column of the hostile object's left cell, from −2 to 32, where a column outside 0–31 lies off the screen
 @ $C94B label=hostile_row
@@ -3119,33 +3152,24 @@ N $C963 Each move takes the offset to be a whole number of steps from the cell g
   $C972 If not, move it into the column on its left
   $C974,6 Flag an exit across the left edge, and drop the new offset.
 @ $C97B label=move_left_blocked
-c $C97B Turn the Skimmer back after a blocked move left
-D $C97B Sends the Skimmer back the other way after a blocked move left, and leaves it where it stands.
   $C97B Drop the new offset.
 @ $C97C label=turn_skimmer_x
 N $C97C This entry point reverses the horizontal speed alone.
   $C97C,8 Reverse the horizontal speed.
 @ $C985 label=move_left_cell
-c $C985 Move the Skimmer into the cell on its left
-D $C985 Moves the Skimmer's top-left cell one column left, unless a cell in the new column blocks it. A blocked Skimmer keeps its place and turns back.
-R $C985 I:A column of the Skimmer's top-left cell, 1–29
   $C985 Move the Skimmer's top-left cell one column left, in its column and its attribute mirror address.
   $C990 Is the way clear through the new column of cells?
   $C993 If so, move the Skimmer into it
   $C995 Blocked: put back the column and the attribute mirror address, and turn the Skimmer back.
 @ $C99E label=move_left_px
-c $C99E Move the Skimmer left inside its cell
-D $C99E Moves the Skimmer left inside its cell. When it comes square on the cell column, it puts back the background of the fourth column, which it no longer covers.
-R $C99E I:A new horizontal offset, 0–2
-R $C99E I:F zero flag set if the new offset is 0
+N $C99E The Skimmer moves left inside its cell.
   $C99E Jump unless the Skimmer now lies square on its cell column
-  $C9A0 Put back the background of the fourth column, apart from cells where the cover map hides the Skimmer.
+  $C9A0 Put back the background of the fourth column, which the Skimmer no longer covers, apart from cells where the cover map hides it.
 @ $C9A6 ssub=LD DE,skimmer_bg_store+3
 @ $C9AA ssub=LD HL,skimmer_cover_map+3
   $C9B3 The new offset is 0.
 @ $C9B7 label=move_left_scroll
-c $C9B7 Move the Skimmer one column left
-D $C9B7 Shifts the Skimmer's place on the screen one column left, with its background store, once the new column is clear. It then stores the new offset and counts the step.
+N $C9B7 The new column is clear, and the Skimmer moves into it.
   $C9B7 Shift the background store one column right, which drops its fourth column.
 @ $C9BA ssub=LD HL,skimmer_bg_store+$5E
 @ $C9BD ssub=LD DE,skimmer_bg_store+$5F
@@ -3321,8 +3345,15 @@ N $CBC6 BUG: this reduces #REGc, which nothing reads, where the flip reduces its
   $CBD8 Hand the draw the background store, the entry's mask and the cover map in the other register set.
   $CBE6 Draw the entry's frame or image at the Skimmer's screen address.
 @ $CBF3 label=skimmer_draw_row
-N $CBF3 This entry point is the draw loop, for the Skimmer and the hostile objects alike. It takes #REGb pixel rows of #REGc bytes, from the frame or image in #REGhl, to the screen at #REGde.
-N $CBF3 The other register set holds the background store in #REGhl, the mask in #REGde and the cover map in #REGbc.
+c $CBF3 Draw a frame or image through its mask
+D $CBF3 Draws a frame or image through its mask over the background store, for the Skimmer and the hostile objects alike. It leaves out the cells that the cover map hides.
+R $CBF3 I:B number of pixel rows
+R $CBF3 I:C number of bytes in a pixel row
+R $CBF3 I:DE screen address of the top-left byte
+R $CBF3 I:HL address of the frame or image
+R $CBF3 I:BC' address of the cover map
+R $CBF3 I:DE' address of the mask
+R $CBF3 I:HL' address of the background store
   $CBF3 Start a pixel row.
 @ $CBF6 label=skimmer_draw_byte
   $CBF6 Does the cover map hide the object in this cell? A hidden cell's byte equals the high byte of the map's address.
@@ -3357,7 +3388,10 @@ D $CC42 Copies the screen under the Skimmer into its background store.
 @ $CC4A label=skimmer_bg_col
   $CC4A Copy one column, then move one column right on the screen and in the store.
 @ $CC57 label=save_bg_column
-N $CC57 This entry point copies one column of the screen, the Skimmer's full depth, into the background store. #REGhl holds the screen address of the column's top byte, and #REGde its place in the store.
+c $CC57 Save one column of the Skimmer's background
+D $CC57 Copies one column of the screen, the Skimmer's full depth, into the background store.
+R $CC57 I:DE address of the column's top byte in the background store
+R $CC57 I:HL screen address of the column's top byte
   $CC57 Walk the column down the Skimmer's depth, one row of the store for each pixel row.
 @ $CC5A label=bg_save_row
   $CC5A Copy one byte. Return after the last pixel row.
@@ -3503,9 +3537,13 @@ R $CD6E O:C number of columns of cells under the Skimmer, 3 or 4
   $CD84,1 It spans three rows.
 @ $CD86 label=toggle_skimmer_mark
 c $CD86 Toggle the Skimmer's mark in the attribute mirror
-D $CD86 Toggles the Skimmer's mark in each attribute mirror cell under it.
+D $CD86 Toggles the Skimmer's mark in each attribute mirror cell under it, and continues into #R$CD89(the block toggle).
 @ $CD89 label=toggle_cells_mark
-N $CD89 This entry point toggles the mark over a block of cells that the caller gives. #REGhl holds the top-left cell, #REGb the rows and #REGc the columns.
+c $CD89 Toggle the Skimmer's mark over a block of cells
+D $CD89 Toggles the Skimmer's mark in each attribute mirror cell of a block that the caller gives.
+R $CD89 I:B number of rows of cells
+R $CD89 I:C number of columns of cells
+R $CD89 I:HL attribute mirror address of the block's top-left cell
   $CD89 Step down one row of cells at a time.
 @ $CD8C label=toggle_cells_mark_row
   $CD8C Start a row.
@@ -3546,7 +3584,8 @@ D $CE07 Runs the #R$D343(readout update) on each interrupt and keeps every regis
   $CE07,14 Keep both register sets and the index registers.
   $CE18 Restore them.
 @ $CE26 label=flag_interrupt
-N $CE26 This entry point is the flag routine, which marks each interrupt at #R$D2AF(the interrupt flag).
+c $CE26 Interrupt routine that raises the interrupt flag
+D $CE26 Marks each interrupt at #R$D2AF(the interrupt flag).
   $CE26,7 Raise the flag.
 @ $CE30 label=skimmer_cells_changed
 c $CE30 Check whether the cells under the Skimmer changed
@@ -3820,7 +3859,7 @@ N $D112 Every pass runs the rest, the passes of the hatchway animation too.
   $D216 Start the next pass.
 @ $D219 label=set_speed_rates
 c $D219 Set the step rates of a Skimmer speed
-D $D219 Sets one axis's step size and step mask from the Skimmer's speed on it, and counts a moving axis at #R$D2D3(the movement flag). While no push runs, a flipped Skimmer takes the rates of the next slower speed.
+D $D219 Sets one axis's step size and step mask from the Skimmer's speed on it, and adds 1 to #R$D2D3(the movement flag) when the axis moves. While no push runs, a flipped Skimmer takes the rates of the next slower speed.
 R $D219 I:A the Skimmer's speed on the axis, −3 to 3, with its sign for the direction
 R $D219 I:HL address of the axis's step size, with its step mask and its step phase after it
   $D219 Is the speed zero or more?
@@ -4875,23 +4914,62 @@ D $F45F Decrypts the title tune player at #R$F009, or encrypts it again. XOR is 
   $F45F Start at the player's first byte, with the first key.
 @ $F468 label=crypt_byte
   $F468,10 XOR each byte with the key, and take one more for the key of the next byte, until every byte of the player is done.
-b $F473
-@ $F480 label=*
-B $F480
-@ $F7F8 label=*
-B $F7F8
+u $F473 Unused bytes
+S $F473,13
+@ $F480 label=copy_new_keys
+@ $F480 ssub=LD A,(redefinable_keys+5)
+c $F480 Copy the new fire and flip keys into the control key sets
+D $F480 Gives the keyboard's set the fire and flip keys from the redefine-keys screen, and gives each joystick's set the new flip key.
+  $F480 Make the new flip key the flip key of the Sinclair joystick, the cursor joystick and the keyboard.
+@ $F483 ssub=LD (control_keys+8),A
+@ $F486 ssub=LD (control_keys+16),A
+@ $F48C ssub=LD A,(redefinable_keys+4)
+  $F48C,6 Make the new fire key the keyboard's fire key.
+@ $F48F ssub=LD (control_keys+1),A
+s $F493 Stack
+D $F493 Room for the stack, which #R$BAC6 sets to grow down from #R$F7F8.
+S $F493,869,365,8*63 Room for the stack
+@ $F7F8 label=stack_start
+B $F7F8,8 Bytes just above the stack, which grows down from this address, where #R$BAC6 points SP
 @ $F800 label=hostile_slots
-B $F800
-@ $F809 label=*
-B $F809
-@ $F840 label=*
-B $F840
-@ $F848 label=*
-B $F848
-@ $F890 label=*
-B $F890
-@ $F940 label=*
-B $F940
-@ $F990 label=*
-B $F990
+g $F800 Hostile object slots
+D $F800 The four hostile object slots, 80 bytes per slot, with two at the start of each page. The rest of each page is unused.
+N $F800 #TABLE(default) { =h Offset | =h Holds } { $00–$08 | Cover map, one byte per cell of 3×3 } { $09–$38 | Background store, 16 rows of 3 bytes } { $39–$48 | Record, as at #R$C947(the current hostile object) } { $49–$4F | Unused } TABLE#
+N $F800 The record holds the object's state at offset $40 and its screen number at $48.
+B $F800,9,3 Cover map
+@ $F809 label=slot_1_bg_store
+S $F809,48 Background store
+B $F839,7 Position of the object
+@ $F840 label=slot_1_state
+B $F840,1 State of the object
+B $F841,7 Addresses of the object's cover map, background store and images, and its steer count
+@ $F848 label=slot_1_screen
+B $F848,1 Number of the screen the object is on
+B $F849,7 Unused
+B $F850,9,3 Cover map
+S $F859,48 Background store
+B $F889,7 Position of the object
+@ $F890 label=slot_2_state
+B $F890,1 State of the object
+B $F891,7 Addresses of the object's cover map, background store and images, and its steer count
+B $F898,1 Number of the screen the object is on
+B $F899,7 Unused
+S $F8A0,96 Unused
+B $F900,9,3 Cover map
+S $F909,48 Background store
+B $F939,7 Position of the object
+@ $F940 label=slot_3_state
+B $F940,1 State of the object
+B $F941,7 Addresses of the object's cover map, background store and images, and its steer count
+B $F948,1 Number of the screen the object is on
+B $F949,7 Unused
+B $F950,9,3 Cover map
+S $F959,48 Background store
+B $F989,7 Position of the object
+@ $F990 label=slot_4_state
+B $F990,1 State of the object
+B $F991,7 Addresses of the object's cover map, background store and images, and its steer count
+B $F998,1 Number of the screen the object is on
+B $F999,7 Unused
+S $F9A0,96 Unused
 i $FA00
