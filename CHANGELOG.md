@@ -32,6 +32,7 @@
 
 ### Changed
 
+- Prose pass with Vale: links named as subjects, addresses split across sentences, passive voice and wordiness removed where an actor exists, "spec" spelled out where it means the document.
 - The stack is bounded at 60 bytes from the code (`$F7BC–$F7F7`); `$F493–$F7BB` is typed unused.
 - Entry structure: the graphic plotters, shadow casters, shot routines, Skimmer draw loops, `flag_interrupt` and `add_hostile` are their own entries with register rows; `move_skimmer_left` is one entry; `$F473` is split into unused bytes, `copy_new_keys`, the stack and the hostile object slots with their layout; `$BD13` and `$BD21` are words; `hostile_pixel_offset` is now `hostile_x_shift`.
 - Site pass: the Screens page shows two screens across and fits an 800 px window; `g` pages are headed "Variables"; links into the tune listing use the code face.

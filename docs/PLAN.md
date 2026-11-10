@@ -78,7 +78,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | whole image   | Sectors 2–3 and game end coverage (FuseX)     |
 | `$F30A`       | Render both tune parts here (blocked by SYNTH_ECHO on the schema) |
 | gate          | The gate's linters skip `src/tune.ctl`; wire them in |
-| lint-prose    | Vale is not installed, so the prose lint never runs |
 
 ### Names
 
@@ -99,6 +98,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | SYNTH_ECHO        | Fires on a data entry's field schema beside a clip (`$F30A`) |
 | `coverage`        | Counts a bare well-named JP or CALL (ENT-7) as skeletal (`$61FD`, `$B000`, `$CD86`) |
 | label-namespace   | Roots miss the game loop                         |
+| `extract_prose`   | Leaves `#R$addr(text)` as `$addr(text)`: false StackedAsides and AddressSubject hits |
 | `operand_subs`    | Wraps only the main skool's parser: the tune listing keeps raw operands; `LinkOperands` skips `LD` |
 | theme.css         | `*{padding:0}` leaves `#UDGTABLE`/`#TABLE` cells unpadded: captions touch |
 | theme.css         | Code-face rule `a[href*="asm/"]` misses same-listing links |
@@ -251,6 +251,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | screens  | Render is right: `start_game` zeroes the device flags |
 | inline audio | `$F30A–$F45E` in the tune snapshot; part clips at `$F021`, `$F030` |
 | `$F493`  | Stack reaches no lower than `$F7BC` (60 bytes); `$F493–$F7BB` unused |
+| lint-prose | Vale 3.26 installed; warnings fixed, the rest are extractor false positives |
 | `$BE3F`  | Unreachable: C is always 3, so the push is down and no shot launches (`$C8FE`) |
 | `$C8C4`  | BUG note: a hostile shot fired right stops at column 30 |
 | `$D08A`  | A pass crossing two edges leaves by the side one, or by neither when that side edge is the map's |

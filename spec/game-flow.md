@@ -9,7 +9,7 @@ The states the game passes through, and what starts and ends each one. How long 
 Each state ends on one event, and leads to the next. #TABLE(default)
 { =h State      | =h Ends when                             | =h Next state            }
 { Title screen  | The player presses a menu key            | Redefine keys, or a game }
-{ Redefine keys | The sixth key is taken                   | Title screen             }
+{ Redefine keys | The game takes the sixth key             | Title screen             }
 { Play          | The last shield goes                     | GAME OVER                }
 { Play          | The Skimmer reaches the WALL DONE screen | WALL DONE                }
 { Hatchway trip | The hatch closes behind the Skimmer      | Play, on the other side  }
@@ -24,7 +24,7 @@ TABLE#
 
 The title screen starts at `show_title`, which clears the screen to white ink on black paper and prints `msg_title`. A bar then lies over the line of the selected control method, from `toggle_method_bar`. It swaps yellow and black in each of the line's 21 cells. The keyboard is the selected method when the game loads, and a choice holds for every later game.
 
-The title tune then plays with interrupts off until a key is pressed, at `menu_tune`. The game takes that key, and looks it up among `menu_keys`. #TABLE(default)
+The title tune then plays with interrupts off until the player presses a key, at `menu_tune`. The game takes that key, and looks it up among `menu_keys`. #TABLE(default)
 { =h Key | =h Option         | =h Result                                    }
 { 1      | KEYBOARD          | Selects the method, and the tune plays again }
 { 2      | KEMPSTON JOYSTICK | Selects the method, and the tune plays again }
@@ -78,7 +78,7 @@ Every screen starts at `enter_screen`: at the start of a game, after the Skimmer
 { 3        | Both shots go                               }
 { 4        | Hatchway cell, launch cells and hits clear  }
 { 5        | The game cancels a shield loss, due or begun }
-{ 6        | The sector is set, and its digit prints     }
+{ 6        | The game sets the sector, and its digit prints }
 { 7        | The play area takes its surface and colours }
 { 8        | The play area's marks clear                 }
 { 9        | The device picture and the layout draw      }

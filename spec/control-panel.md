@@ -26,11 +26,11 @@ The instruction leaflet puts the shield count on the far right of the control pa
 Each part of the panel draws on events of its own. #TABLE(default)
 { =h Event                        | =h What draws                             }
 { A game starts                   | The whole panel, and the shield count     }
-{ A screen is entered             | The sector digit and the device picture   }
+{ The game enters a screen        | The sector digit and the device picture   }
 { Each pass of the play loop      | The indicator and the score               }
 { Each interrupt in a screen draw | The indicator and the score               }
-{ A shield is lost                | The shield count, which blinks four times }
-{ The last shield is lost         | The shield count, at 0                    }
+{ A shield goes                   | The shield count, which blinks four times }
+{ The last shield goes            | The shield count, at 0                    }
 TABLE#
 
 At the start of a game, the pixels of rows 1–4 go blank and the panel draws over them (`start_game`). Nothing draws the panel's graphic again in that game. The device picture shows the design of the current sector's device at `device_designs`, whether that device stands or not.

@@ -136,7 +136,7 @@ These hold the hostile objects and their moves. #TABLE(default)
 { $C95F      | `preshift_pos`       | Image build position             | Address in an image buffer     }
 TABLE#
 
-The slots lie at $F800 and $F850, which move on even counts, and at $F900 and $F950, which move on odd counts. Each slot takes 80 bytes. #TABLE(default)
+The slots at $F800 and $F850 move on even counts. Those at $F900 and $F950 move on odd counts. Each slot takes 80 bytes. #TABLE(default)
 { =h Offset | =h Holds                                   }
 { $00–$08   | Cover map, one byte per cell of its 3×3    }
 { $09–$38   | Background store, 16 pixel rows of 3 bytes }

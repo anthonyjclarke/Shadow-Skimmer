@@ -34,7 +34,7 @@ The game takes its interrupts through a table of vectors, set up by `init_interr
 { `readouts_interrupt` | Runs `update_readouts`, then the flag | While `enter_screen` draws a screen }
 TABLE#
 
-The play loop waits for `interrupt_flag` and clears it. So it runs at most one pass for each 50 Hz interrupt. A pass that takes longer than one interrupt period starts the next pass at once, and the interrupts that fall within it count as one. The game therefore runs at 50 passes per second or fewer. Every timer in the spec counts passes, and a time in seconds assumes one pass per interrupt.
+The play loop waits for `interrupt_flag` and clears it. So it runs at most one pass for each 50 Hz interrupt. A pass that takes longer than one interrupt period starts the next pass at once, and the interrupts that fall within it count as one. The game therefore runs at 50 passes per second or fewer. Every timer in the specification counts passes, and a time in seconds assumes one pass per interrupt.
 
 The title tune plays with interrupts off (`play_title_tune`). The busy wait of `pause`, about 0.3 s at the 3.5 MHz clock, leaves them on. So a pause lasts longer by the time the interrupt routine takes.
 
@@ -69,8 +69,8 @@ Steps 13 and 2 split the controls between two passes. Step 13 reads them into `c
 
 ## The module map
 
-Each part of the game, its main routines, and the page of the spec that describes it. #TABLE(default)
-{ =h Part                    | =h Main routines                         | =h Spec page                          }
+Each part of the game, its main routines, and the page of the specification that describes it. #TABLE(default)
+{ =h Part                    | =h Main routines                         | =h Specification page                 }
 { Start-up and main loop     | `main_loop`, `init_interrupts`           | This page                             }
 { Play loop and screen entry | `play_game`, `enter_screen`              | [Game flow](game-flow.md)             }
 { Hull map and layouts       | `draw_screen`, `draw_layout_graphic`     | [The hull](hull.md)                   }

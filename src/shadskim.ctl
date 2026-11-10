@@ -659,7 +659,7 @@ N $8B00 #UDGTABLE { #UDGARRAY2,7,4,2($8B00-$8B11-1-16)(hull_surface_1) | #UDGARR
 B $8B00,32,8
 @ $8B20 label=skimmer_flip_1
 b $8B20 Skimmer flip frames
-D $8B20 The three frames of the Skimmer's flip, then a mask for each frame, each laid out as one of #R$8800(the Skimmer images).
+D $8B20 The three frames of the Skimmer's flip, then a mask for each frame, each in the form of one of #R$8800(the Skimmer images).
 N $8B20 #UDGTABLE { #UDGARRAY4,7,3,4,,,,2($8B20-$8B63-1-32:$8C40-$8C83-1-32)(skimmer_flip_1) | #UDGARRAY4,7,3,4,,,,2($8B80-$8BC3-1-32:$8CA0-$8CE3-1-32)(skimmer_flip_2) | #UDGARRAY4,7,3,4,,,,2($8BE0-$8C23-1-32:$8D00-$8D43-1-32)(skimmer_flip_3) } { Frame 1 | Frame 2 | Frame 3 } TABLE#
 B $8B20,96,8
 @ $8B80 label=skimmer_flip_2
@@ -674,7 +674,7 @@ B $8CA0,96,8
 B $8D00,96,8
 @ $8D60 label=skimmer_flipped_1
 b $8D60 Flipped Skimmer images
-D $8D60 The flipped Skimmer, one image for each horizontal offset from its cell's left edge in steps of 2 pixels. Each is laid out as one of #R$8800(the Skimmer images), and takes the mask of the image the right way up.
+D $8D60 The flipped Skimmer, one image for each horizontal offset from its cell's left edge in steps of 2 pixels. Each takes the form of one of #R$8800(the Skimmer images), with the mask of the image the right way up.
 N $8D60 #UDGTABLE { #UDGARRAY4,7,3,4,,,,2($8D60-$8DA3-1-32:$8980-$89C3-1-32)(skimmer_flipped_1) | #UDGARRAY4,7,3,4,,,,2($8DC0-$8E03-1-32:$89E0-$8A23-1-32)(skimmer_flipped_2) | #UDGARRAY4,7,3,4,,,,2($8E20-$8E63-1-32:$8A40-$8A83-1-32)(skimmer_flipped_3) | #UDGARRAY4,7,3,4,,,,2($8E80-$8EC3-1-32:$8AA0-$8AE3-1-32)(skimmer_flipped_4) } { At the cell edge | 2 pixels right | 4 pixels right | 6 pixels right } TABLE#
 B $8D60,96,8
 @ $8DC0 label=skimmer_flipped_2
@@ -685,7 +685,7 @@ B $8E20,96,8
 B $8E80,96,8
 @ $8EE0 label=shield_loss_1
 b $8EE0 The Skimmer's shield loss frames
-D $8EE0 The eight frames of a shield loss. Each frame's image comes before its mask, and each is laid out as one of #R$8800(the Skimmer images).
+D $8EE0 The eight frames of a shield loss. Each frame's image comes before its mask, and each takes the form of one of #R$8800(the Skimmer images).
 N $8EE0 #UDGTABLE { #UDGARRAY4,7,3,4,,,,2($8EE0-$8F23-1-32:$8F40-$8F83-1-32)(shield_loss_1) | #UDGARRAY4,7,3,4,,,,2($8FA0-$8FE3-1-32:$9000-$9043-1-32)(shield_loss_2) | #UDGARRAY4,7,3,4,,,,2($9060-$90A3-1-32:$90C0-$9103-1-32)(shield_loss_3) | #UDGARRAY4,7,3,4,,,,2($9120-$9163-1-32:$9180-$91C3-1-32)(shield_loss_4) } { Frame 1 | Frame 2 | Frame 3 | Frame 4 } { #UDGARRAY4,7,3,4,,,,2($91E0-$9223-1-32:$9240-$9283-1-32)(shield_loss_5) | #UDGARRAY4,7,3,4,,,,2($92A0-$92E3-1-32:$9300-$9343-1-32)(shield_loss_6) | #UDGARRAY4,7,3,4,,,,2($9360-$93A3-1-32:$93C0-$9403-1-32)(shield_loss_7) | #UDGARRAY4,7,3,4,,,,2($9420-$9463-1-32:$9480-$94C3-1-32)(shield_loss_8) } { Frame 5 | Frame 6 | Frame 7 | Frame 8 } TABLE#
 B $8EE0,96,8
 @ $8F40 label=shield_loss_mask_1
@@ -720,12 +720,12 @@ B $9420,96,8
 B $9480,96,8
 @ $94E0 label=hull_surface_2
 b $94E0 Sector 2 hull surface
-D $94E0 The pattern of the hull surface in sector 2, laid out as #R$8B00(the pattern of sector 1).
+D $94E0 The pattern of the hull surface in sector 2, in the form of #R$8B00(the pattern of sector 1).
 N $94E0 #UDGTABLE { #UDGARRAY2,7,4,2($94E0-$94F1-1-16)(hull_surface_2) | #UDGARRAY8,7,2,2($94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94E0;$94E1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1;$94F0;$94F1)(hull_surface_2_tiled) } { Pattern | Tiled } TABLE#
 B $94E0,32,8
 @ $9500 label=hull_surface_3
 b $9500 Sector 3 hull surface
-D $9500 The pattern of the hull surface in sector 3, laid out as #R$8B00(the pattern of sector 1).
+D $9500 The pattern of the hull surface in sector 3, in the form of #R$8B00(the pattern of sector 1).
 N $9500 #UDGTABLE { #UDGARRAY2,7,4,2($9500-$9511-1-16)(hull_surface_3) | #UDGARRAY8,7,2,2($9500;$9501;$9500;$9501;$9500;$9501;$9500;$9501;$9510;$9511;$9510;$9511;$9510;$9511;$9510;$9511;$9500;$9501;$9500;$9501;$9500;$9501;$9500;$9501;$9510;$9511;$9510;$9511;$9510;$9511;$9510;$9511;$9500;$9501;$9500;$9501;$9500;$9501;$9500;$9501;$9510;$9511;$9510;$9511;$9510;$9511;$9510;$9511;$9500;$9501;$9500;$9501;$9500;$9501;$9500;$9501;$9510;$9511;$9510;$9511;$9510;$9511;$9510;$9511)(hull_surface_3_tiled) } { Pattern | Tiled } TABLE#
 B $9500,32,8
 @ $9520 label=device_designs
@@ -843,7 +843,7 @@ B $9EF8,48,8
 B $9F28,48,8
 @ $9F58 label=explosion_masks
 b $9F58 Explosion masks
-D $9F58 The mask of an explosion frame for each horizontal offset from the cell's left edge, in steps of 2 pixels. Each is laid out as one of #R$9E08(the explosion frames), and a mask bit of 1 lets the background show. The #R$C2A9(defence device) draws through the first of them too.
+D $9F58 The mask of an explosion frame for each horizontal offset from the cell's left edge, in steps of 2 pixels. Each takes the form of one of #R$9E08(the explosion frames), and a mask bit of 1 lets the background show. The #R$C2A9(defence device) draws through the first of them too.
 N $9F58 The renders draw each mask bit of 1 in black ink on white paper.
 N $9F58 #UDGTABLE { #UDGARRAY3,,4,3($9F58-$9F72-1-24)(explosion_mask_1) | #UDGARRAY3,,4,3($9F88-$9FA2-1-24)(explosion_mask_2) | #UDGARRAY3,,4,3($9FB8-$9FD2-1-24)(explosion_mask_3) | #UDGARRAY3,,4,3($9FE8-$A002-1-24)(explosion_mask_4) } { At the cell edge | 2 pixels right | 4 pixels right | 6 pixels right } TABLE#
 B $9F58,48,8
@@ -875,7 +875,7 @@ B $A758,96,16 Colour pattern of the left half
 B $A7B8,96,16 Colour pattern of the right half
 @ $A818 label=inner_graphic_dir
 b $A818 Inner section graphic directory
-D $A818 The record of each of the 18 graphics of the inner sections, by graphic number from 0, 4 bytes per graphic. Each record is laid out as one of #R$6200(the outer hull's graphic directory).
+D $A818 The record of each of the 18 graphics of the inner sections, by graphic number from 0, 4 bytes per graphic. Each record takes the form of one of #R$6200(the outer hull's graphic directory).
 W $A818,2 Pixels
 B $A81A,2 Width and height in cells
 W $A81C,2 Pixels
@@ -1138,7 +1138,7 @@ R $B27D I:B height in cells
 R $B27D I:C width in cells
 R $B27D I:DE address of the graphic's pixels
 R $B27D I:HL screen address of the top pixel row of the graphic's top-left cell
-  $B27D Use the attribute mirror's top rows, from column 4, as the mask. #R$B003 fills them with 1, and later marks only set more bits, so every cell draws.
+  $B27D Use the attribute mirror's top rows, from column 4, as the mask. #R$B003(The screen clear) fills them with 1, and later marks only set more bits, so every cell draws.
 @ $B27E ssub=LD BC,attr_mirror+4
 @ $B283 label=plot_store_size
   $B283 Record the size, keep it for the later passes, and keep the width for each row of cells.
@@ -1687,7 +1687,7 @@ N $B88F This entry point prints the digit in #REGa at the row in #REGb and the c
 @ $B89F label=msg_title
 t $B89F Title screen text
 D $B89F The title, the menu and the copyright line of the title screen, printed by #R$BAC6. The four control-method lines end in spaces, so each one fills the 21-cell bar that #R$BAAE inverts over the selected method.
-N $B89F Every message that #R$BB4A prints is a run of lines in this format. All of them print on black paper.
+N $B89F Every message that #R$BB4A prints is a run of lines in this format. They all print on black paper.
 N $B89F #TABLE(default,,,:w) { =h Byte | =h Content | =h Values } { 1 | Column | 0–31 } { 2 | Row | 0–23 } { 3 | Attribute | One for every character on the line } { 4 onward | Characters | Space, digits, capitals and [ } { Last | End of the message | $00 } { Last | End of the line | $80–$FF, with the next line after it } TABLE#
 T $B89F,18,n3:14:n1 Game title in bright white
 T $B8B1,25,n3:21:n1 Keyboard option in bright yellow
@@ -1781,7 +1781,7 @@ N $BAD3 A new game starts here.
 @ $BAE8 label=show_method_bar
   $BAE8 Highlight the line of the selected control method.
 @ $BAEB label=menu_tune
-  $BAEB Play the title tune until a key is pressed, and take the key's code.
+  $BAEB Play the title tune until the player presses a key, and take the key's code.
   $BAF1 Look the key up among #R$B9F3(the menu keys), and count the options that do not match.
 @ $BAF8 label=match_menu_key
   $BAF8 Is it this option's key?
@@ -2296,7 +2296,7 @@ R $BF6A O:B pixel rows that each half shows
 R $BF6A O:C bytes in each pixel row of the hatch
 R $BF6A O:DE address of the upper half's first byte
 R $BF6A O:HL address of the lower half's last byte
-  $BF6A Count the rows that each half still shows: all of them when the hatch is shut, none when it is open.
+  $BF6A Count the rows that each half still shows: all when the hatch is shut, none when it is open.
   $BF71 Point at the upper half's first row that shows, 3 bytes per row down from the bitmap's top.
 @ $BF75 ssub=ADD A,hatch_bitmap%$100
 @ $BF78 ssub=LD D,hatch_bitmap/$100
@@ -2421,7 +2421,7 @@ R $C09B O:A number from 0 to one less than the limit
 @ $C0AC label=hostile_image_bufs
 b $C0AC Image buffers of the hostile objects
 D $C0AC The address of each hostile object's image buffer, one for each slot at #R$F800(the hostile object slots). The two slots that move on even counts of #R$C958(the tick) come first.
-N $C0AC A buffer holds the four images of the object's design, then the four masks, 48 bytes each. Each copy sits 2 pixels further right than the one before it. #R$C227 fills them.
+N $C0AC A buffer holds the four images of the object's design, then the four masks, 48 bytes each. Each copy sits 2 pixels further right than the one before it. #R$C227(The image build) fills them.
 N $C0AC The buffers lie over the printer buffer and the system variables, which the game never needs. Its interrupts run through its own vectors. Its one ROM call, KEY-SCAN in the title tune, reads only the keyboard.
 W $C0AC,8,2
 @ $C0B4 label=move_hostile_objects
@@ -3074,7 +3074,7 @@ W $C924,2 Address of the end byte of the #R$C909(animation list), where the next
 u $C926 Unused bytes
 @ $C927 label=shot_range
 g $C927 Shot range
-B $C927,1 Range in cells of the shot that is launched or moved
+B $C927,1 Range in cells of the shot to launch or move
 @ $C928 label=pulse_laser_shot
 g $C928 Pulse laser shot
 B $C928,1 Direction of the shot, 0–3 for left, right, up or down, or $FF for no shot, with bit 7 set before its first move
@@ -3092,7 +3092,7 @@ S $C93A,9 Colour, then the eight pixel rows, of the cell under the shot
 B $C943,1 Unused
 @ $C944 label=current_shot
 g $C944 Current shot
-W $C944,2 Address of the shot to move, #R$C928 or #R$C936
+W $C944,2 Address of the shot to move, #R$C928(the pulse laser shot) or #R$C936(the hostile objects' shot)
 @ $C946 label=hostiles_counted
 g $C946 Hostile objects counted
 B $C946,1 Number of hostile objects that lie on the current screen or explode, in the pair that moves
@@ -3567,11 +3567,11 @@ N $CDAC The entries of the #R$8D60(flipped Skimmer images). They take the masks 
 W $CDAC,16,4
 @ $CDBC label=flip_frame_addrs
 b $CDBC Addresses of the Skimmer's flip frames
-D $CDBC The addresses of #R$8B20(the flip frames) and their masks, which #R$CBA8(the Skimmer's draw) shows in turn whichever way the Skimmer turns over. Each entry is laid out as one of #R$CD9C(the Skimmer image addresses).
+D $CDBC The addresses of #R$8B20(the flip frames) and their masks, which #R$CBA8(the Skimmer's draw) shows in turn whichever way the Skimmer turns over. Each entry takes the form of one of #R$CD9C(the Skimmer image addresses).
 W $CDBC,12,4
 @ $CDC8 label=shield_loss_addrs
 b $CDC8 Addresses of the Skimmer's shield loss frames
-D $CDC8 The addresses of #R$8EE0(the shield loss frames) and their masks, one entry for each #R$D2D4(the loss's stage), from 0. Each entry is laid out as one of #R$CD9C(the Skimmer image addresses).
+D $CDC8 The addresses of #R$8EE0(the shield loss frames) and their masks, one entry for each #R$D2D4(the loss's stage), from 0. Each entry takes the form of one of #R$CD9C(the Skimmer image addresses).
 N $CDC8 A defect in #R$CBC6(the Skimmer's draw) skips the first frame.
 W $CDC8,32,4
 @ $CDE8 label=init_interrupts
@@ -3658,7 +3658,7 @@ N $CEDB A move to the next screen starts the new screen here, and so does the tr
 @ $CEE3 ssub=LD (int_jump+1),HL
   $CEE7 Find the screen address of the Skimmer's top-left cell, and the cell's attribute mirror address.
 @ $CEEF ssub=ADD A,(attr_mirror-$5800)/256
-  $CEF9 Empty the #R$C909(animation list), and take away the pulse laser shot and the hostile objects' shot.
+  $CEF9 Empty the #R$C909(animation list), and remove the pulse laser shot and the hostile objects' shot.
   $CF08 The new screen has no hatchway, launch cells or hits yet, and no shield loss is due or under way. A due loss leaves the indicator at 0, so the next readout update makes the loss due again, from its first stage.
 @ $CF0C ssub=LD ($D2C7+1),A
 N $CF1B The sector follows from the screen's place on the hull map. Columns 0 and 1 make up sector 1. In the other columns, rows 5 to 10 make up sector 2 and rows 0 to 4 make up sector 3.
@@ -3889,7 +3889,7 @@ R $D219 I:HL address of the axis's step size, with its step mask and its step ph
   $D241,8 Store the step size, and the step mask twice: as the mask, and as the phase that starts it.
 @ $D24A label=lose_shield
 c $D24A Lose a shield
-D $D24A Once the Damage Report Indicator runs out, advances a shield loss by one stage every fourth call, or every eighth with one shield left. Its eighth stage takes away a shield, fills the indicator again and ends the game when it takes the last shield.
+D $D24A Once the Damage Report Indicator runs out, advances a shield loss by one stage every fourth call, or every eighth with one shield left. Its eighth stage takes a shield, fills the indicator again and ends the game when it takes the last shield.
   $D24A Count the call.
   $D24E The loss moves on every fourth call. Is this the last shield?
   $D255 Jump if not
@@ -3900,7 +3900,7 @@ D $D24A Once the Damage Report Indicator runs out, advances a shield loss by one
   $D25C Move the loss on by one stage. Is it past its last stage?
   $D261 Return if not
   $D262 The loss is over. Clear its stage and #R$D48D(the shield loss due flag), and refill the indicator and show it.
-  $D26D Take away a shield. Was it the last one?
+  $D26D Lose a shield. Was it the last one?
   $D271 Jump if not
   $D273,5 End the game, and show that no shields are left.
 @ $D279 label=blink_shields
@@ -4048,7 +4048,7 @@ N $D31E Each digit counts in eighths, as #R$D2E6(the digit printer) draws them. 
 N $D31E A digit that drops under 0 always lands one eighth short of 10, however far under 0 it goes. So a drain of more than one eighth takes less than its full step whenever the last digit rolls back.
 R $D31E I:B number of digits
 R $D31E I:DE address of the indicator's last digit
-R $D31E I:HL address of the last digit of the number to take away
+R $D31E I:HL address of the last digit of the number to subtract
 R $D31E O:C 8 if the indicator drops under zero
   $D31E Set the borrow so that the last digit keeps its own eighths.
 @ $D324 label=drain_digit
@@ -4186,7 +4186,7 @@ D $D800 The address of the #R$D8DC(layout) of each outer hull screen, one word p
 @ $D8DC label=outer_layout_0
 @ $D8DC rom
 b $D8DC Outer hull screen layouts
-D $D8DC The graphics on each screen of the outer hull, one layout for each screen number, in the order of #R$D800(their addresses). #R$B4D9 draws them.
+D $D8DC The graphics on each screen of the outer hull, one layout for each screen number, in the order of #R$D800(their addresses). #R$B4D9(The screen draw) draws them.
 N $D8DC Each record of a layout places one graphic at one cell, in three bytes.
 N $D8DC #TABLE(default) { =h Byte | =h Bits | =h Content } { 1 | 0–7 | Number of the graphic, or $FF after the last record } { 2 | 0–4 | Column of the graphic's top-left cell, 0–31 } { 2 | 5–7 | Ink of the graphic, which draws bright on black paper, or 0 for white ink, not bright } { 3 | 0–4 | Row of the graphic's top-left cell, 0 for the top row of the play area } { 3 | 5–7 | For the animated graphic, the calls of #R$D41A(the animation step) that each frame lasts, less 2 } { 3 | 7 | 1 if the graphic repeats in a run to the cell of the next record } TABLE#
 N $D8DC A run repeats its graphic across to the next record's column, or down to its row when the two records share a column (#R$B59E).
@@ -4910,7 +4910,7 @@ c $F006 Decrypt and run the title tune player
 D $F006 Decrypts #R$F009(the tune player) and runs straight into it. The player encrypts itself again before it returns.
   $F006 Decrypt the player, then run on into it.
 b $F009 Title tune player, encrypted
-D $F009 The title tune player, XOR-encrypted in place. #R$F45F decrypts these bytes with key $41 for the first byte and one more for each byte after it.
+D $F009 The title tune player, XOR-encrypted in place. #R$F45F(The decrypt routine) decrypts these bytes with key $41 for the first byte and one more for each byte after it.
 N $F009 #R$F009@tune(The decrypted listing) shows these bytes as the game runs them.
 @ $F30A label=title_tune_notes
 b $F30A Title tune notes

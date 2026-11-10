@@ -22,7 +22,7 @@ The [Controls](input.md) page gives when the fire test reads the controls.
 
 ## The hostile objects' shot
 
-The shot fires from the hostile object that moves, when all of these hold. The routine is `hostile_fire`. #TABLE(default)
+The shot fires from the hostile object that moves, when these all hold. The routine is `hostile_fire`. #TABLE(default)
 { =h Condition                                }
 { The object lies half a cell into its travel }
 { The hostile objects' shot is out of flight  }

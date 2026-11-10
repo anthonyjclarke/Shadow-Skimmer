@@ -88,7 +88,7 @@ The vertical steps cross from a top pixel row at a cell's top. Each step size di
 
 ## The flip
 
-The flip turns the Skimmer over, or back the right way up. It starts at the end of a pass, when all of these hold. #TABLE(default)
+The flip turns the Skimmer over, or back the right way up. It starts at the end of a pass, when these all hold. #TABLE(default)
 { =h Condition                       }
 { Flip is held                       }
 { No direction is held               }

@@ -31,7 +31,7 @@ A vanished object leaves its slot empty and draws nothing. The blocked cell's co
 
 ## Launch
 
-The [hull](hull.md#launch-cells) page gives where the launch cells lie. After the hold, a call of the move can launch one object into the pair it moves, when all of these hold. #TABLE(default)
+The [hull](hull.md#launch-cells) page gives where the launch cells lie. After the hold, a call of the move can launch one object into the pair it moves, when these all hold. #TABLE(default)
 { =h Condition                                 }
 { The call removed no object                   }
 { The pair has fewer objects than launch cells }
