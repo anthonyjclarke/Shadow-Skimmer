@@ -711,18 +711,59 @@ B $B802,8
 B $B80A,8
 @ $B812 label=draw_control_panel
 c $B812 Draw the control panel
+D $B812 Draws the control panel over the top six rows of the screen, as two halves with their own colour patterns.
+N $B812 While #R$BD34(the shadow switch) holds 0, #R$B27D(the unmasked graphic draw) also casts a shadow from each half. No shadow shows, because every cell it reaches holds the bright graphic mark from #R$B003(the screen clear).
+  $B812 Draw in bright white ink. The colour patterns give every cell of the panel an attribute of their own, so no cell takes this one.
+  $B817 Colour the left half from its own colour pattern.
+  $B81C Mark the panel's cells as a bright graphic in the attribute mirror.
+  $B821 Draw the left half from #R$A158(its graphic), in the top-left corner of the screen.
+  $B833 Colour the right half from its own colour pattern.
+  $B838,18 Draw the right half from #R$A458(its graphic), beside the left half.
 @ $B84B label=clear_play_area
 c $B84B Clear the play area
+D $B84B Blanks every pixel of the play area, across the whole width of the screen.
+R $B84B I:HL screen address of the top pixel row of the play area's first cell
+  $B84B Blank each pixel row of the play area in turn, the full width of the screen.
 @ $B850 label=clear_screen_top
 c $B850 Clear the top of the screen
+D $B850 Blanks the pixels of the screen's top four rows, all but their first and last columns.
+  $B850 Start at the top pixel row, one column in.
 @ $B856 label=clear_pixel_rows
+N $B856 This loop blanks a block of pixel rows from #REGhl down the screen. #REGb counts the pixel rows, and #REGc holds the number of bytes along each row.
+  $B856 Start a pixel row, with its width as the count.
 @ $B859 label=clear_fill
+  $B859 Take the fill byte, which #R$BAC6(the main loop) makes a blank one.
+@ $B85B label=clear_row_byte
+  $B85B Fill each byte along the row.
+  $B85F Step down one pixel row. Is it still in the same character row?
+  $B864 Jump if so
+  $B866 Move on to the next character row. Did that cross into the next screen third?
+  $B86A Jump if so: the pixel row step already points into it.
+  $B86C Stay in this third, at the top pixel row of the next character row.
+@ $B870 label=clear_next_row
+  $B870,3 Blank the next pixel row, until the block is done.
 @ $B874 label=colour_play_area
 c $B874 Colour the play area
+D $B874 Gives every cell of the play area one value, either an attribute or a set of marks in the attribute mirror.
+R $B874 I:HL address of the cell at the start of row 6, in the attributes or in the attribute mirror
+  $B874 Cover every row of the play area, the full width of the screen, one row of cells apart.
 @ $B87A label=play_area_colour
+  $B87A Take the value, which the caller patches into this instruction first.
+@ $B87C label=fill_area_row
+  $B87C Start a row of cells.
+@ $B87F label=fill_area_cell
+  $B87F Give each cell along the row the value.
+  $B883,5 Step down to the next row of cells, until the play area is done.
 @ $B889 label=print_shields
 c $B889 Print the number of shields
+D $B889 Prints the number of shields left in bright white, in the left half of the control panel.
+R $B889 O:DE attribute address of the cell after the count's cell
+  $B889 Point at the count's cell, and fetch the number of shields.
 @ $B88F label=print_digit
+N $B88F This entry point prints the digit in #REGa at the row in #REGb and the column in #REGc, in bright white.
+  $B88F Find the cell's screen addresses.
+  $B893 Print in bright white ink on black paper.
+  $B898,6 Turn the digit into its character, and print it.
 @ $B89F label=msg_title
 t $B89F Title screen text
 D $B89F The title, the menu and the copyright line of the title screen, printed by #R$BAC6. The four control-method lines end in spaces, so each one fills the 21-cell bar that #R$BAAE inverts over the selected method.
@@ -765,64 +806,295 @@ t $B9F9 Game over message
 D $B9F9 One line printed by #R$BAC6 in the message format of #R$B89F.
 T $B9F9,13,n3:9:n1 Bright white
 @ $BA06 label=msg_wall_done
-t $BA06 Wall-done message
-D $BA06 Three lines printed by #R$B4D9 in the message format of #R$B89F.
-T $BA06,53,n3:9:n1,n3:13:n1,n3:20 Bright white
-s $BA3B
+t $BA06 WALL DONE message
+D $BA06 Three lines printed by #R$B4D9 on the WALL DONE screen, which ends the game, in the message format of #R$B89F.
+T $BA06,54,n3:9:n1,n3:13:n1,n3:20:n1 Bright white
 @ $BA3C label=redefine_keys
 c $BA3C Redefine-keys screen
-D $BA3C Asks for a key for each of the six controls of #R$B9BD and stores the key codes from #R$BC21. It shows the name of each key from #R$B987.
-b $BAA7
+D $BA3C Asks for a key for each of the six controls of #R$B9BD(the control names), and shows the name of each key it takes. The keys become the keyboard's controls, and the new flip key also serves every joystick.
+  $BA3C Clear the screen, and print the title and the prompt.
+  $BA45 Set the draw attribute to white. This has no effect: each control's name sets it again before any character prints.
+  $BA4A Ask for the six controls in turn, from up to flip. Their key codes go to #R$BC21(the redefinable keys) in that order.
+@ $BA52 label=ask_control_key
+  $BA52 Find the cells after the prompt's last word, where the key's name shows.
+@ $BA5F label=hide_key_name
+  $BA5F Hide the last key's name with black ink on black paper.
+  $BA63 Print the control's name in the gap of the prompt.
+  $BA67 Wait for a new key press.
+  $BA6B Point at the next control's name.
+  $BA6F Is the key code past the last key? #R$BC37(The keyboard scan) never gives one.
+  $BA71 Jump if so
+  $BA73 Store the key code for the control.
+N $BA75 The key's name is the one after as many names as its key code, in #R$B987(the key names). Each name starts on a byte with bit 7 set.
+  $BA75 Switch register sets to keep the count of controls, and start at the first name. Is it the first key?
+  $BA7C Jump if so
+@ $BA7E label=find_key_name
+  $BA7E Step to the start of the next name, once for each key before this one.
+@ $BA87 label=show_key_name
+  $BA87 Find the cell after the prompt, and point at the name.
+@ $BA8F label=print_key_char
+  $BA8F Print each letter of the name without its bit 7, up to the next name's first byte. The name takes the bright white of the control's name.
+  $BA9E Hold the name on the screen for about 0.3 s, then switch register sets back and ask for the next control.
+  $BAA4 Copy the new fire and flip keys into the control key sets at #R$F480(the key copy), which returns from this routine.
+@ $BAA7 label=unused_flip_copy
+b $BAA7 Unused copy of the flip key
+D $BAA7 Three instructions that no routine calls. They store a key code as the flip key of the Sinclair and the cursor joystick, as #R$F480(the key copy) does.
+B $BAA7,7
 @ $BAAE label=toggle_method_bar
 c $BAAE Highlight bar on the selected control method
-D $BAAE Toggles the highlight bar over the title-screen line of the control method at #R$BD24. A second call removes the highlight.
+D $BAAE Toggles the highlight bar over the title-screen line of #R$BD24(the selected control method). A second call removes the highlight.
+  $BAAE Find the first cell of the method's line in the menu. The keyboard's line is on the screen's fifth row, and each other method's line is three rows below the one before.
+  $BABC Count the cells of the line.
+@ $BABE label=swap_bar_colours
+  $BABE,7 Exchange yellow and black between the ink and the paper of each cell. Bright yellow on black turns to black on bright yellow, and back.
 @ $BAC6 label=main_loop
 c $BAC6 Main loop
-D $BAC6 Shows the title screen, acts on its menu keys and runs a game when the player starts one, then shows the title screen again. After a game it first prints the game-over message, unless the game ends on the WALL DONE screen that sets #R$BD3D.
+D $BAC6 Runs the title screen and its menu, and plays a game when the player starts one. A game that ends on the WALL DONE screen goes straight back to the title screen, and any other shows GAME OVER first.
+  $BAC6 Set up the stack and the interrupts, once as the game starts.
 @ $BACE ssub=LD ($B859+1),A
+  $BACD Make #R$B856(the pixel row clear) blank its rows, and turn the border black and the speaker off.
+@ $BAD3 label=new_game
+N $BAD3 A new game starts here.
+  $BAD3 Refill the Skimmer's shields, clear the end of the game, and start on the outer hull.
+@ $BADF label=show_title
+  $BADF Clear the screen and print the title screen.
+@ $BAE8 label=show_method_bar
+  $BAE8 Highlight the line of the selected control method.
+@ $BAEB label=menu_tune
+  $BAEB Play the title tune until a key is pressed, and take the key's code.
+  $BAF1 Look the key up among #R$B9F3(the menu keys), and count the options that do not match.
+@ $BAF8 label=match_menu_key
+  $BAF8 Is it this option's key?
+  $BAF9 Jump if so
+  $BAFB Try the next option, until none is left.
+  $BAFF It is no menu key: play the tune again.
+@ $BB01 label=menu_key_found
+  $BB01 Is it the redefine-keys option?
+  $BB04 Jump if not
+  $BB06 Redefine the keys, then show the title screen again.
+@ $BB0B label=test_start_key
+  $BB0B Jump if it is the start-game option, the one after the redefine-keys option.
+  $BB0D Take the highlight off the old control method, and select the new one.
+  $BB15 Highlight it, and wait for the next key.
+@ $BB17 label=start_game
+N $BB17 The player starts a game.
+  $BB17 Clear the top of the screen, and draw the control panel there with the shield count. The panel overwrites every pixel that the clear blanks.
+  $BB20 Start on the second screen of the hull map's top row, with no defence device destroyed.
+  $BB32 Play the game until it ends. Did it end on the WALL DONE screen?
+  $BB37 Jump if so, to start a new game
+  $BB3A Print GAME OVER.
+  $BB40 Count the pauses.
+@ $BB42 label=hold_game_over
+  $BB42 Hold the message for about 6 seconds at the 3.5 MHz clock, longer by the time the interrupt routine takes.
+  $BB47 Start a new game.
 @ $BB4A label=print_message
 c $BB4A Print a message
-D $BB4A Prints a message in the format of #R$B89F, one line at a time.
+D $BB4A Prints a message in the format of #R$B89F(the title screen text), one line at a time.
+R $BB4A I:HL address of the message
+R $BB4A O:BC address of the message's end byte
+  $BB4A Fetch the line's column and row, and keep its attribute for every character on the line.
+  $BB53 Find the screen addresses of the line's first cell, and keep the address of its first character.
+@ $BB57 label=message_byte
+  $BB57 Fetch the next byte. Is it the end of the message?
+  $BB5B Return if so
+  $BB5C Jump if the byte is a character
+  $BB5F The byte ends the line. Print the next line, from the byte after it.
+@ $BB65 label=message_char
+  $BB65 Keep the address of the next byte, print the character, and go on.
 @ $BB6D label=print_char
 c $BB6D Print a character
-D $BB6D Draws one character of the game's font and colours its cell with #R$BD15.
+D $BB6D Draws one character of #R$A020(the game's font) in a cell, and colours the cell with #R$BD15(the draw attribute).
+N $BB6D The font holds 8 bytes per glyph, one for each pixel row from the top. A space takes glyph 11. A code below the colon takes its value less the code of 0, and any other code its value less $35. So the digits take glyphs 0–9, the capitals take glyphs 12–37, and [ takes glyph 38, the font's slash.
+R $BB6D I:A character code: a space, a digit, a capital or [
+R $BB6D I:DE attribute address of the cell
+R $BB6D I:HL screen address of the cell's top pixel row
+R $BB6D O:DE attribute address of the next cell to the right
+R $BB6D O:HL screen address of the next cell's top pixel row
+  $BB6D Is it a space?
+  $BB6F Jump if not
+  $BB71 Take the blank glyph.
+@ $BB76 label=char_digit_test
+  $BB76 Is it a digit?
+  $BB78 Jump if not
+  $BB7A Take the digit's glyph.
+@ $BB7F label=char_letter
+  $BB7F Take the capital's glyph, or the slash for [.
+@ $BB81 label=glyph_addr
+  $BB81 Point at the glyph in the font, 8 bytes per glyph. Each path leaves the carry clear, so the three rotations multiply the glyph number by 8.
+  $BB90 Walk the glyph's pixel rows from the top.
+@ $BB93 label=glyph_row
+  $BB93 Copy each pixel row of the glyph down the cell.
+  $BB99,8 Step to the next cell, and colour this one.
 @ $BBA2 label=read_controls
 c $BBA2 Read the controls
-D $BBA2 Reads the six controls from the keys or the joystick of the control method at #R$BD24, one bit per control. While a push on the Skimmer runs, it returns a forced direction and then none in place of the controls?
+D $BBA2 Gives the controls held, from the keys or the joystick of #R$BD24(the control method). During a push on the Skimmer it holds the directions the Skimmer moves in, and gives no controls over the push's last four passes.
+R $BBA2 O:A controls held, one bit for each control as in #R$D2B4(the controls in force)
+  $BBA2 Does a push on the Skimmer run?
+  $BBA7 Jump if not
+  $BBA9 Count the push down. Is it near its end?
+  $BBAF Jump if not
+  $BBB1,1 Give no controls.
+@ $BBB3 label=hold_push_dirs
+  $BBB3 Start with no controls. Does the Skimmer move across the screen?
+  $BBBA Jump if not
+  $BBBD Jump if it moves right
+  $BBC0 Hold left.
+@ $BBC5 label=hold_right
+  $BBC5 Hold right.
+@ $BBC7 label=hold_vertical
+  $BBC7 Does the Skimmer move up or down?
+  $BBCD Return if not, with the direction across alone
+  $BBCE Jump if it moves down
+  $BBD1,2 Hold up.
+@ $BBD4 label=hold_down
+  $BBD4,2 Hold down.
+@ $BBD7 label=scan_control_keys
+  $BBD7 Is it the keyboard?
+  $BBDC Jump if so
+  $BBDE Number the joysticks' sets from the Kempston joystick's, which shares the keyboard's set.
+@ $BBDF label=control_set_addr
+  $BBDF Point at the method's set of keys, 8 bytes per set.
+@ $BBE2 ssub=ADC A,control_keys%$100
+@ $BBE5 ssub=LD H,control_keys/$100
+  $BBE9 Never runs: no set of keys lies past the page.
+@ $BBEA label=collect_controls
+  $BBEA Collect one bit for each key. The first key's bit ends up highest, and a marker bit leaves the top after the sixth key.
+@ $BBEC label=test_control_key
+  $BBEC Test the next key, and shift a 1 into the bits if it is held. Go on until the marker bit drops out.
+  $BBF6 Is it the Kempston joystick?
+  $BBFC Return if not, with the keys' bits
+  $BBFD,6 Keep the flip key's bit, and read the other five controls from the joystick's port.
 @ $BC04 label=test_key
 c $BC04 Test one key
-D $BC04 Reads whether one key is held, by its key code. A key code runs from 0 for B to 39 for CAPS SHIFT. Its low three bits pick the half-row, and the rest pick the key in it.
+D $BC04 Tests whether one key is held, by its key code.
+N $BC04 A key code is eight times the key's place in its half-row, plus the half-row's number. Place 0 is the key nearest the middle of the keyboard, and place 4 the key at the row's end.
+N $BC04 #TABLE(default) { =h Half-row | =h Keys, from place 0 to place 4 } { 0 | B, N, M, SYMBOL SHIFT, SPACE } { 1 | H, J, K, L, ENTER } { 2 | Y, U, I, O, P } { 3 | 6 to 0 } { 4 | 5 to 1 } { 5 | T, R, E, W, Q } { 6 | G, F, D, S, A } { 7 | V, C, X, Z, CAPS SHIFT } TABLE#
+R $BC04 I:A key code, 0–39
+R $BC04 O:F carry clear if the key is held
+  $BC04 The half-row's number, plus one, counts the rotations of the port byte.
+  $BC09 The place picks the key's bit, and so the number of shifts that bring that bit into the carry.
+  $BC13 Start from a port byte with only bit 0 reset.
+@ $BC15 label=half_row_select
+  $BC15 Rotate it right once for each count, which selects the half-row.
+  $BC18 Read the half-row.
+@ $BC1A label=key_bit_shift
+  $BC1A,4 Shift the key's bit into the carry, which is clear for a key held.
 @ $BC1F label=control_keys
-b $BC1F Control keys
-D $BC1F The key code of each control for the keyboard, the Sinclair joystick and the cursor joystick.
+g $BC1F Control keys
+D $BC1F The key code of each control in three sets, eight bytes per set: the keyboard's, the Sinclair joystick's and the cursor joystick's. Key codes follow #R$BC04(the key test).
+N $BC1F #TABLE(default) { =h Byte | =h Control | =h Keyboard | =h Sinclair joystick | =h Cursor joystick } { 0 | Flip | CAPS SHIFT | CAPS SHIFT | CAPS SHIFT } { 1 | Fire | 0 | 5 | 0 } { 2 | Up | O | 4 | 7 } { 3 | Down | K | 3 | 6 } { 4 | Left | Z | 1 | 5 } { 5 | Right | X | 2 | 8 } { 6 | Fire | From the redefine-keys screen | Unused | Unused } { 7 | Flip | From the redefine-keys screen | Unused | Unused } TABLE#
+N $BC1F The table names the pre-defined keys, which the redefine-keys screen can replace in the keyboard's set and in the flip of every set.
+B $BC1F,2 Keyboard's flip and fire
 @ $BC21 label=redefinable_keys
-B $BC21
+B $BC21,6 Keyboard's up, down, left and right, then the fire and flip from the redefine-keys screen
+B $BC27,8 Sinclair joystick's set
+B $BC2F,8 Cursor joystick's set
 @ $BC37 label=scan_keyboard
 c $BC37 Scan the keyboard
-D $BC37 Finds the key that is held, if any, and gives its #R$BC04(key code).
+D $BC37 Finds the one key held, if any, and gives its #R$BC04(key code).
+R $BC37 O:D key code of the key held, or $FF for none
+R $BC37 O:F zero flag clear if two or more keys are held
+  $BC37 Start at the half-row of CAPS SHIFT to V, with no key found. Keep the half-row's number plus 40 for the key code.
+@ $BC3D label=scan_half_row
+  $BC3D Read the half-row. Is any of its keys held?
+  $BC42 Jump if not
+  $BC44 Return if a key of an earlier half-row is held too
+  $BC46 Start from the half-row's number plus 40.
+@ $BC48 label=find_key_place
+  $BC48 Step the code back one place for each bit, from bit 0 up to the held key's bit.
+  $BC4E Return if another key of the half-row is held too
+  $BC4F Keep the key code.
+@ $BC50 label=next_half_row
+  $BC50 Move on to the next half-row, until all eight are read.
+  $BC55,1 Set the zero flag: at most one key is held.
 @ $BC57 label=wait_new_key
 c $BC57 Wait for a new key press
-D $BC57 Waits until no key is held, then until one key is held, and returns its key code.
+D $BC57 Waits until no key is held, then until one key alone is held, and gives its key code.
+R $BC57 O:A key code of the key, 0–39
+  $BC57 Wait until no key is held.
 @ $BC5D label=wait_key
-b $BC68
+N $BC5D This entry point waits for one key alone. It does not first wait until no key is held.
+  $BC5D Wait while two or more keys are held.
+  $BC62 Wait while no key is held.
+  $BC65,2 Give the key code.
+@ $BC68 label=unused_draw_steps
+b $BC68 Unused pattern draw steps
+D $BC68 Steps of code that nothing in the game copies or runs. Each loads a pattern byte and puts it in a screen byte.
+B $BC68,8,4
+  $BC68 Store the pattern byte over the screen byte
+  $BC6C Store the pattern byte ANDed with the screen byte
 @ $BC70 label=draw_pattern_row
 c $BC70 Draw a row of one pattern
-D $BC70 Draws one 8×8 pattern again and again along a row of character cells, coloured with #R$BD15.
+D $BC70 Draws one 8×8 pattern in every cell along a row of cells, in #R$BD15(the draw attribute) and with #R$BD23(the mirror mark). It keeps the first cell's attribute address at #R$BD11 and its attribute mirror address at #R$BD13.
+R $BC70 I:B character row of the first cell
+R $BC70 I:C column of the first cell
+R $BC70 I:E number of cells (0 for 256)
+R $BC70 I:HL address of the pattern, one byte for each pixel row from the top
+  $BC70 Keep the attribute, the count and the pattern.
+  $BC76 Find the first cell's screen addresses, and keep its attribute address.
+  $BC7D Take back the pattern's address and the count.
+  $BC7F Walk the pattern's pixel rows from the top.
+@ $BC81 label=pat_row_line
+  $BC81 Start the pixel row at the first cell.
+@ $BC84 label=pat_row_byte
+  $BC84 Copy the pattern's byte into the pixel row of each cell, over what was there.
+  $BC8B Move on to the pattern's next byte and the next pixel row.
+  $BC91 Start at the first cell's attribute, with the draw attribute.
+@ $BC96 label=pat_row_attr
+  $BC96 Colour each cell along the row.
+  $BC9A Find the first cell in the attribute mirror, and keep its address.
 @ $BC9E ssub=ADD A,(attr_mirror-$5800)/256
+  $BCA4 Does the pattern mark its cells?
+  $BCAA Return if not
+  $BCAB Take the mark.
+@ $BCAC label=pat_row_mark
+  $BCAC,6 Set the mark's bits in the marks of each cell along the row.
 @ $BCB3 label=draw_pattern_column
 c $BCB3 Draw a column of one pattern
-D $BCB3 Draws one 8×8 pattern again and again down a column of character cells, coloured with #R$BD15.
+D $BCB3 Draws one 8×8 pattern in every cell down a column of cells, as #R$BC70(the row draw) does along a row.
+R $BCB3 I:B character row of the first cell
+R $BCB3 I:C column of the first cell
+R $BCB3 I:E number of cells (0 for 256)
+R $BCB3 I:HL address of the pattern, one byte for each pixel row from the top
+  $BCB3 Keep the attribute, the count and the pattern.
+  $BCB9 Find the first cell's screen addresses, and keep its attribute address.
+  $BCC0 Take back the pattern's address and the count.
+  $BCC2 Count the cells down the column.
+@ $BCC3 label=pat_col_cell
+  $BCC3 Start the cell from the pattern's top byte.
+@ $BCC8 label=pat_col_line
+  $BCC8 Copy the pattern down the cell's pixel rows, over what was there.
+  $BCD0 Step down to the next cell.
+  $BCD7 Cross into the next screen third.
+@ $BCDB label=pat_col_next
+  $BCDB Draw the next cell.
+  $BCDF Start at the first cell's attribute, with the draw attribute.
+@ $BCE4 label=pat_col_attr
+  $BCE4 Colour the cell, and step down to the next one.
+  $BCEC Cross into the next third of the attributes.
+@ $BCED label=pat_col_attr_next
+  $BCED Colour the next cell.
+  $BCF0 Find the first cell in the attribute mirror, and keep its address.
 @ $BCF4 ssub=ADD A,(attr_mirror-$5800)/256
+  $BCFA Does the pattern mark its cells?
+  $BCFF Return if not
+  $BD00 Take the count and the mark.
+@ $BD02 label=pat_col_mark
+  $BD02 Set the mark's bits in the cell's marks, and step down to the next cell.
+  $BD0B Cross into the next page of the attribute mirror.
+@ $BD0C label=pat_col_mark_next
+  $BD0C,2 Mark the next cell.
 u $BD0F Unused bytes
 @ $BD11 label=graphic_attr_addr
 g $BD11 Game variables
-W $BD11,2 Attribute address of the top-left cell of the current graphic or pattern
+D $BD11 The graphic, pattern, character or layout record that the game draws, the control method, and the current screen with its launch cells.
+W $BD11,2 Attribute address of the top-left cell of the latest graphic or pattern
 @ $BD13 label=pattern_mirror_addr_lo
-B $BD13,1 Low byte of the attribute-mirror address of the first cell of the last pattern row or column
+B $BD13,1 Low byte of the attribute mirror address of the first cell of the latest pattern row or column
 @ $BD14 label=pattern_mirror_addr_hi
-B $BD14,1 High byte of the attribute-mirror address of the first cell of the last pattern row or column
+B $BD14,1 High byte of the attribute mirror address of the first cell of the latest pattern row or column
 @ $BD15 label=draw_attr
-B $BD15,1 Attribute of the current graphic, pattern or character, with $80 for a graphic that keeps the old colours of its cells
+B $BD15,1 Attribute of the current graphic, pattern, character or hostile object, or $80 for a graphic that keeps the colours of its cells
 @ $BD16 label=plot_width
 B $BD16,1 Width in cells of the current graphic
 @ $BD17 label=layout_column
@@ -830,11 +1102,11 @@ B $BD17,1 Column of the current layout graphic, 0–31
 @ $BD18 label=layout_flags
 B $BD18,1 Flags of the current layout record, 0–7, with 4–7 for a run to the next record's cell
 @ $BD19 label=layout_row
-B $BD19,1 Character row of the current layout graphic, counted from the top of the screen
+B $BD19,1 Character row of the current layout graphic, 6–23
 @ $BD1A label=graphic_width
-B $BD1A,1 Width in cells of the last graphic drawn
+B $BD1A,1 Width in cells of the latest graphic drawn
 @ $BD1B label=graphic_height
-B $BD1B,1 Height in cells of the last graphic drawn
+B $BD1B,1 Height in cells of the latest graphic drawn
 @ $BD1C label=run_cells_left
 B $BD1C,1 Distance in cells from the current layout graphic to the end of its run
 @ $BD1D label=prev_layout_cell
@@ -844,11 +1116,11 @@ B $BD1F,1 Number of the layout graphic before the current one
 @ $BD20 label=layout_graphic
 B $BD20,1 Number of the current layout graphic
 @ $BD21 label=graphic_pixel_addr_lo
-B $BD21,1 Low byte of the screen address of the top pixel row of the current graphic's top-left cell
+B $BD21,1 Low byte of the screen address of the top pixel row of the latest graphic's top-left cell
 @ $BD22 label=graphic_pixel_addr_hi
-B $BD22,1 High byte of the screen address of the top pixel row of the current graphic's top-left cell
+B $BD22,1 High byte of the screen address of the top pixel row of the latest graphic's top-left cell
 @ $BD23 label=mirror_mark
-B $BD23,1 0 for no attribute mirror mark, 1 for a bright graphic, marked with its mask bytes, 2 for a bar, marked with 2
+B $BD23,1 Attribute mirror mark of the current graphic or pattern: 0 for none, 1 for a bright graphic's cell masks, 2 for a bar
 @ $BD24 label=control_method
 B $BD24,1 Control method: 0 for the keyboard, 1 for a Kempston joystick, 2 for a Sinclair joystick, 3 for a cursor joystick
 @ $BD25 label=screen_column
@@ -856,15 +1128,15 @@ B $BD25,1 Column of the current screen on the hull map, 0–9 from left to right
 @ $BD26 label=screen_row
 B $BD26,1 Row of the current screen on the hull map, 0–10 from top to bottom
 @ $BD27 label=screen_number
-B $BD27,1 Number of the current screen, from its column and its row on the hull map
+B $BD27,1 Number of the current screen, 0–109, ten times its row on the hull map plus its column
 @ $BD28 label=launch_cells
 B $BD28,8,2 Four launch cells for hostile objects, each a column byte that also holds the start direction, then a row byte
 @ $BD30 label=launch_cell_ptr
 W $BD30,2 Address of the next free launch cell
 @ $BD32 label=colour_pattern
-B $BD32,1 Twice the number of the current graphic's colour pattern in #R$B12F, 0 for a graphic in one colour
+B $BD32,1 Twice the number of the latest graphic's colour pattern in #R$B12F(the colour pattern addresses), 0 for a graphic in one colour
 @ $BD33 label=launch_cell_count
-B $BD33,1 Number of launch cells on the current screen
+B $BD33,1 Number of launch cells on the current screen, 0–3
 @ $BD34 label=skip_shadow
 B $BD34,1 0 if each graphic casts its own shadow, any other value if it casts none
 @ $BD35 label=run_length
@@ -872,21 +1144,22 @@ B $BD35,1 Length in cells of the current layout run
 u $BD36 Unused bytes
 @ $BD3C label=shields
 g $BD3C Game state
+D $BD3C The shields, the end of the game, the Skimmer's place in the hull, and the defence devices.
 B $BD3C,1 Number of shields the Skimmer has left, 0–3
 @ $BD3D label=game_over
-B $BD3D,1 0 while a game runs, any other value once it has ended
+B $BD3D,1 0 while a game runs, 1 once it has ended
 @ $BD3E label=inside_hull
 B $BD3E,1 1 while the Skimmer is in an inner section of the hull, 0 while it is on the outer hull
 @ $BD3F label=sector
 B $BD3F,1 Sector of the hull that the Skimmer is in, 1–3
 @ $BD40 label=device_destroyed_1
-B $BD40,1 0 if the defence device of sector 1 stands, $FF if it is destroyed?
+B $BD40,1 0 if the defence device of sector 1 stands, $FF if it is destroyed
 @ $BD41 label=device_destroyed_2
-B $BD41,1 0 if the defence device of sector 2 stands, $FF if it is destroyed?
+B $BD41,1 0 if the defence device of sector 2 stands, $FF if it is destroyed
 @ $BD42 label=device_destroyed_3
-B $BD42,1 0 if the defence device of sector 3 stands, $FF if it is destroyed?
+B $BD42,1 0 if the defence device of sector 3 stands, $FF if it is destroyed
 @ $BD43 label=hull_one_band
-B $BD43,1 1 to draw the hull pattern as one band of 16 pixel rows, 0 to repeat it down to the bottom of the screen
+B $BD43,1 1 to draw one band of pixel rows, 0 to repeat the band down to the bottom of the screen
 @ $BD44 label=handle_fire
 c $BD44 Handle the fire key
 D $BD44 Fires a pulse laser shot along the one direction held with fire, or starts the hatchway animation on fire alone over a hatch. Each call then moves the shots.
@@ -2962,15 +3235,23 @@ B $EA00
 @ $F000 label=play_title_tune
 c $F000 Play the title tune
 D $F000 Plays the title tune with interrupts off, over and over until the player presses a key.
+  $F000,5 Play the tune with interrupts held off.
 @ $F006 label=run_title_tune
 c $F006 Decrypt and run the title tune player
-D $F006 Decrypts the tune player at #R$F009 and runs straight into it. The player encrypts itself again before it returns.
+D $F006 Decrypts #R$F009(the tune player) and runs straight into it. The player encrypts itself again before it returns.
+  $F006 Decrypt the player, then run on into it.
 b $F009 Encrypted routine
 D $F009 These bytes are code XOR-encrypted in place: #R$F45F decrypts them (key $41 for the first byte, one more for each byte after it) and the routine at #R$F006 runs straight into the result.
-b $F30A
+@ $F30A label=title_tune_notes
+b $F30A Title tune notes
+D $F30A The notes of the title tune that lie outside #R$F009(the encrypted player): the end of the tune's first part, then its second part.
+N $F30A Each note is a record of 3 bytes: the period of its first tone, the period of its second tone, then its length. A record with a length of 0 ends a part. The first part starts inside the encrypted player. Its records run on into this block, and the second part follows its end record.
 @ $F45F label=crypt_title_tune
 c $F45F Decrypt or re-encrypt the title tune player
 D $F45F Decrypts the title tune player at #R$F009, or encrypts it again. XOR is its own inverse, so one pass does either.
+  $F45F Start at the player's first byte, with the first key.
+@ $F468 label=crypt_byte
+  $F468,10 XOR each byte with the key, and take one more for the key of the next byte, until every byte of the player is done.
 b $F473
 @ $F480 label=*
 B $F480

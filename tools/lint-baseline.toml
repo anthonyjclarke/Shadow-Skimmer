@@ -121,12 +121,6 @@ message = "3400 bytes with no sub-directives. Fix it in this order: render it; s
 [[finding]]
 check = "data-structure"
 kind = "UNTYPED"
-at = "$BC1F"
-message = "24 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
-
-[[finding]]
-check = "data-structure"
-kind = "UNTYPED"
 at = "$D473"
 message = "7053 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
 
@@ -234,33 +228,9 @@ message = "`b $A2B8` has no title and publishes as a page headed \"Data at A2B8\
 
 [[finding]]
 check = "identity"
-kind = "UNTITLED"
-at = "$BA3B"
-message = "`s $BA3B` has no title and publishes as a page headed \"Unused RAM at BA3B\". Either it is one field split out of the record above it (t $BA06 Wall-done message), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED"
-at = "$F30A"
-message = "`b $F30A` has no title and publishes as a page headed \"Data at F30A\". Either it is one field split out of the record above it (b $F009 Encrypted routine), and the fix is to drop this block directive so the sub-directive stays inside that record; or it starts a structure of its own, and the fix is to write the title. Fold only if these bytes are fields of that record — folding a structure buries it in an unrelated entry"
-
-[[finding]]
-check = "identity"
 kind = "UNTITLED_ENTRY"
 at = "$6200"
 message = "`b $6200` has no title and publishes as a page headed \"Data at 6200\". There is no record to fold it into — the entry above it is c $61FD — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$BAA7"
-message = "`b $BAA7` has no title and publishes as a page headed \"Data at BAA7\". There is no record to fold it into — the entry above it is c $BA3C — so it is an entry in its own right: write the title"
-
-[[finding]]
-check = "identity"
-kind = "UNTITLED_ENTRY"
-at = "$BC68"
-message = "`b $BC68` has no title and publishes as a page headed \"Data at BC68\". There is no record to fold it into — the entry above it is c $BC57 — so it is an entry in its own right: write the title"
 
 [[finding]]
 check = "identity"

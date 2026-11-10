@@ -8,10 +8,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Item                | State                                     |
 |:--------------------|:------------------------------------------|
-| Phase               | 3 – depth pass, F firing and start-up     |
+| Phase               | 3 – depth pass, code complete             |
 | Gate                | `CHECKS PASS` (SkoolKit 10.1, gate 14)    |
-| Baseline findings   | 45                                        |
-| Routines to the bar | 99 of 121 (`$61A8–$B811`, `$BD44–$D472` but `$CD86`) |
+| Baseline findings   | 40                                        |
+| Routines to the bar | 118 of 121 (3 flagged only for a bare well-named JP or CALL) |
 | Data documented     | screen text, variables, workspace `$C909` |
 | Glossary            | registry (11 words) and naming policy     |
 | Catalogs            | graphics, sound, data: not started        |
@@ -24,7 +24,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Target              | Lane | State                                |
 |:--------------------|:-----|:-------------------------------------|
-| Depth G2a `$B3B0–$B4D8`, `$B789–$B811` | code | spliced; review |
+| Depth L `$B812–$BD43`, `$F000–$F472` | code | fixes; re-review |
 
 ---
 
@@ -71,16 +71,11 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | Address       | Open question                                 |
 |:--------------|:----------------------------------------------|
 | `$F009`       | Decrypted listing of the title tune player (see `docs/RESEARCH.md`) |
-| `$F30A–$F45E` | Code or data? No play trace executes it       |
-| `$F480`       | Document the key copy that `$BA3C` jumps to   |
-| `$A020`       | Map and render the font; `$A150` is the "/"   |
-| `$B16F`       | Label the control panel patterns in `$A2B8`   |
-| `$BAA7`       | Code with no caller: unused?                  |
-| `$BC68`       | Draw-mode code templates: what copies them?   |
-| `$C4DB`       | Table addresses built from immediates: `$BBE5`, `$BF58`, `$C1F5` (needs `$9A88`), `$C503` (needs `$A018`) |
+| `$F480`       | Split the key copy out of `b $F473` as code (moves `$F473` baseline keys) |
+| `$A020`       | One font entry (39 glyphs) and a render; `@ssub` at `$BB89` |
+| `$B16F`       | Label the panel patterns `$A758`/`$A7B8` in `$A2B8` |
+| `$C4DB`       | Table addresses built from immediates: `$BF58`, `$C1F5` (needs `$9A88`), `$C503` (needs `$A018`) |
 | `$CD9C`       | Label images in `$7CD4`, then type `$CD9C–$CDE7` as `W` |
-| `$BA3B`       | Fold WALL DONE's end `$00` into `t $BA06`     |
-| `$BA45`       | Dead store to the text attribute              |
 | `$6200`       | Document the graphic directory record (also `$A818`, needs a split) |
 | `$B20A`       | Split plot_graphic, plot_unmasked, cast_shadow, draw_shadow into entries |
 | `$D800`       | Split the layout tables and lists; record `#TABLE` |
@@ -97,13 +92,8 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | Address       | Open question                                 |
 |:--------------|:----------------------------------------------|
 | whole image   | Sectors 2–3 and game end coverage (FuseX)     |
-| `$BA06`       | Title and label of WALL DONE                  |
 | `$C946`       | Limit per slot pair allows twice the launch cells: intended? |
-| `$B889`       | Shield count at column 5; leaflet says right  |
-| `$B850`       | Rows 0–3 cleared; panel is rows 0–5           |
-| `$F30A`       | Is it the title tune's data?                  |
-| `$BC1F`       | Schema of the three control-key sets          |
-| `$B812`       | Can the control panel shadow row 6?           |
+| `$B889`       | Shield count at row 3 col 5, not far right as the leaflet says |
 | `$B5F6`       | Column-0 vertical runs shade twice: visible?  |
 | `$B7B7`       | Bit 7: only the steering distances' sign bits? |
 | `$B3B0`       | A zero-length bar loops 256 times: document?  |
@@ -113,7 +103,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$FF70`       | Cover map `$FF` is the map's page byte (relocation) |
 | `$D48D`       | Label `shield_loss_due` (split `$D473`)       |
 | `$F840`       | Label the hostile slots' state bytes (split `$F473`) |
-| `$BBA2`       | Give `read_controls` an `R` row               |
 | `$D219`       | Note the movement flag +1 in the `D`          |
 | `$D2B5`       | Snapshot `$01` sets a blue border on the first click? |
 | `$C845`       | Push sets speed ±3 without new rates: visible? |
@@ -141,6 +130,10 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$9DC8`       | Label and render the eight shot graphics (`$7CD4` split) |
 | `$8B00`       | Label and render the three hull patterns (`$7CD4` split) |
 | `$B04F`       | Split `$B04F`, `$BE1E`, `$BE4D` into entries for `R` rows |
+| `$BD13`       | Merge `$BD13/$BD14`, `$BD21/$BD22` into words (`@ssub` at `$B5BD`, `$B60D`, `$B4C5`) |
+| `$BAC6`       | What is at `$F7F8–$F7FF`, above the stack's start? |
+| `$BB6D`       | Does any message wrap past column 31 within a third? |
+| `$F30A`       | Lay out the 3-byte note records with the title tune's `#AUDIO` render (stride rows need it) |
 | `$E141`       | Screen 55's last record runs into the next layout |
 | `$C955`       | Counter value `$17` for the defence device    |
 | `$B363`       | Shadow edge tests use the layout cell, not the drawn one |
@@ -162,7 +155,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `verify-frag`     | Renders `game.skool`; baseline keys `shadskim`   |
 | `diff_entries.py` | Skips untracked files                            |
 | `rules.md`        | No DEF-6/VIS-11 exemption for the glossary boxes |
-| `coverage`        | Counts a bare well-named CALL (ENT-7) as skeletal (`$CD86`) |
+| `coverage`        | Counts a bare well-named JP or CALL (ENT-7) as skeletal (`$61FD`, `$B000`, `$CD86`) |
 | label-namespace   | Roots miss the game loop                         |
 
 ### Closed
@@ -268,3 +261,13 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$BEEF`  | Says "adds 20 points"                               |
 | `$B4FB`  | No: `$B02A` restores `$B058` before every band      |
 | `$BEE0`  | Z only on an upward push with D 0; the hostile shot then launches from `$D2C3` (see `$BE3F`) |
+| `$BAA7`  | Unused copy of part of the key copy at `$F480`     |
+| `$BC68`  | Unused pattern draw steps; nothing copies them     |
+| `$BA3B`  | Folded into `t $BA06`                              |
+| `$BA45`  | Dead store: the control name sets it first         |
+| `$BA06`  | Titled "WALL DONE message"                         |
+| `$B850`  | The panel draw then overwrites rows 0–5            |
+| `$F30A`  | Title tune notes: 3-byte records, two parts        |
+| `$BC1F`  | Three 8-byte sets: flip, fire, up, down, left, right |
+| `$B812`  | No: every cell it tests holds mark 1               |
+| `$BBA2`  | `R` row O:A gives the control bits                 |

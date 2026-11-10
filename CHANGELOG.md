@@ -5,6 +5,7 @@
 ### Added
 
 - Graphics engine documented in depth (`$B080–$B3AF`): cell addresses, the graphic directory fields, cell masks, colour patterns, the pixel, colour, mark and shadow passes, with every basic block commented.
+- Control panel, menus, keys, the main loop, printing and the title tune wrapper documented in depth (`$B812–$BD43`, `$F000–$F472`), with every game variable defined and the title tune's note data identified. Every routine outside the encrypted title tune player is now documented.
 - Start-up, firing and hatchways documented in depth (`$61A8–$B07F`, `$BD44–$C09A`): the entry, screen clear and hull surface, the fire key, both shots' launch, flight, colours and marks, hits and pushes, and the hatchway animation's halves and phases.
 - Documented two more defects in the game: a failed shot launch writes `$FF` to the range byte instead of the direction (`$BE3F`), and a push at a shot's first cell can report the cell as free (`$BEED`).
 - The Skimmer documented in depth (`$C963–$CDE7`): its four moves and screen exits, the shared draw with its cover map and timing-matched skip, background saves and restores, blocking checks and pushes, and the image, flip and shield-loss frame tables with renders.
