@@ -4916,6 +4916,10 @@ N $F009 #R$F009@tune(The decrypted listing) shows these bytes as the game runs t
 b $F30A Title tune notes
 D $F30A The notes of the title tune that lie outside #R$F009(the encrypted player): the end of the tune's first part, then its second part.
 N $F30A Each note is a record of 3 bytes: the period of its first tone, the period of its second tone, then its length. A record with a length of 0 ends a part. The first part starts at #R$F1BF@tune(the first notes), inside the encrypted player. Its records run on into this block, and the second part follows its end record.
+N $F30A The clip plays the title tune's first part.
+N $F30A #HTML(#PUSHS #SIM($F472,$F45F,1,sp=$F7F8)#AUDIO1,$F021,$F027(title-tune-first-part.wav)#POPS)
+N $F30A The clip plays the title tune's second part.
+N $F30A #HTML(#PUSHS #SIM($F472,$F45F,1,sp=$F7F8)#AUDIO1,$F030,$F037(title-tune-second-part.wav)#POPS)
 @ $F45F label=crypt_title_tune
 c $F45F Decrypt or re-encrypt the title tune player
 D $F45F Decrypts the title tune player at #R$F009, or encrypts it again. XOR is its own inverse, so one pass does either.

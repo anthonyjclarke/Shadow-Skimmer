@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.4.0] 11-11-2026
+
+### Added
+
+- `tools/build_fusex.sh` builds the FuseX emulator; FuseX runs confirm sectors 2–3, the graphic-150 gates and the WALL DONE ending as the listing describes them.
+- Both title tune parts play at `$F30A` in the main listing.
+- `LD` operands are links; the tune listing names its operands.
+
+### Changed
+
+- The skill's upstream fixes (branch `shadskim-fixes` of the skill clone) are vendored: padded figure tables, flowing image grids, code-face links within a listing, one card colour, steady code row spacing, and the spec converter, which moved from `tools/spec_pages.py` into the skill.
+- The gate lints `src/tune.ctl` and holds the prose to the glossary's registry.
+- The Screens page flows its screens to fit the width.
+
 ## [0.3.0] 09-11-2026
 
 ### Added
@@ -7,7 +21,7 @@
 - The hatch of screen 91 opening step by step, graphic 24 with its dropped cell and graphics 104–109 in their colour patterns, each drawn by the game's own code; the tune parts as clips in the tune listing; "slide" and "noise run" in the glossary, and the project's name rulings in its Write/Not registry.
 - Sound clips inline at the code that makes each sound: the shot (`$BE1E`), the explosion (`$C44B`), the title tune (`$F000`) and the introduction, bridge and noise run in the tune listing.
 - Graphics engine documented in depth (`$B080–$B3AF`): cell addresses, the graphic directory fields, cell masks, colour patterns, the pixel, colour, mark and shadow passes, with every basic block commented.
-- Behaviour specification (`spec/*.md`, published on the site by `tools/spec_pages.py`, kept in this repo by owner ruling until the skill takes a generic converter): architecture, game flow, the hull, graphics, the control panel, the Skimmer, controls, hostile objects, shots, collisions, the economy, the score, effects and sound, and the state, actions, dynamics and rewards for an agent.
+- Behaviour specification (`spec/*.md`, published on the site): architecture, game flow, the hull, graphics, the control panel, the Skimmer, controls, hostile objects, shots, collisions, the economy, the score, effects and sound, and the state, actions, dynamics and rewards for an agent.
 - Sound page (`src/sound.ref`): the title tune whole and in its parts, the shot's clicks and the explosion, each captured by running the game's own code in SkoolKit's simulator.
 - Documented a defect in the game's data: screen 55's last layout record carries a stray run flag, so that graphic casts no shadow.
 - Screens page (`src/screens.ref`, `src/screens.py`): every outer hull screen, every inner section screen and the whole 10 × 11 hull map, each drawn by the game's own screen code in SkoolKit's simulator; the layout tables split into one labelled list per screen with the record format, and the readout variables at `$D473` split and defined.

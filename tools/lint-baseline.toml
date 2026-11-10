@@ -13,8 +13,8 @@ adopted = [
 ]
 
 [gate]
-generation = 14
-digest = "e4c25bf"
+generation = 16
+digest = "1df48be"
 
 [[finding]]
 check = "array-elements"
@@ -29,12 +29,6 @@ at = "$F009"
 message = "769 bytes with no sub-directive - the record size is stated in prose only, so no element is annotated"
 
 [[finding]]
-check = "array-elements"
-kind = "UNDECLARED"
-at = "$F30A"
-message = "341 bytes with no sub-directive - the record size is stated in prose only, so no element is annotated"
-
-[[finding]]
 check = "data-structure"
 kind = "UNTYPED"
 at = "$61A8"
@@ -45,9 +39,3 @@ check = "data-structure"
 kind = "UNTYPED"
 at = "$F009"
 message = "769 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"
-
-[[finding]]
-check = "data-structure"
-kind = "UNTYPED"
-at = "$F30A"
-message = "341 bytes with no sub-directives. Fix it in this order: render it; state the record length the code walks; model it as code if it is code; never a width chosen to clear this check. If this block was passing before, check whether a prose edit removed the #R that named its render's partner: the exemption needs the two blocks to name each other, and the link can be anywhere in the body"

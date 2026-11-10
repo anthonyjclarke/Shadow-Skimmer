@@ -122,7 +122,7 @@ The direction byte holds $FF while the shot is out of flight. The hostile object
 These hold the hostile objects and their moves. #TABLE(default)
 { =h Address | =h Label             | =h Holds                         | =h Values                      }
 { $F800      | `hostile_slots`      | The four hostile object slots    | 80 bytes per slot, below       }
-{ $C0AC      | `hostile_image_bufs` | Image buffer of each slot        | Addresses from $5B00           }
+{ $C0AC      | `hostile_image_bufs` | Image buffer of each slot        | Addresses over the printer buffer, from $5B00 }
 { $C947      | `hostile_screen_pos` | Record of the object that moves  | 16 bytes, below                }
 { $C95D      | `hostile_slot`       | Slot of the object that moves    | Address of the slot            }
 { $C958      | `hostile_tick`       | Count of the moves               | 0–255, even for the first pair }

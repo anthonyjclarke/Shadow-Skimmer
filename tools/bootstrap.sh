@@ -38,4 +38,5 @@ if [ ! -d external/fuse-for-macos ]; then
   git -C external/fuse-for-macos submodule update --init --recursive
 fi
 
-echo "Bootstrap done. Next: gmake restore   (then tools/build_fuse.sh to build Fuse)"
+echo "Bootstrap done. Next: gmake restore   (then tools/build_fuse.sh to build Fuse,"
+echo "and tools/build_fusex.sh to build FuseX)"

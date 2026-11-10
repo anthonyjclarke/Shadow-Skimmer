@@ -127,16 +127,3 @@ $(HTML_DIR)/.stamp: $(TUNE_SKOOL)
 # it is passed here.
 SKOOL2HTML += -c "Config/HtmlWriterClass=$(CURDIR)/src:screens.ScreenWriter"
 $(HTML_DIR)/.stamp: src/screens.py
-
-# --- The behaviour specification ----------------------------------------------
-#
-# spec/*.md is the single source. tools/spec_pages.py renders each file as a page
-# of the site into build/spec.ref. src/shadskim.ref names it in RefFiles as
-# ../build/spec.ref, which the site build reads relative to src/.
-SPEC_REF = $(BUILD)/spec.ref
-
-$(SPEC_REF): $(wildcard spec/*.md) spec tools/spec_pages.py $(SKOOL)
-	@mkdir -p $(dir $@)
-	python3 tools/spec_pages.py $@ $(SKOOL) $(wildcard spec/*.md)
-
-$(HTML_DIR)/.stamp: $(SPEC_REF)

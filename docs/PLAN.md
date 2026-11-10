@@ -75,9 +75,6 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Address       | Open question                                 |
 |:--------------|:----------------------------------------------|
-| whole image   | Sectors 2–3 and game end coverage (FuseX)     |
-| `$F30A`       | Render both tune parts here (blocked by SYNTH_ECHO on the schema) |
-| gate          | The gate's linters skip `src/tune.ctl`; wire them in |
 
 ### Names
 
@@ -87,26 +84,11 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 ### Skill (upstream)
 
+All 18 items are fixed on branch `shadskim-fixes` of the local skill clone (25 commits on `70b3589`), vendored here, and offered upstream as a PR. Until morozov/zx-spectrum-skills takes them, a fresh clone's `vendor-check` fails against the unmodified upstream skill.
+
 | Subject           | Open question                                    |
 |:------------------|:-------------------------------------------------|
-| `CHECK_terms`     | Passes no `--registry`                           |
-| `verify-frag`     | Renders `game.skool`; baseline keys `shadskim`   |
-| `diff_entries.py` | Skips untracked files                            |
-| `rules.md`        | No DEF-6/VIS-11 exemption for the glossary boxes |
-| `prose_units`     | Reads a Markdown pipe table as one sentence |
-| `spec_pages.py`   | Generic spec converter: move into the skill's `site/` (WORK-15). Kept in `tools/` by owner ruling 11-11-2026 until upstream takes it, since a vendored copy fails `vendor-check` on a fresh clone |
-| SYNTH_ECHO        | Fires on a data entry's field schema beside a clip (`$F30A`) |
-| `coverage`        | Counts a bare well-named JP or CALL (ENT-7) as skeletal (`$61FD`, `$B000`, `$CD86`) |
-| label-namespace   | Roots miss the game loop                         |
-| `extract_prose`   | Leaves `#R$addr(text)` as `$addr(text)`: false StackedAsides and AddressSubject hits |
-| `operand_subs`    | Wraps only the main skool's parser: the tune listing keeps raw operands; `LinkOperands` skips `LD` |
-| theme.css         | `*{padding:0}` leaves `#UDGTABLE`/`#TABLE` cells unpadded: captions touch |
-| theme.css         | Code-face rule `a[href*="asm/"]` misses same-listing links |
-| theme.css         | Catalog section cards alternate background by position (VIS-2) |
-| theme.css         | A wrapped comment stretches the spacing of the code rows beside it (VIS-9) |
-| theme.css         | Image tables cannot flow to fit the width (Screens grid fixed at 2 across) |
-| SYNTH_ECHO        | Also blocks clips at `$F0E2` and `$F043` (tone formula text) |
-| game.ref.template | No default `g` page header (`Asm-g`, `GameStatusBuffer`) |
+| PR                | Open the PR to morozov/zx-spectrum-skills (owner approval) |
 
 ### Closed
 
@@ -252,6 +234,9 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | inline audio | `$F30A–$F45E` in the tune snapshot; part clips at `$F021`, `$F030` |
 | `$F493`  | Stack reaches no lower than `$F7BC` (60 bytes); `$F493–$F7BB` unused |
 | lint-prose | Vale 3.26 installed; warnings fixed, the rest are extractor false positives |
+| whole image | FuseX runs reach sectors 2–3 and WALL DONE; no listing claim contradicted |
+| `$F30A`  | Both tune parts render here (SYNTH_ECHO narrowed in the skill) |
+| gate     | Other `.ctl` files (`src/tune.ctl`) run through 12 lint checks |
 | `$BE3F`  | Unreachable: C is always 3, so the push is down and no shot launches (`$C8FE`) |
 | `$C8C4`  | BUG note: a hostile shot fired right stops at column 30 |
 | `$D08A`  | A pass crossing two edges leaves by the side one, or by neither when that side edge is the map's |

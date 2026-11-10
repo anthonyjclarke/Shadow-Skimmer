@@ -5,29 +5,23 @@
 ; Addresses are the game's own, so they match the main listing.
 ;
 ; The file ends with the title tune notes from $F30A to $F45E, as the snapshot
-; holds them. They are an `i` block: the main listing documents them, and here
-; they only put the second part's notes, and the end of the first part's, into
-; the listing's memory, so its clips play each part to its end.
+; holds them. They are an `i` block: the main listing documents them, and
+; carries the clips of the tune's two parts.
 @ $F009 rom
 @ $F009 label=perform_title_tune
 c $F009 Title tune player
 D $F009 Plays the title tune: its introduction once, then its two parts over and over until the player presses a key. It encrypts itself again before it returns.
 N $F009 #TABLE(default) { =h Stage | =h Played by | =h Data } { Introduction | #R$F0A2, #R$F06C | #R$F043 to #R$F05C } { First part | #R$F104 | #R$F1BF } { Bridge | #R$F06C | #R$F065 } { Second part | #R$F104 | #R$F30A@main(the title tune notes) } { Noise run | #R$F0E2 | ROM bytes } TABLE#
 N $F009 After the noise run the tune starts again at its first part. A key stops it at the end of any note of the two parts.
-N $F009 The T-state counts of the tone and noise players leave out the ULA's waits. Each OUT to port $FE waits up to 6 T-states more while the ULA reads the display. The ULA does so for 128 T-states of each of the screen's 192 display lines.
 N $F009 The clip plays the introduction.
 N $F009 #HTML(#PUSHS #AUDIO1,$F009,$F021(title-tune-introduction.wav)#POPS)
   $F009 Play the introduction: a three-tone slide, a two-tone slide, then two more three-tone slides.
-N $F021 The clip plays the first part.
-N $F021 #HTML(#PUSHS #AUDIO1,$F021,$F027(title-tune-first-part.wav)#POPS)
 @ $F021 label=tune_repeat
   $F021 Play the first part. Did the player press a key?
   $F028 If so, stop.
 N $F02A The clip plays the bridge.
 N $F02A #HTML(#PUSHS #AUDIO1,$F02A,$F030(title-tune-bridge.wav)#POPS)
   $F02A Play the bridge, a two-tone slide.
-N $F030 The clip plays the second part.
-N $F030 #HTML(#PUSHS #AUDIO1,$F030,$F037(title-tune-second-part.wav)#POPS)
   $F030 Play the second part, whose notes follow the first part's in #R$F30A@main(the title tune notes). Did the player press a key?
   $F037 If so, stop.
 N $F039 The clip plays the noise run.
@@ -100,7 +94,7 @@ R $F0DA O:HL address of the next tone's period
 @ $F0E2 label=play_noise_run
 c $F0E2 Play the noise run
 D $F0E2 Plays the noise run that closes each round of the title tune.
-N $F0E2 Each pulse takes the next byte of the ROM. Times run from one OUT to the next. Pulse n holds the speaker high for 40 × n + 24 × m + 16 T-states, where m is its ROM byte (0 counts as 256). It then holds the speaker low for 40 × n + 43 T-states.
+N $F0E2 Each pulse takes the next byte of the ROM. Times run from one OUT to the next, with no #R$F11E(ULA wait states). Pulse n holds the speaker high for 40 × n + 24 × m + 16 T-states, where m is its ROM byte (0 counts as 256). It then holds the speaker low for 40 × n + 43 T-states.
 R $F0E2 I:D number of pulses
   $F0E2 Start with the shortest pulse and its ROM byte.
 @ $F0E7 label=noise_pulse
@@ -133,7 +127,8 @@ R $F104 O:C 0 at the end of the part, or 255 when the player presses a key
 c $F11E Play two tones
 D $F11E Plays two tones on the speaker at once for a given length.
 N $F11E Each tone keeps its own level and its own counter of passes. Each pass sends both levels to the speaker in turn, the first tone's then the second's. A tone's level flips once its counter runs out.
-N $F11E Every pass takes 96 T-states, except the last of each unit of length, which takes 97. The two levels go out 48 T-states apart, so each tone has the speaker for half the time. A tone of period P sounds at 3.5 MHz ÷ (192 × P), counting no ULA wait states. A unit of length is 24,577 T-states, about 7 ms.
+N $F11E Every pass takes 96 T-states, except the last of each unit of length, which takes 97. The two levels go out 48 T-states apart, so each tone has the speaker for half the time. A tone of period P sounds at 3.5 MHz ÷ (192 × P) with no ULA wait states. A unit of length is 24,577 T-states, about 7 ms.
+N $F11E Each OUT to port $FE waits up to 6 T-states more while the ULA reads the display. The ULA does so for 128 T-states of each of the screen's 192 display lines. The counts above leave those waits out.
 R $F11E I:IXh period of the first tone: the passes between flips of its level (0 for 256)
 R $F11E I:L period of the second tone
 R $F11E I:C length in units of 256 passes
@@ -159,7 +154,7 @@ R $F11E I:C length in units of 256 passes
 c $F154 Play three tones
 D $F154 Plays three tones on the speaker at once for a given length.
 N $F154 Each pass gives each of three levels a slot. In its slot a level goes to the speaker, unless its counter runs out. Then the level flips and nothing goes out, so the speaker holds the level of the slot before.
-N $F154 Every pass takes 118 T-states, except the last of each unit of length, which takes 119. The three slots last 31, 31 and 56 T-states, so the third level has the speaker for longest. A level whose counter restarts from period P sounds at 3.5 MHz ÷ (236 × P), counting no ULA wait states. A unit of length is 30,209 T-states, about 8.6 ms.
+N $F154 Every pass takes 118 T-states, except the last of each unit of length, which takes 119. The three slots last 31, 31 and 56 T-states, so the third level has the speaker for longest. A level whose counter restarts from period P sounds at 3.5 MHz ÷ (236 × P) with no #R$F11E(ULA wait states). A unit of length is 30,209 T-states, about 8.6 ms.
 N $F154 Each counter starts from its own period, then restarts from another's. So after the first counts, the third level, which has the speaker longest, sounds at the second period.
 N $F154 #TABLE(default) { =h Level | =h First count | =h Then every } { First | first period | third period } { Second | second period | first period } { Third | third period | second period } TABLE#
 R $F154 I:D first period (0 for 256)
@@ -200,7 +195,7 @@ R $F154 I:L length in units of 256 passes
   $F1BA,4 Next unit of length.
 @ $F1BF label=tune_part_1
 b $F1BF Title tune notes, start of the first part
-D $F1BF The first notes of the title tune's first part. The part runs on into #R$F30A@main(the title tune notes), where the note format is.
+D $F1BF The first notes of the title tune's first part, which #R$F009(the title tune player) plays. The part runs on into #R$F30A@main(the title tune notes), where the note format is.
 B $F1BF,330,3 Notes
 B $F309,1 Period of the first tone of the note that ends in #R$F30A@main(the title tune notes)
 i $F30A

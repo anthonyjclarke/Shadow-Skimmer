@@ -1,6 +1,6 @@
 # CLAUDE.md – Shadow Skimmer disassembly
 
-Target: ZX Spectrum 48K game *Shadow Skimmer* (The Edge, 1987), from the snapshot `SHADSKIM.Z80`. Not an ESP32 project: no `platformio.ini`, `config.h` or `debug.h` rules apply. This is a SkoolKit disassembly built on the `zx-game-disasm` skill in `external/zx-spectrum-skills/` (clone of morozov/zx-spectrum-skills). Version 0.1.0: code/data map done, byte-for-byte restore green, documentation not started.
+Target: ZX Spectrum 48K game *Shadow Skimmer* (The Edge, 1987), from the snapshot `SHADSKIM.Z80`. Not an ESP32 project: no `platformio.ini`, `config.h` or `debug.h` rules apply. This is a SkoolKit disassembly built on the `zx-game-disasm` skill in `external/zx-spectrum-skills/` (clone of morozov/zx-spectrum-skills). Version 0.4.0: every routine documented, graphics, screens, sound and a behaviour spec published, byte-for-byte restore green.
 
 ## Rules
 
@@ -19,8 +19,9 @@ Target: ZX Spectrum 48K game *Shadow Skimmer* (The Edge, 1987), from the snapsho
 - The skill's `$(Z80)` rule wants a tape (`.t2s`). The Makefile overrides it to copy `SHADSKIM.Z80`; the "overriding recipe" warning is expected.
 - pasmo lives in `.venv/bin` (built by `tools/bootstrap.sh`). Without it the framework preflight fails every goal except `restore`, `fuse` and `coverage`.
 - `skool2bin.py` flags are `-S`/`-E` (capital), not `-s`/`-e`.
+- `external/zx-spectrum-skills` is on branch `shadskim-fixes` (local skill fixes, PR pending). Until upstream takes them, a fresh clone of upstream fails `vendor-check`.
 - `$FA00+` is runtime workspace outside the image (IM 2 vector at `$FDFD`/`$FE00`), so it needs `@equ` constants, not labels.
 
 ## Fuse
 
-`tools/build_fuse.sh` builds the arm64 branch. It needs `MACOSX_DEPLOYMENT_TARGET=12.0`, since Xcode 27 rejects 11.5, and Homebrew ruby + jekyll for the help book. The output is `external/fuse-for-macos/fuse/fusepb/build/Deployment/Fuse.app`. The skill's `zx-fuse-driver` needs FuseX, a different emulator.
+`tools/build_fuse.sh` builds the arm64 branch. It needs `MACOSX_DEPLOYMENT_TARGET=12.0`, since Xcode 27 rejects 11.5, and Homebrew ruby + jekyll for the help book. The output is `external/fuse-for-macos/fuse/fusepb/build/Deployment/Fuse.app`. The skill's `zx-fuse-driver` needs FuseX, a different emulator: `tools/build_fusex.sh` builds its library into `external/fusex/` (set `FUSEX_LIB`/`FUSEX_ROMS`); the full `FuseX.app` also needs Apple's Metal Toolchain.

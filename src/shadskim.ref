@@ -4,7 +4,7 @@
 ; [Index:...], [Paths], [Links] and [Titles] lines, as it is written.
 
 [Config]
-RefFiles=glossary.ref;workspace.ref;graphics.ref;screens.ref;sound.ref;tune.ref;../build/spec.ref
+RefFiles=glossary.ref;workspace.ref;graphics.ref;screens.ref;sound.ref;tune.ref
 GameDir=shadskim
 ; #DRAWSCREEN(column,row,inside) draws one screen with the game's own code in
 ; SkoolKit's simulator: the screen clear, then the screen entry of the play
@@ -25,8 +25,26 @@ StyleSheet=skoolkit.css;theme.css;shadskim.css
 ; Hex anchors to match the hex-addressed .ctl (see [Paths] CodeFiles).
 AddressAnchor={address#IF({base}==16)(:04x)}
 
+; Link the operands a reader will chase, LD's pointers among them.
+LinkOperands=CALL,DEFW,DJNZ,JP,JR,LD
+
 Release=The Edge / Softek, 1987
 Copyright=Game &copy; 1987 The Edge / Softek. Disassembly for preservation and study.
+
+; [Index] lists the groups the home page draws, in this order: SkoolKit's own
+; list, then Spec, the behaviour pages the site build writes from spec/*.md.
+[Index]
+MemoryMaps
+Graphics
+DataTables
+OtherCode
+Reference
+Spec
+
+; SkoolKit heads the DataTables group "Data tables and buffers", storage words
+; for what the reader browses as the game's data and its variables (HEAD-2).
+[Index:DataTables:Game data]
+GameStatusBuffer
 
 ; Index headings group pages on the home page. Each name must match a
 ; [Page:...] or a generated page id.
@@ -36,7 +54,6 @@ Graphics
 Screens
 Sound
 Workspace
-tune-Index
 
 [Paths]
 CodeFiles={address:04X}.html
