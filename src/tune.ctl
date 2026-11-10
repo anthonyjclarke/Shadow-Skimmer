@@ -9,13 +9,19 @@ c $F009 Title tune player
 D $F009 Plays the title tune: its introduction once, then its two parts over and over until the player presses a key. It encrypts itself again before it returns.
 N $F009 #TABLE(default) { =h Stage | =h Played by | =h Data } { Introduction | #R$F0A2, #R$F06C | #R$F043 to #R$F05C } { First part | #R$F104 | #R$F1BF } { Bridge | #R$F06C | #R$F065 } { Second part | #R$F104 | #R$F30A@main(the title tune notes) } { Noise run | #R$F0E2 | ROM bytes } TABLE#
 N $F009 After the noise run the tune starts again at its first part. A key stops it at the end of any note of the two parts.
+N $F009 The clip plays the introduction.
+N $F009 #HTML(#PUSHS #AUDIO1,$F009,$F021(title-tune-introduction.wav)#POPS)
   $F009 Play the introduction: a three-tone slide, a two-tone slide, then two more three-tone slides.
 @ $F021 label=tune_repeat
   $F021 Play the first part. Did the player press a key?
   $F028 If so, stop.
+N $F02A The clip plays the bridge.
+N $F02A #HTML(#PUSHS #AUDIO1,$F02A,$F030(title-tune-bridge.wav)#POPS)
   $F02A Play the bridge, a two-tone slide.
   $F030 Play the second part, whose notes follow the first part's in #R$F30A@main(the title tune notes). Did the player press a key?
   $F037 If so, stop.
+N $F039 The clip plays the noise run.
+N $F039 #HTML(#PUSHS #AUDIO1,$F039,$F03E(title-tune-noise-run.wav)#POPS)
   $F039 Play the noise run, then the tune again from its first part.
 @ $F040 label=tune_done
   $F040 Encrypt the player again. The crypt routine returns to the player's caller.

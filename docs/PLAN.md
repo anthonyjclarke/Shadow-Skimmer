@@ -24,7 +24,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 | Target              | Lane | State                                |
 |:--------------------|:-----|:-------------------------------------|
-| Site pass (theme, page widths, inline audio, reader pass) | site | next |
+| Site pass (theme, page widths, inline audio, reader pass) | site | review |
 
 ---
 
@@ -103,15 +103,12 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$CD89`       | Split into its own entry for `R` rows         |
 | `$CBF3`       | Split the shared draw loop for its contract   |
 | `$CC57`       | Split for `R` rows                            |
-| site theme    | `#UDGTABLE` cells have no padding: captions touch (`$CD9C`, `$9520`) |
 | `$C28D`       | "pixel offset" → "horizontal offset" in the hostile entries |
 | `$CDC8`       | Split the unused first frame into its own `u` block? |
 | `$BE3F`       | Is the range `$FF` write reachable? Only via `$C8FE` (C AND 3 = 2) |
 | screens       | Renders show every defence device standing (graphic 150) |
 | graphics      | List the graphics no layout places on the Graphics page? |
-| inline audio  | Add `#AUDIO` at the owning blocks (`$BE1E`/`$CBA8`, `$C44B`, tune routines) |
-| Screens page  | 833 px wide at an 800 px window (3-across grid) |
-| `$B850`       | `D` says rows 0–3; the code clears rows 1–4 |
+| inline audio  | Tune part clips need `$F30A` in the tune snapshot; `$F0E2`/`$F043` clips wait on SYNTH_ECHO |
 | `$CEDB`       | Screen entry cancels a due shield loss; the indicator stays at 0 |
 | `$C8FE`       | Can C AND 3 be 2 after `update_hostile`? Shot with range 255 |
 | `$B04F`       | Split `$B04F`, `$BE1E`, `$BE4D` into entries for `R` rows |
@@ -120,18 +117,16 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$BB6D`       | Does any message wrap past column 31 within a third? |
 | `$F154`       | Crosswise counter reloads in the three-tone player: quirk? |
 | `$F11E`       | Tone formulas assume no contended port wait states |
-| `$F30A`       | Render both tune parts here (blocked by SYNTH_ECHO on the schema); link `#R$F1BF@tune` |
+| `$F30A`       | Render both tune parts here (blocked by SYNTH_ECHO on the schema) |
 | glossary      | Add "slide" and "noise run" (DEF-6)           |
 | gate          | The gate's linters skip `src/tune.ctl`; wire them in |
 | `tune`        | Raw operands in the tune listing (`operand_subs` reads only the main skool) |
-| `tune`        | Tune links use the prose face; try `tune-CodePath=tune/asm` |
 | lint-prose    | Vale is not installed, so the prose lint never runs |
 | `$9810`       | Unused graphics: confirm the 3×2 / 2×2 grouping |
 | `$6200`       | Entries 117/120 overlap 118/121; 119 points at ROM `$145C` |
 | `$99A0`       | Render the hatch at opening steps with the GX1 decoder |
 | `$C500`       | Link `#R$A018` instead of "after the explosion masks" |
 | glyph 10      | `?` reaches the second 0; no message prints `?` |
-| `g` pages     | `g` entries get SkoolKit's "Game status buffer" header |
 | graphic 35    | Names for graphics 77–79 and 86–87, cells of hatchway graphic 35 |
 | decoder       | Render graphic 24 with its dropped cell, and 104–109 in their colour patterns |
 | `$C955`       | Counter value `$17` for the defence device    |
@@ -159,6 +154,13 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | SYNTH_ECHO        | Fires on a data entry's field schema beside a clip (`$F30A`) |
 | `coverage`        | Counts a bare well-named JP or CALL (ENT-7) as skeletal (`$61FD`, `$B000`, `$CD86`) |
 | label-namespace   | Roots miss the game loop                         |
+| theme.css         | `*{padding:0}` leaves `#UDGTABLE`/`#TABLE` cells unpadded: captions touch |
+| theme.css         | Code-face rule `a[href*="asm/"]` misses same-listing links |
+| theme.css         | Catalog section cards alternate background by position (VIS-2) |
+| theme.css         | A wrapped comment stretches the spacing of the code rows beside it (VIS-9) |
+| theme.css         | Image tables cannot flow to fit the width (Screens grid fixed at 2 across) |
+| SYNTH_ECHO        | Also blocks clips at `$F0E2` and `$F043` (tone formula text) |
+| game.ref.template | No default `g` page header (`Asm-g`, `GameStatusBuffer`) |
 
 ### Closed
 
@@ -295,6 +297,11 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 | `$B5F6`  | No: shading twice changes nothing (24 screens simulated) |
 | layouts  | Every screen and the hull map rendered by the game's own code |
 | `#AUDIO`  | Sound page: every effect and the whole tune, from the game's own code |
+| `$B850`   | Clears rows 1–4 (`LD HL,$4021`, `LD BC,$201E`)      |
+| `g` pages | Headed "Variables" via `[PageHeaders]`/`[Titles]` |
+| Screens page | Two screens across: fits 800 px            |
+| inline audio | Clips at `$BE1E`, `$C44B`, `$F000`, `$F009` body |
+| `tune` links | `tune-CodePath=tune/asm`: code face from other pages |
 | `$D2CE`  | Clicks follow either side's shot; comments say "a shot" |
 | `$CC3C`  | The dummy read keeps the click rate independent of cover |
 | `$D2B5`  | No: the snapshot's `$01` never reaches the port     |

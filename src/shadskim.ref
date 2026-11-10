@@ -46,8 +46,12 @@ Screens=reference/screens.html
 Sound=reference/sound.html
 Workspace=reference/workspace.html
 tune-Index=tune/index.html
+; The tune listing's entry pages sit under an asm/ directory, as the main
+; listing's do, so that the theme sets links to them in the code face.
+tune-CodePath=tune/asm
 
 [Links]
+GameStatusBuffer=Variables
 Glossary=Glossary
 Graphics=Graphics
 Screens=Screens
@@ -56,9 +60,17 @@ Workspace=Workspace
 tune-Index=Title tune player
 
 [Titles]
+Asm-g=Variables at {entry[address]}
+GameStatusBuffer=Variables
 Glossary=Glossary
 Graphics=Graphics
 Screens=Screens
 Sound=Sound
 Workspace=Workspace
 tune-Index=Title tune player
+
+; The game's variables and the buffers it writes as it runs (the `g` entries),
+; under a name of this game's rather than SkoolKit's "Game status buffer".
+[PageHeaders]
+Asm-g=Variables
+GameStatusBuffer=Variables

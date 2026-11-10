@@ -4,6 +4,7 @@
 
 ### Added
 
+- Sound clips inline at the code that makes each sound: the shot (`$BE1E`), the explosion (`$C44B`), the title tune (`$F000`) and the introduction, bridge and noise run in the tune listing.
 - Graphics engine documented in depth (`$B080–$B3AF`): cell addresses, the graphic directory fields, cell masks, colour patterns, the pixel, colour, mark and shadow passes, with every basic block commented.
 - Behaviour specification (`spec/*.md`, published on the site by `tools/spec_pages.py`, kept in this repo by owner ruling until the skill takes a generic converter): architecture, game flow, the hull, graphics, the control panel, the Skimmer, controls, hostile objects, shots, collisions, the economy, the score, effects and sound, and the state, actions, dynamics and rewards for an agent.
 - Sound page (`src/sound.ref`): the title tune whole and in its parts, the shot's clicks and the explosion, each captured by running the game's own code in SkoolKit's simulator.
@@ -27,6 +28,14 @@
 - Screen layout interpreter documented in depth (`$B4D9–$B788`): the layout record format, runs, special graphics, launch cells, the WALL DONE screen and the defence device set-up.
 - Documented two more defects in the game: launch cells store their direction where the reader takes another bit, and a run records the last graphic's size, not its own cell, as the previous graphic's cell.
 - Documented a latent defect in the game: `$B096` maps every column past the right edge to column 32.
+
+### Changed
+
+- Site pass: the Screens page shows two screens across and fits an 800 px window; `g` pages are headed "Variables"; links into the tune listing use the code face.
+
+### Fixed
+
+- `$B850` blanks rows 1–4 of the screen, not rows 0–3.
 
 ## [0.2.0] 08-11-2026
 

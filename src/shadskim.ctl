@@ -1612,8 +1612,8 @@ R $B84B I:HL screen address of the top pixel row of the play area's first cell
   $B84B Blank each pixel row of the play area in turn, the full width of the screen.
 @ $B850 label=clear_screen_top
 c $B850 Clear the top of the screen
-D $B850 Blanks the pixels of the screen's top four rows, all but their first and last columns.
-  $B850 Start at the top pixel row, one column in.
+D $B850 Blanks the pixels of rows 1–4 of the screen, all but their first and last columns.
+  $B850 Start at the top pixel row of row 1, one column in.
 @ $B856 label=clear_pixel_rows
 N $B856 This loop blanks a block of pixel rows from #REGhl down the screen. #REGb counts the pixel rows, and #REGc holds the number of bytes along each row.
   $B856 Start a pixel row, with its width as the count.
@@ -2119,6 +2119,8 @@ R $BE11 I:DE step in the attribute mirror from the Skimmer's top-left cell to th
   $BE1A Point at the pulse laser shot's record, and take the direction back.
 @ $BE1E label=launch_shot
 N $BE1E This entry point launches the shot whose record #REGde points at, in direction #REGa, from the cell whose attribute mirror address #REGhl holds.
+N $BE1E The clip plays the launch of a hostile objects' shot.
+N $BE1E #HTML(#PUSHS #SIM($BAEB,$BAC6,1)#SIM($CF92,$BB17)#SIM($C906,execint=1)#SIM($CF95,execint=1)#AUDIO1,$CF95,$D11D,1(shot.wav)#POPS)
   $BE1E Store the direction, marked so that the shot holds its first cell until its next move.
   $BE22 Start the shot's clicks: the Skimmer draw clicks the speaker on every pixel row for two passes.
   $BE2C Store the range and the first cell, and point at the store for the saved colour.
@@ -2610,6 +2612,8 @@ D $C43E Paints the current hostile object's cells white on black and removes the
 @ $C44B label=explode_hostile
 c $C44B Animate a hostile object's explosion
 D $C44B Starts the current hostile object's explosion or shows its next frame. An explosion inside the hull destroys the sector's defence device.
+N $C44B The clip plays one explosion to its end.
+N $C44B #HTML(#PUSHS #SIM($BAEB,$BAC6,1)#SIM($CF92,$BB17)#SIM($C437,execint=1)#SIM($CF95,execint=1)#POKES$F940,$FF#AUDIO1,$CF95,$C448,1(explosion.wav)#POPS)
 R $C44B I:A state of the hostile object, $E0 or more to start the explosion
   $C44B Keep the state. Does the hold after a new screen run? Jump if so, and let the object vanish.
   $C453 Count it among the objects of the screen.
@@ -4851,6 +4855,8 @@ u $EEC2 Unused bytes
 @ $F000 label=play_title_tune
 c $F000 Play the title tune
 D $F000 Plays the title tune with interrupts off, over and over until the player presses a key.
+N $F000 The clip plays the tune's introduction and its first round.
+N $F000 #HTML(#PUSHS #SIM($F472,$F45F,1,sp=$F7F8)#AUDIO1,$F009,$F03E(title-tune.wav)#POPS)
   $F000,5 Play the tune with interrupts held off.
 @ $F006 label=run_title_tune
 c $F006 Decrypt and run the title tune player
@@ -4862,7 +4868,7 @@ N $F009 #R$F009@tune(The decrypted listing) shows these bytes as the game runs t
 @ $F30A label=title_tune_notes
 b $F30A Title tune notes
 D $F30A The notes of the title tune that lie outside #R$F009(the encrypted player): the end of the tune's first part, then its second part.
-N $F30A Each note is a record of 3 bytes: the period of its first tone, the period of its second tone, then its length. A record with a length of 0 ends a part. The first part starts inside the encrypted player. Its records run on into this block, and the second part follows its end record.
+N $F30A Each note is a record of 3 bytes: the period of its first tone, the period of its second tone, then its length. A record with a length of 0 ends a part. The first part starts at #R$F1BF@tune(the first notes), inside the encrypted player. Its records run on into this block, and the second part follows its end record.
 @ $F45F label=crypt_title_tune
 c $F45F Decrypt or re-encrypt the title tune player
 D $F45F Decrypts the title tune player at #R$F009, or encrypts it again. XOR is its own inverse, so one pass does either.
