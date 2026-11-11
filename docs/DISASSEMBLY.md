@@ -102,16 +102,6 @@ The gate is green against a recorded starting point: `CHECKS PASS [SkoolKit 10.1
 
 ---
 
-## Next steps (the skill's stages 3–5)
+## Since the map phase
 
-1. Run `gmake hooks` to point git at the skill's pre-commit hook, which refuses a commit with no Challenger review record. It was left for the owner to run, because it makes git execute scripts from `external/`.
-2. Make the first commit on `main` (then branch `dev` for the work), once you have decided whether `SHADSKIM.Z80` and the original zip belong in a repository that may be pushed.
-3. Dig-tasks:
-   - the stub at `$61A8` (it looks like a relocator)
-   - the title tune's `#AUDIO` render, which lays out the note records of `$F1BF` (tune listing) and `$F30A`
-   - `$F30A–$F45E`
-   - the text block at `$B89F` (menu, keys, end-of-game messages: x, y, colour, text, `$FF`/`$00` terminators)
-4. Run the skill's Manager/Worker/Challenger loop (`references/roles/`) routine by routine: contracts, line comments, `@equ` for `$FA00+`, `#UDG` sprites, `#AUDIO`, the behaviour spec, and the HTML site.
-5. Prove relocatability by permuting one block and running both images under `zx-fuse-driver` (FuseX), as `references/build-verify.md` describes.
-
-The skill's `zx-fuse-driver` targets **FuseX** (`speccytools/fusex`), not Fuse for macOS. Fuse for macOS is the interactive test bed here (`gmake fuse`). FuseX is a separate build if the automated profiling and relocation proof are wanted.
+This file records the map phase (v0.1.0). Stages 3–5 are done: the hook is installed, every routine is documented, the catalogs and the behaviour spec are published, and the dig-tasks above are closed. `CHANGELOG.md` and `docs/PLAN.md` hold the history, and `README.md` the method. The snapshot is no longer tracked; each user supplies it, and the Makefile checks its SHA-256.

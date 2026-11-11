@@ -61,7 +61,19 @@ endif
 # The game comes as a snapshot, not a tape, so the snapshot the skill's build
 # would make with tap2sna.py is a copy of the original. ($(T2S) stays a
 # prerequisite of the skill's rule; src/shadskim.t2s records the provenance.)
+#
+# The snapshot is not distributed with the source: each user supplies their own
+# copy, checked here against the SHA-256 of the one this disassembly was made
+# from.
+ORIGINAL_SHA256 = 3adeb924bdf5e85ea5e7086a77dd57b2546291fd893cef08f90cf2019bd29183
+
+$(ORIGINAL):
+	$(error $(ORIGINAL) not found: put your copy of the snapshot in the project root (see README, "Getting the snapshot"))
+
 $(Z80): $(ORIGINAL)
+	@test "$$(shasum -a 256 $< | cut -d' ' -f1)" = "$(ORIGINAL_SHA256)" || \
+	  { echo "$<: SHA-256 differs from the snapshot this disassembly was made from" >&2; exit 1; }
+	@echo "$<: SHA-256 matches $(ORIGINAL_SHA256)"
 	@mkdir -p $(dir $@)
 	cp $< $@
 

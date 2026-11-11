@@ -4,3 +4,9 @@ __pycache__/
 .venv/
 external/
 .DS_Store
+
+# The game itself is not distributed: supply your own snapshot (see README).
+SHADSKIM.Z80
+*.z80.zip
+ShadowSkimmer.txt
+ShadowSkimmer.jpg

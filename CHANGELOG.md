@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.1] 11-11-2026
+
+### Changed
+
+- The game files (`SHADSKIM.Z80`, the zipped copy, the leaflet text and the magazine map scan) are removed from the repository and from its history. Each user supplies the snapshot; the Makefile stops with a clear message when it is missing and checks its SHA-256 before the build.
+
 ## [0.4.0] 11-11-2026
 
 ### Added

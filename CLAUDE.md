@@ -1,6 +1,6 @@
 # CLAUDE.md – Shadow Skimmer disassembly
 
-Target: ZX Spectrum 48K game *Shadow Skimmer* (The Edge, 1987), from the snapshot `SHADSKIM.Z80`. Not an ESP32 project: no `platformio.ini`, `config.h` or `debug.h` rules apply. This is a SkoolKit disassembly built on the `zx-game-disasm` skill in `external/zx-spectrum-skills/` (clone of morozov/zx-spectrum-skills). Version 0.4.0: every routine documented, graphics, screens, sound and a behaviour spec published, byte-for-byte restore green.
+Target: ZX Spectrum 48K game *Shadow Skimmer* (The Edge, 1987), from the snapshot `SHADSKIM.Z80`, which is not tracked: each user supplies it, and the Makefile checks its SHA-256. Not an ESP32 project: no `platformio.ini`, `config.h` or `debug.h` rules apply. This is a SkoolKit disassembly built on the `zx-game-disasm` skill in `external/zx-spectrum-skills/` (clone of morozov/zx-spectrum-skills). Version 0.4.1: every routine documented, graphics, screens, sound and a behaviour spec published, byte-for-byte restore green.
 
 ## Rules
 

@@ -2,7 +2,7 @@
 
 A complete, commented and reassemblable disassembly of *Shadow Skimmer* (The Edge / Softek, 1987, by John Marshall and Jack Wilkes). It is built from the snapshot `SHADSKIM.Z80` with [SkoolKit](https://skoolkit.ca) and the [`zx-game-disasm`](https://github.com/morozov/zx-spectrum-skills) skill, and published as an HTML site with every graphic, screen and sound rendered by the game's own code.
 
-**Status (v0.4.0, 11-11-2026):** finished. `gmake restore` rebuilds `SHADSKIM.Z80` from source, identical to the original byte for byte. The skill's full gate passes, and every diff since the code map has been approved by an independent review.
+**Status (v0.4.1, 11-11-2026):** finished. `gmake restore` rebuilds `SHADSKIM.Z80` from source, identical to the original byte for byte. The skill's full gate passes, and every diff since the code map has been approved by an independent review.
 
 ---
 
@@ -28,7 +28,21 @@ The listing records eleven defects as BUG notes, in the code and in the game's d
 
 ## Quick start
 
-macOS on Apple silicon, with Xcode and Homebrew. Run these once on a fresh checkout:
+macOS on Apple silicon, with Xcode and Homebrew.
+
+### Getting the snapshot
+
+The game itself is not in this repository. Put your own copy of the snapshot in the project root as `SHADSKIM.Z80`. The copy this disassembly was made from is a version 3 `.z80` file of 41,483 bytes. [Spectrum Computing](https://spectrumcomputing.co.uk/entry/4426) and [World of Spectrum](https://worldofspectrum.org/archive/software/games/shadow-skimmer-the-edge) archive the game, but their downloads have not been checked against it. The build checks the snapshot's SHA-256 before anything else:
+
+```
+3adeb924bdf5e85ea5e7086a77dd57b2546291fd893cef08f90cf2019bd29183  SHADSKIM.Z80
+```
+
+A different dump of the game fails that check, and the disassembly will not match it.
+
+### Build
+
+Run these once on a fresh checkout:
 
 ```bash
 tools/bootstrap.sh
@@ -109,7 +123,7 @@ The work turned up 18 defects in the skill itself. They include checks that misf
 
 ### Sources
 
-- `ShadowSkimmer.txt`: the game's leaflet text, which backs the game's own words ("mothership", "pulse lasers").
+- The game's leaflet text (not included), which backs the game's own words ("mothership", "pulse lasers").
 - The instructions archived at [nvg.ntnu.no](https://rk.nvg.ntnu.no/sinclair/instructions/shadowsk.html) come from a different edition. They say "liner" and "welding lasers", and put the shield count at top left, where the code prints it.
 - [Spectrum Computing entry 4426](https://spectrumcomputing.co.uk/entry/4426) and [World of Spectrum](https://worldofspectrum.org/archive/software/games/shadow-skimmer-the-edge) for the release details.
 
@@ -159,7 +173,7 @@ The figures are summed from the session transcripts. Cache reads dominate: each 
 ## Potential issues
 
 - **The vendored skill is ahead of upstream.** `tools/bootstrap.sh` clones the unmodified upstream skill. Until [PR #1](https://github.com/morozov/zx-spectrum-skills/pull/1) is merged, a fresh clone fails `vendor-check`. Switch `external/zx-spectrum-skills` to the `shadskim-fixes` branch of [the fork](https://github.com/anthonyjclarke/zx-spectrum-skills) to build.
-- **Copyright.** The game is © 1987 The Edge / Softek. This repo includes `SHADSKIM.Z80`, a zipped copy, the leaflet text and a cover image, because the build needs the snapshot as its ground truth. The disassembly is for preservation and study.
+- **Copyright.** The game is © 1987 The Edge / Softek. This repository does not include it: you supply your own snapshot, and the build checks its SHA-256. The disassembly is for preservation and study.
 - **macOS only.** The bootstrap and build scripts assume Apple silicon with Homebrew and Xcode. FuseX also needs Apple's Metal Toolchain for its GUI app; the headless library builds without it.
 - **Unpinned tools.** SkoolKit is pinned to 10.1, but Vale's style packages and the `markdown` package are not pinned. A newer release may change the prose lint's findings.
 - **Advisory prose findings remain.** `gmake lint-prose` reports 147 advisory findings: passives with no actor, Oxford commas the project does not use, sentences over Microsoft's length limit, three adverbs and two British logical quotes. They are left by choice.
@@ -171,7 +185,7 @@ The figures are summed from the session transcripts. Cache reads dominate: each 
 
 | Path                     | Holds                                        |
 |:-------------------------|:---------------------------------------------|
-| `SHADSKIM.Z80`           | The original snapshot (ground truth)         |
+| `SHADSKIM.Z80`           | Your copy of the snapshot (not tracked)      |
 | `src/shadskim.ctl`       | Control file for the code block              |
 | `src/tune.ctl`           | The decrypted title tune player              |
 | `src/environment.ctl`    | Screen, system vars, BASIC, top of RAM       |
