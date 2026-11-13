@@ -1,4 +1,4 @@
 skoolkit==10.1
 pillow
 numpy
-markdown
+markdown==3.11.3

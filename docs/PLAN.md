@@ -84,7 +84,7 @@ The Manager's plan and dig-task queue (`references/roles/manager.md`). It has on
 
 ### Skill (upstream)
 
-All 18 items are fixed on branch `shadskim-fixes` of the local skill clone (25 commits on `70b3589`), vendored here, and offered upstream as a PR. Until morozov/zx-spectrum-skills takes them, a fresh clone's `vendor-check` fails against the unmodified upstream skill.
+All 18 items were fixed on branch `shadskim-fixes` (25 commits on `70b3589`, then 12 that answered the author's review). morozov/zx-spectrum-skills merged them as PR #1 (`95b22d5`, 13-11-2026), and the skill clone now tracks upstream `main`.
 
 | Subject           | Open question                                    |
 |:------------------|:-------------------------------------------------|

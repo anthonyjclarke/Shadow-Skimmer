@@ -1,6 +1,6 @@
 # CLAUDE.md – Shadow Skimmer disassembly
 
-Target: ZX Spectrum 48K game *Shadow Skimmer* (The Edge, 1987), from the snapshot `SHADSKIM.Z80`, which is not tracked: each user supplies it, and the Makefile checks its SHA-256. Not an ESP32 project: no `platformio.ini`, `config.h` or `debug.h` rules apply. This is a SkoolKit disassembly built on the `zx-game-disasm` skill in `external/zx-spectrum-skills/` (clone of morozov/zx-spectrum-skills). Version 0.4.1: every routine documented, graphics, screens, sound and a behaviour spec published, byte-for-byte restore green.
+Target: ZX Spectrum 48K game *Shadow Skimmer* (The Edge, 1987), from the snapshot `SHADSKIM.Z80`, which is not tracked: each user supplies it, and the Makefile checks its SHA-256. Not an ESP32 project: no `platformio.ini`, `config.h` or `debug.h` rules apply. This is a SkoolKit disassembly built on the `zx-game-disasm` skill in `external/zx-spectrum-skills/` (clone of morozov/zx-spectrum-skills). Version 0.4.2: every routine documented, graphics, screens, sound and a behaviour spec published, byte-for-byte restore green.
 
 ## Rules
 
@@ -19,7 +19,7 @@ Target: ZX Spectrum 48K game *Shadow Skimmer* (The Edge, 1987), from the snapsho
 - The skill's `$(Z80)` rule wants a tape (`.t2s`). The Makefile overrides it to copy `SHADSKIM.Z80`; the "overriding recipe" warning is expected.
 - pasmo lives in `.venv/bin` (built by `tools/bootstrap.sh`). Without it the framework preflight fails every goal except `restore`, `fuse` and `coverage`.
 - `skool2bin.py` flags are `-S`/`-E` (capital), not `-s`/`-e`.
-- `external/zx-spectrum-skills` is on branch `shadskim-fixes` (local skill fixes, PR pending). Until upstream takes them, a fresh clone of upstream fails `vendor-check`.
+- `external/zx-spectrum-skills` tracks upstream `main`; our skill fixes were merged there (PR #1, `95b22d5`). If upstream changes `site/`, run `gmake vendor`, then run `gmake lint-baseline` if the gate digest moves.
 - `$FA00+` is runtime workspace outside the image (IM 2 vector at `$FDFD`/`$FE00`), so it needs `@equ` constants, not labels.
 
 ## Fuse

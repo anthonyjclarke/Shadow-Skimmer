@@ -2,7 +2,7 @@
 
 A complete, commented and reassemblable disassembly of *Shadow Skimmer* (The Edge / Softek, 1987, by John Marshall and Jack Wilkes). It is built from the snapshot `SHADSKIM.Z80` with [SkoolKit](https://skoolkit.ca) and the [`zx-game-disasm`](https://github.com/morozov/zx-spectrum-skills) skill, and published as an HTML site with every graphic, screen and sound rendered by the game's own code.
 
-**Status (v0.4.1, 11-11-2026):** finished. `gmake restore` rebuilds `SHADSKIM.Z80` from source, identical to the original byte for byte. The skill's full gate passes, and every diff since the code map has been approved by an independent review.
+**Status (v0.4.2, 14-11-2026):** finished. `gmake restore` rebuilds `SHADSKIM.Z80` from source, identical to the original byte for byte. The skill's full gate passes, and every diff since the code map has been approved by an independent review.
 
 ---
 
@@ -101,7 +101,7 @@ Most checkpoints took one or two SPLIT rounds before COMMIT. The Challenger caug
 
 ### Upstream skill fixes
 
-The work turned up 18 defects in the skill itself. They include checks that misfired on link text, the gate skipping the tune listing's control file, theme layout faults, and a generic spec converter living in this repo. They are fixed in 25 commits, each with a test fixture, on branch `shadskim-fixes` of a fork. They are offered upstream as [morozov/zx-spectrum-skills#1](https://github.com/morozov/zx-spectrum-skills/pull/1), and vendored here in `vendor/zx-game-disasm/`.
+The work turned up 18 defects in the skill itself. They include checks that misfired on link text, the gate skipping the tune listing's control file, theme layout faults, and a generic spec converter living in this repo. They are fixed in 25 commits, each with a test fixture, on branch `shadskim-fixes` of a fork. The skill's author reviewed them, and 12 more commits answered that review. He merged them upstream as [morozov/zx-spectrum-skills#1](https://github.com/morozov/zx-spectrum-skills/pull/1), and they are vendored here in `vendor/zx-game-disasm/`.
 
 ---
 
@@ -172,10 +172,10 @@ The figures are summed from the session transcripts. Cache reads dominate: each 
 
 ## Potential issues
 
-- **The vendored skill is ahead of upstream.** `tools/bootstrap.sh` clones the unmodified upstream skill. Until [PR #1](https://github.com/morozov/zx-spectrum-skills/pull/1) is merged, a fresh clone fails `vendor-check`. Switch `external/zx-spectrum-skills` to the `shadskim-fixes` branch of [the fork](https://github.com/anthonyjclarke/zx-spectrum-skills) to build.
+- **The skill is not pinned.** `tools/bootstrap.sh` clones upstream `main`, which this build was last checked against at `95b22d5`. A later upstream change to the skill's site files fails `vendor-check` until `gmake vendor` copies it in, and a new gate generation may report findings the baseline does not hold.
 - **Copyright.** The game is © 1987 The Edge / Softek. This repository does not include it: you supply your own snapshot, and the build checks its SHA-256. The disassembly is for preservation and study.
 - **macOS only.** The bootstrap and build scripts assume Apple silicon with Homebrew and Xcode. FuseX also needs Apple's Metal Toolchain for its GUI app; the headless library builds without it.
-- **Unpinned tools.** SkoolKit is pinned to 10.1, but Vale's style packages and the `markdown` package are not pinned. A newer release may change the prose lint's findings.
+- **Unpinned tools.** SkoolKit is pinned to 10.1 and `markdown` to 3.11.3, but Vale's style packages are not pinned. A newer release may change the prose lint's findings.
 - **Advisory prose findings remain.** `gmake lint-prose` reports 147 advisory findings: passives with no actor, Oxford commas the project does not use, sentences over Microsoft's length limit, three adverbs and two British logical quotes. They are left by choice.
 - **One question has no answer.** Nothing in the game or either leaflet names the animated 3×3 graphic at `$95D0`.
 

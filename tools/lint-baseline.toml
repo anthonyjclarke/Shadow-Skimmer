@@ -21,7 +21,7 @@ adopted = [
 
 [gate]
 generation = 20
-digest = "2504541"
+digest = "73dc819"
 
 [[finding]]
 check = "array-elements"

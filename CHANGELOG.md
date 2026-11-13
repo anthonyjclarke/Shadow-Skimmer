@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2] 14-11-2026
+
+### Changed
+
+- The skill is now upstream `main` (`95b22d5`), which merged this project's skill fixes, and the fixes for the author's review, as morozov/zx-spectrum-skills#1. The vendored site files match it (`theme.css`, `site.mk`, `spec_pages.py`, `render/font.py`), including two upstream changes: a project's own padding on image cells now wins, and the font generator gains a double-height mode. `tools/lint-baseline.toml` is re-recorded under gate 20, which adds per-listing scopes for `src/tune.ctl` with no findings.
+- `tools/requirements.txt` pins `markdown==3.11.3`, the version the skill's spec-page fixture is recorded under.
+
 ## [0.4.1] 11-11-2026
 
 ### Changed
