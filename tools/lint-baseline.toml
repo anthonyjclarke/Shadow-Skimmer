@@ -1,20 +1,27 @@
 adopted = [
   "array-elements",
+  "array-elements@tune.ctl",
   "byte-counts",
+  "byte-counts@tune.ctl",
   "comments",
+  "comments@tune.ctl",
   "data-structure",
   "html-layout",
   "identity",
+  "identity@tune.ctl",
   "images",
   "label-namespace",
+  "label-namespace@tune.ctl",
   "prose-names",
+  "prose-names@tune.ctl",
   "publication",
   "registers",
+  "registers@tune.ctl",
 ]
 
 [gate]
-generation = 16
-digest = "1df48be"
+generation = 20
+digest = "2504541"
 
 [[finding]]
 check = "array-elements"
