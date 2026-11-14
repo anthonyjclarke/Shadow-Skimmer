@@ -10,3 +10,6 @@ SHADSKIM.Z80
 *.z80.zip
 ShadowSkimmer.txt
 ShadowSkimmer.jpg
+
+# Local-only graphics extract pack (game assets, never distributed).
+/graphics-pack/
