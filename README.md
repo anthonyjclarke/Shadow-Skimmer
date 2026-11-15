@@ -172,7 +172,7 @@ The figures are summed from the session transcripts. Cache reads dominate: each 
 
 ## Potential issues
 
-- **The skill is not pinned.** `tools/bootstrap.sh` clones upstream `main`, which this build was last checked against at `95b22d5`. A later upstream change to the skill's site files fails `vendor-check` until `gmake vendor` copies it in, and a new gate generation may report findings the baseline does not hold.
+- **The skill is not pinned.** `tools/bootstrap.sh` clones upstream `main`, which this build was last checked against at `66ab702`. A later upstream change to the skill's site files fails `vendor-check` until `gmake vendor` copies it in, and a new gate generation may report findings the baseline does not hold.
 - **Copyright.** The game is © 1987 The Edge / Softek. This repository does not include it: you supply your own snapshot, and the build checks its SHA-256. The disassembly is for preservation and study.
 - **macOS only.** The bootstrap and build scripts assume Apple silicon with Homebrew and Xcode. FuseX also needs Apple's Metal Toolchain for its GUI app; the headless library builds without it.
 - **Unpinned tools.** SkoolKit is pinned to 10.1 and `markdown` to 3.11.3, but Vale's style packages are not pinned. A newer release may change the prose lint's findings.
